@@ -1,0 +1,41 @@
+{
+	"source": "assets/candid.svg",
+	"current": 2,
+	"gravity": [0, -20],
+	"debug": true,
+	"ground": true,
+	"groups":
+	{
+		"default":
+		{
+			"structure": "triangulate",
+			"innerStructureDef": 0.02,
+			"physics":
+			{
+				"bodyType": "soft",
+				"nodesDiameter": 1,
+				"mass": 1,
+				"distanceConstraint":
+				{
+					"stiffness": 1000,
+					"relaxation": 0.1
+				}
+			}
+		},
+		"soft":
+		{
+			"structure": "preciseHexaFill",
+			"innerStructureDef": 0.02,
+			"physics":
+			{
+				"nodesDiameter": 1,
+				"mass": 1,
+				"distanceConstraint":
+				{
+					"stiffness": 1000,
+					"relaxation": 0.1
+				}
+			}
+		}
+	}
+}

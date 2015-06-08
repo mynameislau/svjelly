@@ -1,0 +1,263 @@
+Searching 2 files for "Coral" (case sensitive)
+
+/Users/Lau/www/svjelly/src/svjellymaker.js:
+    1: var CoralWorld = require('./core/CoralWorld');
+    2: var CoralDraw = require('./renderer/CoralDraw');
+    3  var SVGParser = require('./core/SVGParser');
+    4  var P2PhysicsManager = require('./physics/P2PhysicsManager');
+    5: var CoralUtils = require('./core/CoralUtils');
+    6  var confObject = require('./core/ConfObject');
+    7  
+    .
+   26  		{
+   27  			var JSONConfig = JSON.parse($configData);
+   28: 			sceneViewer.conf = CoralUtils.extend(confObject, JSONConfig);
+   29  
+   30  			svjellyMaker.loadFile(sceneViewer.conf.source, function ($SVG) { sceneViewer.create($SVG); }, true);
+   ..
+   62  				{
+   63  					var JSONConfig = JSON.parse($configData);
+   64: 					appendCanvas(CoralUtils.extend(confObject, JSONConfig));
+   65  				});
+   66  			}
+   ..
+   83  
+   84  		var PhysicsManager = this.physicsManager || P2PhysicsManager;
+   85: 		var coralWorld = new CoralWorld(new PhysicsManager(conf), conf);
+   86  
+   87  		var requestID = '';
+   ..
+   99  		canvas.style.transform = 'scale(' + 1 / canvasDefinition + ')';
+  100  
+  101: 		var Renderer = this.renderer || CoralDraw;
+  102  		var coralDraw = new Renderer(coralWorld, canvas);
+  103  
+
+10 matches in 1 file
+
+
+Searching 0 files for "Coral" (case sensitive)
+
+0 matches
+
+Searching 50 files for "Coral" (case sensitive)
+
+/Users/Lau/www/svjelly/src/svjellymaker.js:
+    1: var CoralWorld = require('./core/CoralWorld');
+    2: var CoralDraw = require('./renderer/CoralDraw');
+    3  var SVGParser = require('./core/SVGParser');
+    4  var P2PhysicsManager = require('./physics/P2PhysicsManager');
+    5: var CoralUtils = require('./core/CoralUtils');
+    6  var confObject = require('./core/ConfObject');
+    7  
+    .
+   26  		{
+   27  			var JSONConfig = JSON.parse($configData);
+   28: 			sceneViewer.conf = CoralUtils.extend(confObject, JSONConfig);
+   29  
+   30  			svjellyMaker.loadFile(sceneViewer.conf.source, function ($SVG) { sceneViewer.create($SVG); }, true);
+   ..
+   62  				{
+   63  					var JSONConfig = JSON.parse($configData);
+   64: 					appendCanvas(CoralUtils.extend(confObject, JSONConfig));
+   65  				});
+   66  			}
+   ..
+   83  
+   84  		var PhysicsManager = this.physicsManager || P2PhysicsManager;
+   85: 		var coralWorld = new CoralWorld(new PhysicsManager(conf), conf);
+   86  
+   87  		var requestID = '';
+   ..
+   99  		canvas.style.transform = 'scale(' + 1 / canvasDefinition + ')';
+  100  
+  101: 		var Renderer = this.renderer || CoralDraw;
+  102  		var coralDraw = new Renderer(coralWorld, canvas);
+  103  
+
+/Users/Lau/www/svjelly/src/core/CoralGroup.js:
+    1: var CoralNode = require('./CoralNode');
+    2: var CoralJoint = require('./CoralJoint');
+    3  
+    4: var CoralGroup = function ($type, $conf)
+    5  {
+    6  	this.physicsManager = undefined;
+    .
+   11  };
+   12  
+   13: CoralGroup.prototype.getNodeAtPoint = function ($x, $y)
+   14  {
+   15  	for (var i = 0, nodesLength = this.nodes.length; i < nodesLength; i += 1)
+   ..
+   24  };
+   25  
+   26: CoralGroup.prototype.createNode = function ($px, $py, $options, $overwrite)
+   27  {
+   28  	var node = this.getNodeAtPoint($px, $py);
+   ..
+   33  	else
+   34  	{
+   35: 		node = new CoralNode($px, $py, $options);
+   36  		this.nodes.push(node);
+   37  	}
+   ..
+   42  };
+   43  
+   44: CoralGroup.prototype.getBoundingBox = function ()
+   45  {
+   46  	var minX;
+   ..
+   59  };
+   60  
+   61: CoralGroup.prototype.createJoint = function ($p1x, $p1y, $p2x, $p2y)
+   62  {
+   63  	var node1 = this.getNodeAtPoint($p1x, $p1y);
+   ..
+   83  	}
+   84  
+   85: 	var joint = new CoralJoint(node1, node2);
+   86  
+   87  	this.joints.push(joint);
+   ..
+   90  };
+   91  
+   92: CoralGroup.prototype.createNodesFromPoints = function ($coordsArray)
+   93  {
+   94  	var coordsArrayLength = $coordsArray.length;
+   ..
+  102  };
+  103  
+  104: CoralGroup.prototype.createJointsFromPoints = function ($coordsArray, $noClose)
+  105  {
+  106  	var coordsArrayLength = $coordsArray.length;
+  ...
+  117  };
+  118  
+  119: CoralGroup.prototype.addNodesToWorld = function ()
+  120  {
+  121  	this.physicsManager.addNodesToWorld();
+  122  };
+  123  
+  124: CoralGroup.prototype.addJointsToWorld = function ()
+  125  {
+  126  	this.physicsManager.addJointsToWorld();
+  127  };
+  128  
+  129: module.exports = CoralGroup;
+  130  
+  131  
+
+/Users/Lau/www/svjelly/src/core/CoralJoint.js:
+    1: var CoralJoint = function ($node1, $node2)
+    2  {
+    3  	this.node1 = $node1;
+    .
+    5  };
+    6  
+    7: module.exports = CoralJoint;
+    8  
+    9  
+
+/Users/Lau/www/svjelly/src/core/CoralNode.js:
+    1: var CoralNode = function ($oX, $oY, $options)
+    2  {
+    3  	this.jointsArray = [];
+    .
+   12  
+   13  //raccourci
+   14: CoralNode.prototype.setOptions = function ($options)
+   15  {
+   16  	if ($options)
+   ..
+   21  };
+   22  
+   23: CoralNode.prototype.getX = function ()
+   24  {
+   25  	return this.physicsManager.getX();
+   ..
+   27  
+   28  //raccourci
+   29: CoralNode.prototype.getY = function ()
+   30  {
+   31  	return this.physicsManager.getY();
+   32  };
+   33  
+   34: module.exports = CoralNode;
+   35  
+   36  
+
+/Users/Lau/www/svjelly/src/core/CoralWorld.js:
+    1: var CoralGroup = require('./CoralGroup');
+    2  var Structure = require('./Structure');
+    3  
+    4: var CoralWorld = function ($physicsManager, $conf)
+    5  {
+    6  	this.physicsManager = $physicsManager;
+    .
+   11  };
+   12  
+   13: CoralWorld.prototype.setHeight = function ($height)
+   14  {
+   15  	this.worldHeight = this.physicsManager.worldHeight = $height;
+   16  };
+   17  
+   18: CoralWorld.prototype.getWidth = function ()
+   19  {
+   20  	return this.worldWidth;
+   21  };
+   22  
+   23: CoralWorld.prototype.createGroup = function ($type)
+   24  {
+   25  	var type = $type || 'default';
+   26: 	var group = new CoralGroup(type, this.conf.groups[type]);
+   27  	group.physicsManager = this.physicsManager.getGroupPhysicsManager(group);
+   28  	group.structure = new Structure(group, this);
+   ..
+   31  };
+   32  
+   33: CoralWorld.prototype.addGroupsToWorld = function ()
+   34  {
+   35  	for (var i = 0, groupsArrayLength = this.groupsArray.length; i < groupsArrayLength; i += 1)
+   ..
+   42  };
+   43  
+   44: module.exports = CoralWorld;
+   45  
+   46  
+
+/Users/Lau/www/svjelly/src/renderer/svjelly/SVJellyRenderer.js:
+    1: var CoralDraw = function ($world, $canvas)
+    2  {
+    3  	this.canvas = $canvas;
+    .
+   33  };
+   34  
+   35: CoralDraw.prototype.getDrawingGroup = function ($comparison)
+   36  {
+   37  	for (var i = 0, length = this.drawingGroups.length; i < length; i += 1)
+   ..
+   42  };
+   43  
+   44: CoralDraw.prototype.compareProperties = function ($one, $two)
+   45  {
+   46  	var comparison = true;
+   ..
+   52  };
+   53  
+   54: CoralDraw.prototype.draw = function ()
+   55  {
+   56  	this.context.clearRect(0, 0, this.width, this.height);
+   ..
+  108  };
+  109  
+  110: CoralDraw.prototype.debugDraw = function ($clear)
+  111  {
+  112  	if ($clear !== undefined) { this.context.clearRect(0, 0, this.width, this.height); }
+  ...
+  152  };
+  153  
+  154: module.exports = CoralDraw;
+  155  
+  156  
+
+48 matches across 6 files
