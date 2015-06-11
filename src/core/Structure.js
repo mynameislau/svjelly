@@ -9,30 +9,32 @@ var Structure = function ($group, $world)
 	this.innerStructure = undefined;
 };
 
-Structure.prototype.create = function ($coordsArray)
+Structure.prototype.create = function ($element)
 {
 	var nodesToDraw;
+	var points = $element.points;
+	this.group.structureInfos = $element;
 
 	switch (this.group.conf.structure)
 	{
 		case 'triangulate':
-			nodesToDraw = this.group.createNodesFromPoints($coordsArray);
-			this.createJointsFromTriangles($coordsArray);
+			nodesToDraw = this.group.createNodesFromPoints(points);
+			this.createJointsFromTriangles(points);
 			break;
 		case 'line':
-			nodesToDraw = this.group.createNodesFromPoints($coordsArray);
-			this.group.createJointsFromPoints($coordsArray, true);
-			nodesToDraw[0].fixed = true;//to remove later maybe ?
+			nodesToDraw = this.group.createNodesFromPoints(points);
+			this.group.createJointsFromPoints(points, true);
+			//nodesToDraw[0].fixed = true;//to remove later maybe ?
 			break;
 		case 'preciseHexaFill':
-			nodesToDraw = this.createPreciseHexaFillStructure($coordsArray);
+			nodesToDraw = this.createPreciseHexaFillStructure(points);
 			// structureNodes.forEach(function ($element) { $element.drawing = { notToDraw: true }; });
 			break;
 		case 'hexaFill':
-			nodesToDraw = this.createHexaFillStructure($coordsArray);
+			nodesToDraw = this.createHexaFillStructure(points);
 			break;
 		default:
-			nodesToDraw = this.group.createNodesFromPoints($coordsArray);
+			nodesToDraw = this.group.createNodesFromPoints(points);
 			break;
 	}
 
@@ -66,7 +68,9 @@ Structure.prototype.createPreciseHexaFillStructure = function ($coordsArray)
 		for (var k = 0, closestLength = closest.length; k < closestLength; k += 1)
 		{
 			var currClosest = closest[k];
-			this.group.createJoint(currPoint[0], currPoint[1], currClosest[0], currClosest[1]);
+			var n1 = this.group.getNodeAtPoint(currPoint[0], currPoint[1]);
+			var n2 = this.group.getNodeAtPoint(currClosest[0], currClosest[1]);
+			this.group.createJoint(n1, n2);
 		}
 	}
 	return nodesToDraw;
@@ -81,15 +85,18 @@ Structure.prototype.createJointsFromTriangles = function ($coordsArray)
 	for (var i = 0; i < trianglesLength; i += 1)
 	{
 		var currTriangle = triangles[i];
-		this.group.createJoint(currTriangle[0].x, currTriangle[0].y, currTriangle[1].x, currTriangle[1].y);
-		this.group.createJoint(currTriangle[1].x, currTriangle[1].y, currTriangle[2].x, currTriangle[2].y);
-		this.group.createJoint(currTriangle[2].x, currTriangle[2].y, currTriangle[0].x, currTriangle[0].y);
+		var n0 = this.group.getNodeAtPoint(currTriangle[0].x, currTriangle[0].y);
+		var n1 = this.group.getNodeAtPoint(currTriangle[1].x, currTriangle[1].y);
+		var n2 = this.group.getNodeAtPoint(currTriangle[2].x, currTriangle[2].y);
+		this.group.createJoint(n0, n1);
+		this.group.createJoint(n1, n2);
+		this.group.createJoint(n2, n0);
 	}
 };
 
 Structure.prototype.createInnerStructure = function ($coordsArray)
 {
-	var polygon = Object.create(Polygon).init($coordsArray);
+	var polygon = Polygon.init($coordsArray);
 	var diam = this.world.getWidth() * this.group.conf.innerStructureDef;//width / 10;//this.world.getWidth() / 30;
 	this.innerStructure = Grid.createFromPolygon(polygon, diam, true);
 	var structureNodes = this.group.createNodesFromPoints(this.innerStructure.getNodesArray());
@@ -100,7 +107,9 @@ Structure.prototype.createInnerStructure = function ($coordsArray)
 	for (i; i < length; i += 1)
 	{
 		var currLink = network[i];
-		this.group.createJoint(currLink[0][0], currLink[0][1], currLink[1][0], currLink[1][1]);
+		var n1 = this.group.getNodeAtPoint(currLink[0][0], currLink[0][1]);
+		var n2 = this.group.getNodeAtPoint(currLink[1][0], currLink[1][1]);
+		this.group.createJoint(n1, n2);
 	}
 	return structureNodes;
 };

@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Underwater</title>
+</head>
+<body>
+	<canvas id="canvas"></canvas>
+	<script src="svjellymaker.js"></script>
+	<script>
+		var loadEventHandler = function ()
+		{
+			var canvas = document.getElementById('canvas');
+			canvas.width = document.body.clientWidth;
+			var svjellyMaker = window.svjellymaker.createFromConfig(canvas, 'assets/underwaterConfig.json');
+			svjellyMaker.promise.then(function ()
+			{
+				var world = svjellyMaker.svjellyWorld;
+				var p2 = world.physicsManager.p2;
+				var p2World = world.physicsManager.p2World;
+				var mouseBody = new p2.Body();
+				p2World.addBody(mouseBody);
+
+				var mouseConstraint;
+				var bodies = p2World.bodies.concat();
+				var body;
+				var scale = canvas.width / world.getWidth();
+				// Convert a canvas coordiante to physics coordinate
+				function getPhysicsCoord (mouseEvent){
+					var rect = canvas.getBoundingClientRect();
+					var x = mouseEvent.clientX - rect.left;
+					var y = mouseEvent.clientY - rect.top;
+
+					x = x / scale;
+					y = (canvas.height - y) / scale;
+					return [x, y];
+				}
+
+				var mouseMove = function (event)
+				{
+					var position = getPhysicsCoord(event);
+					mouseBody.position[0] = position[0];
+					mouseBody.position[1] = position[1];
+				};
+
+				canvas.addEventListener('mousedown', function (event)
+				{
+					var position = getPhysicsCoord(event);
+
+					// Check if the cursor is inside the box
+					var hitBodies = p2World.hitTest(position, bodies);
+
+					if(hitBodies.length)
+					{
+						body = hitBodies[0];
+						// Move the mouse body to the cursor position
+
+						mouseBody.position[0] = position[0];
+						mouseBody.position[1] = position[1];
+
+						// Create a RevoluteConstraint.
+						// This constraint lets the bodies rotate around a common point
+						mouseConstraint = new p2.RevoluteConstraint(mouseBody, body,
+						{
+							worldPivot: position,
+							collideConnected:false
+						});
+						p2World.addConstraint(mouseConstraint);
+						canvas.addEventListener('mousemove', mouseMove);
+					}
+				});
+
+					// Remove the mouse constraint on mouse up
+				canvas.addEventListener('mouseup', function (){
+					p2World.removeConstraint(mouseConstraint);
+					mouseConstraint = null;
+					canvas.removeEventListener('mousemove');
+				});
+			});
+		};
+
+		window.addEventListener('load', loadEventHandler);
+	</script>
+</body>
+</html>

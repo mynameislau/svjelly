@@ -2,9 +2,10 @@ var Polygon =
 {
 	init: function ($points)
 	{
-		this.points = $points;
-		this._boundingBox = undefined;
-		return this;
+		var polygon = Object.create(Polygon);
+		polygon.points = $points;
+		polygon._boundingBox = undefined;
+		return polygon;
 	},
 
 	getBoundingBox: function ()
@@ -66,12 +67,13 @@ var Polygon =
 		return intersections;
 	},
 
-	isInside: function ($testPoint, $intersections)
+	isInside: function ($point)
 	{
 		var infNumber = 0;
-		for (var i = 0, length = $intersections.length; i < length; i += 1)
+		var intersections = this.getIntersectionsAtY($point[1]);
+		for (var i = 0, length = intersections.length; i < length; i += 1)
 		{
-			if ($testPoint < $intersections[i]) { infNumber += 1; }
+			if ($point[0] < intersections[i]) { infNumber += 1; }
 		}
 		return infNumber % 2 > 0;
 	}

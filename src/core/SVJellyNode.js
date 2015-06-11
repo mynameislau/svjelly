@@ -20,6 +20,12 @@ SVJellyNode.prototype.setOptions = function ($options)
 	}
 };
 
+SVJellyNode.prototype.setFixed = function ($fixed)
+{
+	this.fixed = $fixed;
+	this.physicsManager.setFixed($fixed);
+};
+
 SVJellyNode.prototype.getX = function ()
 {
 	return this.physicsManager.getX();

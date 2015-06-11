@@ -4,25 +4,36 @@ var SVJellyRenderer = function ($world, $canvas)
 	this.world = $world;
 	this.context = this.canvas.getContext('2d');
 	this.debug = $world.conf.debug;
+	this.cached = [];
 
 	this.width = this.canvas.width;
 	this.height = this.canvas.height;
 	this.drawScaleX = this.drawScaleY = this.canvas.width / this.world.getWidth();
 
 	this.drawingGroups = [];
-	for (var k = 0, groupsLength = this.world.groupsArray.length; k < groupsLength; k += 1)
+	var k = 0;
+	var i;
+	var drawingGroup;
+	for (var groupsLength = this.world.groupsArray.length; k < groupsLength; k += 1)
 	{
 		var currGroup = this.world.groupsArray[k];
 
-		for (var i = 0, nodesLength = currGroup.nodes.length; i < nodesLength; i += 1)
+		i = 0;
+		for (var nodesLength = currGroup.nodes.length; i < nodesLength; i += 1)
 		{
 			var currNode = currGroup.nodes[i];
-			var drawingGroup;
 			if (currNode.drawing)
 			{
 				if (currNode.drawing.fill || currNode.drawing.stroke)// && !currNode.drawing.notToDraw)
 				{
-					drawingGroup = { properties: currNode.drawing, nodes: [], type: currGroup.type };
+					drawingGroup =
+					{
+						properties: currNode.drawing,
+						nodes: [],
+						type: currGroup.type,
+						structure: currGroup.conf.structure,
+						fixed: currGroup.conf.fixed
+					};
 					this.drawingGroups.push(drawingGroup);
 				}
 				drawingGroup.nodes.push(currNode);
@@ -30,6 +41,35 @@ var SVJellyRenderer = function ($world, $canvas)
 		}
 	}
 	this.drawingGroupLength = this.drawingGroups.length;
+
+	//caching ghosts
+	i = 0;
+	var previousDrawingGroup;
+	for (i; i < this.drawingGroupLength; i += 1)
+	{
+		drawingGroup = this.drawingGroups[i];
+		if (drawingGroup.type === 'ghost' || drawingGroup.fixed === true)
+		{
+			var canvas;
+			if (this.cached[i - 1] === undefined)
+			{
+				canvas = window.document.createElement('canvas');
+				canvas.width = this.width;
+				canvas.height = this.height;
+			}
+			else
+			{
+				//if some ghost layers are on top of each other, no need to create
+				//a new canvas, you can just draw the layers on the same one
+				canvas = this.cached[i - 1];
+			}
+
+			var context = canvas.getContext('2d');
+			this.drawGroup(drawingGroup, context);
+			this.cached[i] = canvas;
+		}
+		previousDrawingGroup = drawingGroup;
+	}
 };
 
 SVJellyRenderer.prototype.getDrawingGroup = function ($comparison)
@@ -55,56 +95,74 @@ SVJellyRenderer.prototype.draw = function ()
 {
 	this.context.clearRect(0, 0, this.width, this.height);
 	this.context.miterLimit = 1;
+	var previousCached;
 	for (var i = 0; i < this.drawingGroupLength; i += 1)
 	{
 		var drawingGroup = this.drawingGroups[i];
-		var nodesLength = drawingGroup.nodes.length;
-		this.context.beginPath();
-
-		if (drawingGroup.properties.fill !== 'none') { this.context.fillStyle = drawingGroup.properties.fill; }
-		if (drawingGroup.properties.stroke !== 'none') { this.context.strokeStyle = drawingGroup.properties.stroke; }
-		if (drawingGroup.properties.lineWidth !== 'none') { this.context.lineWidth = drawingGroup.properties.lineWidth * this.drawScaleX; }
-		if (drawingGroup.properties.lineCap) { this.context.lineCap = drawingGroup.properties.lineCap; }
-		if (drawingGroup.properties.lineJoin) { this.context.lineJoin = drawingGroup.properties.lineJoin; }
-		this.context.globalAlpha = drawingGroup.properties.opacity ? drawingGroup.properties.opacity : 1;
-
-		for (var k = 0; k < nodesLength; k += 1)
+		if (this.cached[i] && this.cached[i] !== previousCached)
 		{
-			var currNode = drawingGroup.nodes[k];
-			if (currNode.drawing && currNode.drawing.notToDraw) { continue; }
-			if (currNode.isStart)
-			{
-				//gradient
-				if (drawingGroup.properties.strokeGradient !== 'none')
-				{
-					var x1 = currNode.getX() * this.drawScaleX;
-					var y1 = currNode.getY() * this.drawScaleY;
-					var x2 = currNode.endNode.getX() * this.drawScaleX;
-					var y2 = currNode.endNode.getY() * this.drawScaleY;
-					var gradient = this.context.createLinearGradient(x1, y1, x2, y2);
-					for (var stopN = 0, stopLength = currNode.drawing.strokeGradient.length; stopN < stopLength; stopN += 1)
-					{
-						gradient.addColorStop(1 - currNode.drawing.strokeGradient[stopN].offset, currNode.drawing.strokeGradient[stopN].color);
-					}
-					this.context.strokeStyle = gradient;
-				}
-				//
-
-				this.context.moveTo(currNode.getX() * this.drawScaleX, currNode.getY() * this.drawScaleY);
-			}
-			else
-			{
-				this.context.lineTo(currNode.getX() * this.drawScaleX, currNode.getY() * this.drawScaleY);
-			}
-			// this.context.moveTo(currNode.getX() * this.drawScaleX, this.height - currNode.getY() * this.drawScaleY);
-			// this.context.arc(currNode.getX() * this.drawScaleX, this.height - currNode.getY() * this.drawScaleY, 2, 0, Math.PI * 2);
+			this.context.drawImage(this.cached[i], 0, 0);
 		}
-		if (drawingGroup.type !== 'line') { this.context.closePath(); }
-		if (drawingGroup.properties.fill !== 'none') { this.context.fill(); }
-		if (drawingGroup.properties.stroke !== 'none' || drawingGroup.properties.strokeGradient !== 'none') { this.context.stroke(); }
+		else
+		{
+			this.drawGroup(drawingGroup, this.context);
+		}
+		previousCached = this.cached[i];
 	}
 
 	if (this.debug) { this.debugDraw(); }
+};
+
+SVJellyRenderer.prototype.drawGroup = function ($drawingGroup, $context)
+{
+	var nodesLength = $drawingGroup.nodes.length;
+	$context.beginPath();
+
+	if ($drawingGroup.properties.fill !== 'none') { $context.fillStyle = $drawingGroup.properties.fill; }
+	if ($drawingGroup.properties.stroke !== 'none') { $context.strokeStyle = $drawingGroup.properties.stroke; }
+	if ($drawingGroup.properties.lineWidth !== 'none') { $context.lineWidth = $drawingGroup.properties.lineWidth * this.drawScaleX; }
+	if ($drawingGroup.properties.lineCap) { $context.lineCap = $drawingGroup.properties.lineCap; }
+	if ($drawingGroup.properties.lineJoin) { $context.lineJoin = $drawingGroup.properties.lineJoin; }
+	$context.globalAlpha = $drawingGroup.properties.opacity ? $drawingGroup.properties.opacity : 1;
+
+	for (var k = 0; k < nodesLength; k += 1)
+	{
+		var currNode = $drawingGroup.nodes[k];
+		if (currNode.drawing && currNode.drawing.notToDraw) { continue; }
+		if (currNode.isStart)
+		{
+			//gradient
+			if ($drawingGroup.properties.strokeGradient !== 'none')
+			{
+				var x1 = currNode.getX() * this.drawScaleX;
+				var y1 = currNode.getY() * this.drawScaleY;
+				var x2 = currNode.endNode.getX() * this.drawScaleX;
+				var y2 = currNode.endNode.getY() * this.drawScaleY;
+				var gradient = $context.createLinearGradient(x1, y1, x2, y2);
+				for (var stopN = 0, stopLength = currNode.drawing.strokeGradient.length; stopN < stopLength; stopN += 1)
+				{
+					gradient.addColorStop(1 - currNode.drawing.strokeGradient[stopN].offset, currNode.drawing.strokeGradient[stopN].color);
+				}
+				$context.strokeStyle = gradient;
+			}
+			//
+
+			$context.moveTo(currNode.getX() * this.drawScaleX, currNode.getY() * this.drawScaleY);
+			if ($drawingGroup.properties.radius)
+			{
+				$context.arc(currNode.getX() * this.drawScaleX, currNode.getY() * this.drawScaleY, $drawingGroup.properties.radius, 0, Math.PI * 2);
+			}
+		}
+		else
+		{
+			$context.lineTo(currNode.getX() * this.drawScaleX, currNode.getY() * this.drawScaleY);
+		}
+		// $context.moveTo(currNode.getX() * this.drawScaleX, this.height - currNode.getY() * this.drawScaleY);
+		// $context.arc(currNode.getX() * this.drawScaleX, this.height - currNode.getY() * this.drawScaleY, 2, 0, Math.PI * 2);
+	}
+	if ($drawingGroup.properties.closePath) { $context.closePath(); }
+	if ($drawingGroup.properties.fill !== 'none') { $context.fill(); }
+	if ($drawingGroup.properties.stroke !== 'none' || $drawingGroup.properties.strokeGradient !== 'none') { $context.stroke(); }
 };
 
 SVJellyRenderer.prototype.debugDraw = function ($clear)
@@ -147,6 +205,17 @@ SVJellyRenderer.prototype.debugDraw = function ($clear)
 			this.context.moveTo(currJoint.node1.getX() * this.drawScaleX, currJoint.node1.getY() * this.drawScaleY);
 			this.context.lineTo(currJoint.node2.getX() * this.drawScaleX, currJoint.node2.getY() * this.drawScaleY);
 		}
+	}
+	this.context.stroke();
+
+	this.context.strokeStyle = 'blue';
+	this.context.beginPath();
+	var length = this.world.groupConstraints.length;
+	for (k = 0; k < length; k += 1)
+	{
+		var currLock = this.world.groupConstraints[k];
+		this.context.moveTo(currLock.anchorA.getX() * this.drawScaleX, currLock.anchorA.getY() * this.drawScaleY);
+		this.context.lineTo(currLock.anchorB.getX() * this.drawScaleX, currLock.anchorB.getY() * this.drawScaleY);
 	}
 	this.context.stroke();
 };

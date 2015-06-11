@@ -1,13 +1,15 @@
 var SVJellyNode = require('./SVJellyNode');
 var SVJellyJoint = require('./SVJellyJoint');
 
-var SVJellyGroup = function ($type, $conf)
+var SVJellyGroup = function ($type, $conf, $ID)
 {
 	this.physicsManager = undefined;
+	this.structure = undefined;
 	this.conf = $conf;
 	this.type = $type;
 	this.nodes = [];
 	this.joints = [];
+	this.ID = $ID;
 };
 
 SVJellyGroup.prototype.getNodeAtPoint = function ($x, $y)
@@ -41,6 +43,78 @@ SVJellyGroup.prototype.createNode = function ($px, $py, $options, $overwrite)
 	return node;
 };
 
+SVJellyGroup.prototype.getClosestPoint = function ($points, $nodes)
+{
+	var nodes = $nodes || this.nodes;
+	var closestDist = Infinity;
+	var closestPoint;
+	var closestNode;
+	var closestOffsetX;
+	var closestOffsetY;
+
+	for (var i = 0, length = $points.length; i < length; i += 1)
+	{
+		var currPoint = $points[i];
+		for (var k = 0, nodesLength = nodes.length; k < nodesLength; k += 1)
+		{
+			var currNode = nodes[k];
+			var offsetX = currPoint[0] - currNode.oX;
+			var offsetY = currPoint[1] - currNode.oY;
+			var cX = Math.abs(offsetX);
+			var cY = Math.abs(offsetY);
+			var dist = Math.sqrt(cX * cX + cY * cY);
+			if (dist < closestDist)
+			{
+				closestNode = currNode;
+				closestPoint = currPoint;
+				closestDist = dist;
+				closestOffsetX = offsetX;
+				closestOffsetY = offsetY;
+			}
+		}
+	}
+
+	return closestPoint;
+};
+
+SVJellyGroup.prototype.getClosestNode = function ($coord, $nodes)
+{
+	var nodes = $nodes || this.nodes;
+	var closestDist = Infinity;
+	var closest;
+	for (var i = 0, length = nodes.length; i < length; i += 1)
+	{
+		var node = nodes[i];
+		var offsetX = $coord[0] - node.oX;
+		var offsetY = $coord[1] - node.oY;
+		var cX = Math.abs(offsetX);
+		var cY = Math.abs(offsetY);
+		var dist = Math.sqrt(cX * cX + cY * cY);
+		if (dist < closestDist)
+		{
+			closest = node;
+			closestDist = dist;
+		}
+	}
+	return closest;
+};
+
+SVJellyGroup.prototype.getNodesInside = function ($points)
+{
+	var Polygon = require('./Polygon');
+	var toReturn = [];
+	var polygon = Polygon.init($points);
+	for (var i = 0, length = this.nodes.length; i < length; i += 1)
+	{
+		var node = this.nodes[i];
+		if (polygon.isInside([node.oX, node.oY]))
+		{
+			toReturn.push(node);
+		}
+	}
+	return toReturn;
+};
+
 SVJellyGroup.prototype.getBoundingBox = function ()
 {
 	var minX;
@@ -58,31 +132,32 @@ SVJellyGroup.prototype.getBoundingBox = function ()
 	return [[minX, minY], [maxX, maxY]];
 };
 
-SVJellyGroup.prototype.createJoint = function ($p1x, $p1y, $p2x, $p2y)
+//TODO : to remove
+SVJellyGroup.prototype.hitTest = function ($point)
 {
-	var node1 = this.getNodeAtPoint($p1x, $p1y);
-	var node2 = this.getNodeAtPoint($p2x, $p2y);
+	var currX = $point[0];
+	var currY = $point[1];
+	var bounding = this.getBoundingBox();
+	if (currX >= bounding[0][0] && currX <= bounding[1][0] &&
+		currY >= bounding[0][1] && currY <= bounding[1][1])
+	{
+		return true;
+	}
+	return false;
+};
 
+SVJellyGroup.prototype.createJoint = function ($node1, $node2)
+{
 	for (var i = 0, jointsLength = this.joints.length; i < jointsLength; i += 1)
 	{
 		var currJoint = this.joints[i];
-		if ((currJoint.node1 === node1 && currJoint.node2 === node2) || (currJoint.node2 === node1 && currJoint.node1 === node2))
+		if ((currJoint.node1 === $node1 && currJoint.node2 === $node2) || (currJoint.node2 === $node1 && currJoint.node1 === $node2))
 		{
 			return;
 		}
 	}
 
-	if (node1 === undefined)
-	{
-		node1 = this.createNode($p1x, $p1y);
-	}
-
-	if (node2 === undefined)
-	{
-		node2 = this.createNode($p2x, $p2y);
-	}
-
-	var joint = new SVJellyJoint(node1, node2);
+	var joint = new SVJellyJoint($node1, $node2);
 
 	this.joints.push(joint);
 
@@ -101,6 +176,11 @@ SVJellyGroup.prototype.createNodesFromPoints = function ($coordsArray)
 	return toReturn;
 };
 
+SVJellyGroup.prototype.getBestMatchForGroupConstraint = function ($points, $anchor)
+{
+	return this.physicsManager.getBestMatchForGroupConstraint($points, $anchor);
+};
+
 SVJellyGroup.prototype.createJointsFromPoints = function ($coordsArray, $noClose)
 {
 	var coordsArrayLength = $coordsArray.length;
@@ -108,10 +188,13 @@ SVJellyGroup.prototype.createJointsFromPoints = function ($coordsArray, $noClose
 	{
 		var currPoint = $coordsArray[i];
 		var lastPoint = $coordsArray[i - 1];
-		this.createJoint(lastPoint[0], lastPoint[1], currPoint[0], currPoint[1]);
+		var lastNode = this.getNodeAtPoint(lastPoint[0], lastPoint[1]);
+		var currNode = this.getNodeAtPoint(currPoint[0], currPoint[1]);
+		this.createJoint(lastNode, currNode);
 		if (i === coordsArrayLength - 1 && $noClose !== true)
 		{
-			this.createJoint(currPoint[0], currPoint[1], $coordsArray[0][0], $coordsArray[0][1]);
+			var firstNode = this.getNodeAtPoint($coordsArray[0][0], $coordsArray[0][1]);
+			this.createJoint(currNode, firstNode);
 		}
 	}
 };

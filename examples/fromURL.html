@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>SVJelly From URL</title>
+</head>
+<body>
+	<canvas id="canvas"></canvas>
+	<script src="svjellymaker.js"></script>
+	<script>
+		var loadEventHandler = function ()
+		{
+			var canvas = document.getElementById('canvas');
+			window.svjellymaker.createFromURL(canvas, 'assets/rocks.svg');
+		};
+
+		window.addEventListener('load', loadEventHandler);
+	</script>
+</body>
+</html>

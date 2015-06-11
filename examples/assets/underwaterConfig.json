@@ -1,0 +1,30 @@
+{
+	"source": "assets/balloonsV1.svg",
+	"current": 2,
+	"debug": true,
+	"ground": true,
+	"groups":
+	{
+		"default":
+		{
+			"structure": "triangulate",
+			"physics":
+			{
+				"stiffness": 10000,
+				"relaxation": 1
+			}
+		},
+		"line":
+		{
+			"physics":
+			{
+				"lockConstraint":
+				{
+					"stiffness": 10,
+					"relaxation": 0.1
+				},
+				"gravityScale": -1
+			}
+		}
+	}
+}

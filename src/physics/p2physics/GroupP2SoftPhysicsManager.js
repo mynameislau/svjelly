@@ -13,6 +13,39 @@ var GroupP2SoftPhysicsManager = function ($world, $worldHeight, $group, $conf)
 	this.nodesDiameter = this.conf.nodesDiameter;
 };
 
+GroupP2SoftPhysicsManager.prototype.getBestMatchForGroupConstraint = function ($points)
+{
+	var closestDist = Infinity;
+	var closestPoint;
+	var closestNode;
+	var closestOffsetX;
+	var closestOffsetY;
+
+	for (var i = 0, length = $points.length; i < length; i += 1)
+	{
+		var currPoint = $points[i];
+		for (var k = 0, nodesLength = this.group.nodes.length; k < nodesLength; k += 1)
+		{
+			var currNode = this.group.nodes[k];
+			var offsetX = currPoint[0] - currNode.oX;
+			var offsetY = currPoint[1] - currNode.oY;
+			var cX = Math.abs(offsetX);
+			var cY = Math.abs(offsetY);
+			var dist = Math.sqrt(cX * cX + cY * cY);
+			if (dist < closestDist)
+			{
+				closestNode = currNode;
+				closestPoint = currPoint;
+				closestDist = dist;
+				closestOffsetX = offsetX;
+				closestOffsetY = offsetY;
+			}
+		}
+	}
+
+	return { node: closestNode, point: closestPoint, offset: [closestOffsetX, closestOffsetY] };
+};
+
 GroupP2SoftPhysicsManager.prototype.addJointsToWorld = function ()
 {
 	for (var i = 0, length = this.group.joints.length; i < length; i += 1)
@@ -46,10 +79,11 @@ GroupP2SoftPhysicsManager.prototype.addJointsToWorld = function ()
 		}
 		if (rotationalSpring)
 		{
+			console.log(rotationalSpring.stiffness, rotationalSpring.damping);
 			var constraint4 = new p2.RotationalSpring(joint.node1.physicsManager.body, joint.node2.physicsManager.body);
 			if (rotationalSpring.stiffness) { constraint4.stiffness = rotationalSpring.stiffness; }
 			if (rotationalSpring.damping) { constraint4.damping = rotationalSpring.damping; }
-			this.world.addSpring(constraint4);
+			//this.world.addSpring(constraint4);
 		}
 	}
 };
@@ -61,27 +95,31 @@ GroupP2SoftPhysicsManager.prototype.addNodesToWorld = function ()
 		var node = this.group.nodes[i];
 		//var mass = 500;
 		var mass = this.conf.mass;//Math.random() * 10 + 1;
-		this.body = new p2.Body({
-			mass: node.fixed ? 0 : mass,
+		var body = new p2.Body({
+			mass: this.group.conf.fixed ? 0 : mass,
 			position: [node.oX, this.worldHeight - node.oY]
 		});
+		//if (node.fixed) { body.type = p2.Body.STATIC; }
 		//console.log(node.oX, node.oY);
 		//this.body.fixedRotation = true;
-		// this.body.gravityScale = -1;//0;// -1;
+		body.gravityScale = this.conf.gravityScale || 1;//0;// -1;
 
 		// var radius = this.nodesDiameter;
 		// var circleShape = new p2.Circle(radius);
-		// this.body.addShape(circleShape);
+		// body.addShape(circleShape);
 		var particleShape = new p2.Particle();
-		this.body.addShape(particleShape);
+		body.addShape(particleShape);
 
 		//console.log(this.body.getArea());
 
 		//this.body.setDensity(node.type === 'line' ? 1 : 5000);
-		this.world.addBody(this.body);
-		// this.body.damping = 0.8;
+		console.log('masm', body.mass);
 
-		node.physicsManager = new NodeP2SoftPhysicsManager(this.body, this.worldHeight);
+		// this.body.damping = 0.8;
+		//body.mass = mass;
+		node.physicsManager = new NodeP2SoftPhysicsManager(p2, body, this.worldHeight);
+		//node.physicsManager.setFixed(node.fixed);
+		this.world.addBody(body);
 		//node.physicsManager.applyForce([0, 0]);
 	}
 };

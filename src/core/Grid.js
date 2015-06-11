@@ -29,12 +29,12 @@ var Grid =
 		for (var yPos = boundingBox[0][1]; yPos <= boundingBox[1][1]; yPos += yInc)
 		{
 			var line = [];
-			var intersections = $polygon.getIntersectionsAtY(yPos);
+			//var intersections = $polygon.getIntersectionsAtY(yPos);
 			var xPos = boundingBox[0][0];
 			xPos = ($hexa && toReturn.length % 2 !== 0) ? xPos + halfDef : xPos;
 			for (xPos; xPos <= boundingBox[1][0] + halfDef; xPos += def)
 			{
-				if ($polygon.isInside(xPos, intersections)) { line.push([xPos, yPos]); }
+				if ($polygon.isInside([xPos, yPos])) { line.push([xPos, yPos]); }
 				else { line.push(null); }
 			}
 			toReturn.push(line);

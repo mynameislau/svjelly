@@ -1,12 +1,24 @@
 // jscs:disable requireCamelCaseOrUpperCaseIdentifiers
 /*jshint camelcase:false*/
+var p2 = require('../../../libs/p2');
 
 var NodeP2HardPhysicsManager = function ($body, $position, $worldHeight)
 {
 	this.body = $body;
 	this.position = $position;
 	this.worldHeight = $worldHeight;
-	this.offset = undefined;
+	this.offset = [0, 0];
+	this.getX = this.getXSimple;
+	this.getY = this.getYSimple;
+};
+
+NodeP2HardPhysicsManager.prototype.setFixed = function ($fixed)
+{
+	if ($fixed)
+	{
+		this.body.type = p2.Body.STATIC;
+		this.body.updateMassProperties();
+	}
 };
 
 NodeP2HardPhysicsManager.prototype.setOffset = function ($offset)
@@ -15,19 +27,28 @@ NodeP2HardPhysicsManager.prototype.setOffset = function ($offset)
 	var dY = this.position[1] - $offset[1];
 	this.angle = Math.atan2(dY, dX);
 	this.hyp = Math.sqrt(dX * dX + dY * dY);
+	this.getX = this.getXOffset;
+	this.getY = this.getYOffset;
 };
 
-NodeP2HardPhysicsManager.prototype.getX = function ()
+NodeP2HardPhysicsManager.prototype.getXSimple = function ()
 {
-	//console.log(this.body.GetWorldCenter().get_x());
-	return this.body.position[0] + this.hyp * Math.cos(this.body.angle + this.angle);
-	// return this.body.position[0] + this.position[0] - this.offset[0];
+	return this.body.position[0];
 };
 
-NodeP2HardPhysicsManager.prototype.getY = function ()
+NodeP2HardPhysicsManager.prototype.getYSimple = function ()
+{
+	return this.worldHeight - this.body.position[1];
+};
+
+NodeP2HardPhysicsManager.prototype.getXOffset = function ()
+{
+	return this.body.position[0] + this.hyp * Math.cos(this.body.angle + this.angle);
+};
+
+NodeP2HardPhysicsManager.prototype.getYOffset = function ()
 {
 	return this.worldHeight - (this.body.position[1] + this.hyp * Math.sin(this.body.angle + this.angle));
-	// return this.worldHeight - (this.body.position[1] + this.position[1]) - this.offset[1];
 };
 
 module.exports = NodeP2HardPhysicsManager;

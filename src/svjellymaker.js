@@ -5,32 +5,42 @@ var P2PhysicsManager = require('./physics/p2physics/P2PhysicsManager');
 var SVJellyUtils = require('./core/SVJellyUtils');
 var confObject = require('./core/ConfObject');
 
-var svjellyMaker =
+//TODO promise polyfill
+var SVJellyMaker =
 {
 	createFromURL: function ($canvas, $URL, $physicsManager, $renderer)
 	{
-		var sceneViewer = Object.create(svjellyMaker);
-		sceneViewer.canvas = $canvas;
-		sceneViewer.renderer = $renderer;
-		sceneViewer.physicsManager = $physicsManager;
-		sceneViewer.loadFile($URL, function ($SVG) { sceneViewer.create($SVG); }, true);
-		return sceneViewer;
+		var svjellyMaker = Object.create(SVJellyMaker);
+		svjellyMaker.canvas = $canvas;
+		svjellyMaker.renderer = $renderer;
+		svjellyMaker.physicsManager = $physicsManager;
+		svjellyMaker.loadFile($URL, function ($SVG) { svjellyMaker.create($SVG); }, true);
+		return svjellyMaker;
 	},
-	createFromConf: function ($canvas, $configURL, $physicsManager, $renderer)
+	createFromConfig: function ($canvas, $configURL, $physicsManager, $renderer)
 	{
-		var sceneViewer = Object.create(svjellyMaker);
-		sceneViewer.canvas = $canvas;
-		sceneViewer.renderer = $renderer;
-		sceneViewer.physicsManager = $physicsManager;
-		var loadConfigComplete = function ($configData)
-		{
-			var JSONConfig = JSON.parse($configData);
-			sceneViewer.conf = SVJellyUtils.extend(confObject, JSONConfig);
+		var svjellyMaker = Object.create(SVJellyMaker);
+		svjellyMaker.canvas = $canvas;
+		svjellyMaker.renderer = $renderer;
+		svjellyMaker.physicsManager = $physicsManager;
 
-			svjellyMaker.loadFile(sceneViewer.conf.source, function ($SVG) { sceneViewer.create($SVG); }, true);
-		};
-		svjellyMaker.loadFile($configURL, loadConfigComplete);
-		return sceneViewer;
+		svjellyMaker.promise = new window.Promise(function (resolve)
+		{
+			var loadConfigComplete = function ($configData)
+			{
+				var JSONConfig = JSON.parse($configData);
+				svjellyMaker.conf = SVJellyUtils.extend(confObject, JSONConfig);
+
+				SVJellyMaker.loadFile(svjellyMaker.conf.source, function ($SVG)
+				{
+					svjellyMaker.create($SVG);
+					resolve();
+				}, true);
+			};
+			SVJellyMaker.loadFile($configURL, loadConfigComplete);
+		});
+
+		return svjellyMaker;
 	},
 	createFromPageSVG: function ($physicsManager, $renderer)
 	{
@@ -38,27 +48,27 @@ var svjellyMaker =
 
 		var createViewer = function ($element)
 		{
-			var sceneViewer = Object.create(svjellyMaker);
+			var svjellyMaker = Object.create(SVJellyMaker);
 			var currSVG = $element;
 			var appendCanvas = function ($config)
 			{
-				sceneViewer.conf = $config;
+				svjellyMaker.conf = $config;
 				var canvas = document.createElement('canvas');
 				canvas.width = currSVG.clientWidth;
 				canvas.height = currSVG.clientHeight;
 				currSVG.parentElement.insertBefore(canvas, currSVG);
 				currSVG.remove();
-				sceneViewer.canvas = canvas;
-				sceneViewer.renderer = $renderer;
-				sceneViewer.physicsManager = $physicsManager;
+				svjellyMaker.canvas = canvas;
+				svjellyMaker.renderer = $renderer;
+				svjellyMaker.physicsManager = $physicsManager;
 				var wrapper = document.createElement('div');
 				wrapper.appendChild(currSVG);
-				sceneViewer.create(wrapper);
+				svjellyMaker.create(wrapper);
 			};
 			var configURL = currSVG.getAttribute('data-svjelly');
 			if (configURL)
 			{
-				svjellyMaker.loadFile(configURL, function ($configData)
+				SVJellyMaker.loadFile(configURL, function ($configData)
 				{
 					var JSONConfig = JSON.parse($configData);
 					appendCanvas(SVJellyUtils.extend(confObject, JSONConfig));
@@ -78,11 +88,19 @@ var svjellyMaker =
 	},
 	create: function ($SVG)
 	{
+		var requestAnimFrame = window.requestAnimationFrame ||
+								window.webkitRequestAnimationFrame ||
+								window.mozRequestAnimationFrame;
+
+		var cancelAnimFrame = window.cancelAnimationFrame ||
+								window.webkitCancelAnimationFrame ||
+								window.mozCancelAnimationFrame;
+
 		var conf = this.conf || confObject;
 		var canvas = this.canvas;
 
-		var PhysicsManager = this.physicsManager || P2PhysicsManager;
-		var svjellyWorld = new SVJellyWorld(new PhysicsManager(conf), conf);
+		this.physicsManager = this.physicsManager || new P2PhysicsManager(conf);
+		var svjellyWorld = this.svjellyWorld = new SVJellyWorld(this.physicsManager, conf);
 
 		var requestID = '';
 
@@ -122,13 +140,13 @@ var svjellyMaker =
 				svjellyDraw.draw();
 				lastRender = $now;
 			}
-			requestID = window.requestAnimationFrame(update);
+			requestID = requestAnimFrame(update);
 		};
 
-		window.addEventListener('focus', function () { requestID = window.requestAnimationFrame(update); });
-		window.addEventListener('blur', function () { window.cancelAnimationFrame(requestID); });
+		window.addEventListener('focus', function () { requestID = requestAnimFrame(update); });
+		window.addEventListener('blur', function () { cancelAnimFrame(requestID); });
 
-		requestID = window.requestAnimationFrame(update);
+		requestID = requestAnimFrame(update);
 	},
 
 	loadFile: function ($URL, $successCallback, $XML)
@@ -155,9 +173,9 @@ if (document.querySelector('[data-svjelly-auto]'))
 {
 	var windowLoadHandler = function ()
 	{
-		svjellyMaker.createFromPageSVG();
+		SVJellyMaker.createFromPageSVG();
 	};
 	window.addEventListener('load', windowLoadHandler);
 }
 
-module.exports = svjellyMaker;
+module.exports = SVJellyMaker;

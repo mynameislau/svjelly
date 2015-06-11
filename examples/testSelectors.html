@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Document</title>
+	<style>
+	span:not([id*="anchor"]):not([id*="joint"])
+	{
+		color: red;
+	}
+	</style>
+</head>
+<body>
+	<main>
+		<div>
+			<span id="anchor">red</span>
+			<span id="joint">red</span>
+			<span>red</span>
+			<span>red</span>
+		</div>
+		<div id="green">
+			<span>green</span>
+			<span>green</span>
+			<span>green</span>
+			<span>green</span>
+		</div>
+		<div id="vraiid">
+			<div>
+				<span>vrai id red</span>
+				<span>vrai id red</span>
+				<span>vrai id red</span>
+				<span>vrai id red</span>
+			</div>
+		</div>
+		<div id="yellow">
+			<span>autre id</span>
+		</div>
+		<span>defaut</span>
+		<span>defaut</span>
+		<span id="blue">blue</span>
+	</main>
+	<script>
+
+		var toptop = function ()
+		{
+			// var result = document.querySelectorAll('main :not(div)');
+			// for (var i = 0, length = result.length; i < length; i += 1)
+			// {
+			// 	var curr = result[i];
+			// 	curr.style.border = '1px solid black';
+			// 	console.log(curr.parentNode);
+			// 	var type = curr.id || (curr.parentNode && curr.parentNode.id ? curr.parentNode.id : 'red');
+			// 	curr.style.backgroundColor = type;
+			// }
+		};
+		toptop();
+		
+	</script>
+</body>
+</html>

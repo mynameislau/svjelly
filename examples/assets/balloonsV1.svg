@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Generator: Adobe Illustrator 16.0.0, SVG Export Plug-In . SVG Version: 6.00 Build 0)  -->
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+	 width="1000px" height="500px" viewBox="0 0 1000 500" enable-background="new 0 0 1000 500" xml:space="preserve">
+<g id="hard-rectangle">
+	<rect x="415.368" y="305.021" fill="#2FA900" stroke="#A8FF3F" stroke-miterlimit="10" width="178" height="16.145"/>
+	<line id="constraint" fill="none" stroke="#A8FF3F" stroke-miterlimit="10" x1="420.349" y1="313.213" x2="251.835" y2="333.166"/>
+	
+		<line id="constraint_1_" fill="none" stroke="#A8FF3F" stroke-miterlimit="10" x1="586.557" y1="313.213" x2="657.169" y2="329.833"/>
+</g>
+<rect id="static" x="109.026" y="357.23" fill="#2FA900" stroke="#A8FF3F" stroke-miterlimit="10" width="714.102" height="73.073"/>
+<g id="balloon_3_">
+	
+		<line id="constraint-rectangle_7_" fill="none" stroke="#A8FF3F" stroke-miterlimit="10" x1="445.003" y1="73.166" x2="425.764" y2="308.011"/>
+	<circle fill="#D400BE" stroke="#A8FF3F" stroke-miterlimit="10" cx="445.003" cy="73.166" r="13.866"/>
+</g>
+<g id="balloon_1_">
+	
+		<line id="constraint-rectangle_1_" fill="none" stroke="#A8FF3F" stroke-miterlimit="10" x1="602.26" y1="78.166" x2="583.02" y2="313.011"/>
+	<circle fill="#D400BE" stroke="#A8FF3F" stroke-miterlimit="10" cx="604.636" cy="75.789" r="16.242"/>
+</g>
+<g id="balloon">
+	
+		<line id="constraint-rectangle_3_" fill="none" stroke="#A8FF3F" stroke-miterlimit="10" x1="578.774" y1="47.59" x2="586.557" y2="313.213"/>
+	<circle fill="#D400BE" stroke="#A8FF3F" stroke-miterlimit="10" cx="578.774" cy="47.59" r="13.866"/>
+</g>
+<g id="car">
+	<polygon id="static_1_" fill="#2FA900" stroke="#A8FF3F" stroke-miterlimit="10" points="100.938,48.41 165.434,199.53 
+		220.931,241.528 337.326,213.084 337.326,194.166 276.834,191.588 241.659,189.607 200.326,179.607 169.934,127.365 135.436,48.41 
+			"/>
+	<g id="hard_2_">
+		<circle fill="#2FA900" stroke="#A8FF3F" stroke-miterlimit="10" cx="155.113" cy="52.5" r="11.667"/>
+		
+			<line id="constraint-chassis" fill="none" stroke="#A8FF3F" stroke-miterlimit="10" x1="155.113" y1="52.5" x2="153.516" y2="27.775"/>
+		
+			<line id="constraint-chassis_3_" fill="none" stroke="#A8FF3F" stroke-miterlimit="10" x1="158.667" y1="52.5" x2="184.167" y2="26.328"/>
+	</g>
+	<g>
+		<circle id="hard" fill="#2FA900" stroke="#A8FF3F" stroke-miterlimit="10" cx="199.576" cy="51.595" r="11"/>
+		
+			<line id="constraint-chassis_1_" fill="none" stroke="#A8FF3F" stroke-miterlimit="10" x1="199.576" y1="51.595" x2="194.955" y2="26.328"/>
+		
+			<line id="constraint-chassis_2_" fill="none" stroke="#A8FF3F" stroke-miterlimit="10" x1="198.167" y1="51.595" x2="152.5" y2="28.5"/>
+	</g>
+	<g id="hard-chassis">
+		<polygon fill="#2FA900" stroke="#A8FF3F" stroke-miterlimit="10" points="148.855,32.186 199.615,30.484 198.566,20.469 
+			149.267,23.866 		"/>
+	</g>
+</g>
+<g id="balloon_2_">
+	
+		<line id="constraint-rectangle_2_" fill="none" stroke="#A8FF3F" stroke-miterlimit="10" x1="395.957" y1="67.989" x2="420.349" y2="311.052"/>
+	<circle fill="#D400BE" stroke="#A8FF3F" stroke-miterlimit="10" cx="397.053" cy="68.903" r="16.824"/>
+</g>
+</svg>

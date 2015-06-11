@@ -19,17 +19,11 @@ module.exports = function(grunt)
 			jshint:
 			{
 				files: ['src/**/*.js'],
-				tasks: ['jshint']
-			},
-			browserifySVJellyMaker:
-			{
-				files: ['src/**/*.js'],
-				tasks: ['browserify:svjellymaker']
-			},
-			browserifySVJelly:
-			{
-				files: ['src/svjelly.js', 'src/core/**/*.js', 'src/renderer/svjelly/**/*.js'],
-				tasks: ['browserify:svjelly']
+				tasks: ['jshint'],
+				options:
+				{
+					livereload: true
+				}
 			}
 		},
 		express:
@@ -51,8 +45,13 @@ module.exports = function(grunt)
 				options:
 				{
 					watch: true,
+					watchifyOptions:
+					{
+						verbose: true,
+					},
 					browserifyOptions:
 					{
+						debug: true,
 						standalone: 'svjelly'
 					}
 				}
@@ -64,9 +63,32 @@ module.exports = function(grunt)
 				options:
 				{
 					watch: true,
+					watchifyOptions:
+					{
+						verbose: true,
+					},
 					browserifyOptions:
 					{
+						debug: true,
 						standalone: 'svjellymaker'
+					}
+				}
+			},
+			P2PhysicsManager:
+			{
+				src: 'src/physics/p2physics/P2PhysicsManager.js',
+				dest: 'build/P2PhysicsManager.js',
+				options:
+				{
+					watch: true,
+					watchifyOptions:
+					{
+						verbose: true,
+					},
+					browserifyOptions:
+					{
+						debug: true,
+						standalone: 'SVJellyP2PhysicsManager'
 					}
 				}
 			}
@@ -78,6 +100,5 @@ module.exports = function(grunt)
 	grunt.loadNpmTasks('grunt-express');
 	grunt.loadNpmTasks('grunt-browserify');
 
-	grunt.registerTask('overwatch', ['watch:jshint', 'watch:browserifySVJelly', 'watch:browserifySVJellyMaker']);
-	grunt.registerTask('server', ['express', 'watch']);
+	grunt.registerTask('server', ['express', 'browserify:svjellymaker', 'browserify:P2PhysicsManager', 'browserify:svjelly', 'watch:jshint']);
 };
