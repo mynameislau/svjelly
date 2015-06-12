@@ -10,8 +10,11 @@
 			"structure": "triangulate",
 			"physics":
 			{
-				"stiffness": 10000,
-				"relaxation": 1
+				"distanceConstraint":
+				{
+					"stiffness": 100000,
+					"relaxation": 10
+				}
 			}
 		},
 		"line":

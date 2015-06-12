@@ -3,59 +3,51 @@
 
 var p2 = require('../../../libs/p2');
 var NodeP2HardPhysicsManager = require('./NodeP2HardPhysicsManager');
+var AnchorP2HardPhysicsManager = require('./AnchorP2HardPhysicsManager');
 
 var GroupP2HardPhysicsManager = function ($P2World, $worldHeight, $group, $conf)
 {
 	this.group = $group;
+	this.group.fixed = this.group.conf.fixed;
 	this.worldHeight = $worldHeight;
 	this.P2World = $P2World;
 	this.conf = $conf;
 };
 
-GroupP2HardPhysicsManager.Anchor = function ($group) { this.group = $group; };
-// GroupP2HardPhysicsManager.Anchor.prototype.setup = function ($body, $point, $offset)
-// {
-// 	this.body = $body;
-// 	this.point = $point;
-// 	this.offset = [0, 0];
-// };
-GroupP2HardPhysicsManager.Anchor.prototype.getX = function () { return this.body.position[0]; };
-GroupP2HardPhysicsManager.Anchor.prototype.getY = function () { return this.body.position[1]; };
-GroupP2HardPhysicsManager.Anchor.prototype.setup = function ($points)
+GroupP2HardPhysicsManager.prototype.createAnchorFromPoint = function ($point)
 {
-	var closestDist = Infinity;
-	var closestPoint;
-	var closestNode;
-	var closestOffsetX;
-	var closestOffsetY;
+	var anchor = new AnchorP2HardPhysicsManager(this.group);
+	anchor.setFromPoint($point);
+	return anchor;
+};
 
-	for (var i = 0, length = $points.length; i < length; i += 1)
+GroupP2HardPhysicsManager.prototype.createAnchorFromLine = function ($linePoints)
+{
+	var closestPoint = this.group.getClosestPoint($linePoints);
+	var anchor = new AnchorP2HardPhysicsManager(this.group);
+	anchor.setFromPoint(closestPoint);
+	return anchor;
+};
+
+GroupP2HardPhysicsManager.prototype.createAnchors = function ($points)
+{
+	var toReturn = [];
+	var nodes = this.group.getNodesInside($points);
+	if (!nodes.length)
 	{
-		var currPoint = $points[i];
-		for (var k = 0, nodesLength = this.group.nodes.length; k < nodesLength; k += 1)
-		{
-			var currNode = this.group.nodes[k];
-			var offsetX = currPoint[0] - currNode.oX;
-			var offsetY = currPoint[1] - currNode.oY;
-			var cX = Math.abs(offsetX);
-			var cY = Math.abs(offsetY);
-			var dist = Math.sqrt(cX * cX + cY * cY);
-			if (dist < closestDist)
-			{
-				closestNode = currNode;
-				closestPoint = currPoint;
-				closestDist = dist;
-				closestOffsetX = offsetX;
-				closestOffsetY = offsetY;
-			}
-		}
+		var defaultAnchor = new AnchorP2HardPhysicsManager(this.group);
+		var closest = this.group.getClosestPoint($points);
+		defaultAnchor.setFromPoint(closest);
+		return [defaultAnchor];
 	}
-	this.body = this.group.physicsManager.body;
-	this.point = closestPoint;
-	this.offset = [0, 0];
-	//$anchor.setup(this.body, closestPoint);
-
-	//return { node: closestNode, point: closestPoint, offset: [this.body.position[0] - closestPoint[0], this.body.position[1] - closestPoint[1]] };
+	for (var i = 0, length = nodes.length; i < length; i += 1)
+	{
+		var node = nodes[i];
+		var currAnchorA = new AnchorP2HardPhysicsManager(this.group);
+		currAnchorA.setFromPoint([node.oX, node.oY]);
+		toReturn.push(currAnchorA);
+	}
+	return toReturn;
 };
 
 GroupP2HardPhysicsManager.prototype.addJointsToWorld = function () { return; };
@@ -75,7 +67,7 @@ GroupP2HardPhysicsManager.prototype.addNodesToWorld = function ()
 	var initY = this.worldHeight - startY;
 
 	this.body = new p2.Body({
-		mass: this.group.conf.fixed ? 0 : 1,
+		mass: this.group.fixed ? 0 : 1,
 		position: [startX, this.worldHeight - startY]
 	});
 	var node;
@@ -100,7 +92,7 @@ GroupP2HardPhysicsManager.prototype.addNodesToWorld = function ()
 	}
 	else
 	{
-		var radius = this.group.structureInfos.radius;
+		var radius = this.group.structureProperties.radius;
 		var circleShape = new p2.Circle(radius);
 		this.body.addShape(circleShape);
 	}
@@ -113,6 +105,7 @@ GroupP2HardPhysicsManager.prototype.addNodesToWorld = function ()
 	this.P2World.addBody(this.body);
 	this.body.mass = this.body.getArea() * this.conf.mass;
 	this.body.updateMassProperties();
+	this.body.collisionResponse = false;
 	//node.physicsManager.setFixed(this.group.conf.fixed);
 	// console.log(this.body.shapes);
 	// debugger;

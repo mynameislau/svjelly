@@ -1,0 +1,51 @@
+{
+	"source": "assets/calanques.svg",
+	"current": 2,
+	"worldWidth": 1000,
+	"debug": false,
+	"ground": true,
+	"groups":
+	{
+		"default":
+		{
+			"structure": "triangulate",
+			"physics":
+			{
+				"nodeRadius": 0.1,
+				"mass": 1,
+				"distanceConstraint": null,
+				"distanceConstraint":
+				{
+					"stiffness": 10000000000000000000000000,
+					"relaxation": 1
+				},
+				"lockConstraintsssss":
+				{
+				},
+				"linearSpringzzzzz":
+				{
+					"damping": 0.000001,
+					"stiffness": 10000
+				},
+				"rotationalSpringzzzz":
+				{
+					"stiffness": 1000,
+					"damping": 10
+				},
+				"fdezfez": null
+			}
+		},
+		"line":
+		{
+			"physics":
+			{
+				"lockConstraint":
+				{
+					"stiffness": 10,
+					"relaxation": 0.1
+				},
+				"gravityScale": -1
+			}
+		}
+	}
+}

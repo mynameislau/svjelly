@@ -12,7 +12,7 @@
 		{
 			var canvas = document.getElementById('canvas');
 			canvas.width = document.body.clientWidth;
-			var svjellyMaker = window.svjellymaker.createFromConfig(canvas, 'assets/underwaterConfig.json');
+			var svjellyMaker = window.svjellymaker.createFromConfig(canvas, 'assets/calanques.json');
 			svjellyMaker.promise.then(function ()
 			{
 				var world = svjellyMaker.svjellyWorld;
@@ -48,7 +48,7 @@
 					var position = getPhysicsCoord(event);
 
 					// Check if the cursor is inside the box
-					var hitBodies = p2World.hitTest(position, bodies);
+					var hitBodies = p2World.hitTest(position, bodies, 1000);
 
 					if(hitBodies.length)
 					{

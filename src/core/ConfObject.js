@@ -17,7 +17,7 @@ module.exports = {
 					stiffness: 500,
 					relaxation: 0.1
 				},
-				nodesDiameter: 0.1,
+				nodeRadius: 0.1,
 				mass: 1
 			}
 		},
@@ -31,7 +31,7 @@ module.exports = {
 					stiffness: 500,
 					relaxation: 0.1
 				},
-				nodesDiameter: 0.1,
+				nodeRadius: 0.1,
 				mass: 1
 			}
 		},
@@ -41,6 +41,25 @@ module.exports = {
 			{
 				mass: 1,
 				bodyType: 'hard'
+			}
+		},
+		noCollide:
+		{
+			physics:
+			{
+				mass: 1,
+				bodyType: 'hard',
+				noCollide: true
+			}
+		},
+		cloud:
+		{
+			physics:
+			{
+				mass: 1,
+				gravityScale: 0,
+				bodyType: 'hard',
+				noCollide: true
 			}
 		},
 		metal:

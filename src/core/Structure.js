@@ -9,11 +9,34 @@ var Structure = function ($group, $world)
 	this.innerStructure = undefined;
 };
 
-Structure.prototype.create = function ($element)
+Structure.prototype.create = function ($properties)
 {
 	var nodesToDraw;
-	var points = $element.points;
-	this.group.structureInfos = $element;
+	var points = $properties.points;
+	this.group.structureProperties = $properties;
+
+	if ($properties.type === 'polygon')
+	{
+		var polygon = Polygon.init(points);
+		this.group.structureProperties.area = polygon.getArea();
+	}
+	else if ($properties.type === 'line')
+	{
+		var area = 0;
+		for (var i = 1, length = this.points.length; i < length; i += 1)
+		{
+			var currPoint = this.points[i];
+			var lastPoint = this.points[i - 1];
+			var dX = Math.abs(currPoint[0] - lastPoint[0]);
+			var dY = Math.abs(currPoint[1] - lastPoint[1]);
+			area += Math.sqrt(dX * dX + dY * dY);
+		}
+		this.group.structureProperties.area = area;
+	}
+	else if ($properties.type === 'circle')
+	{
+		this.group.structureProperties.area = Math.pow(Math.PI * $properties.radius, 2);
+	}
 
 	switch (this.group.conf.structure)
 	{

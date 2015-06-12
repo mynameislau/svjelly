@@ -3,6 +3,7 @@
 
 var p2 = require('../../../libs/p2');
 var NodeP2SoftPhysicsManager = require('./NodeP2SoftPhysicsManager');
+var AnchorP2SoftPhysicsManager = require('./AnchorP2SoftPhysicsManager');
 
 var GroupP2SoftPhysicsManager = function ($world, $worldHeight, $group, $conf)
 {
@@ -10,40 +11,36 @@ var GroupP2SoftPhysicsManager = function ($world, $worldHeight, $group, $conf)
 	this.world = $world;
 	this.worldHeight = $worldHeight;
 	this.conf = $conf;
-	this.nodesDiameter = this.conf.nodesDiameter;
+	//this.nodesDiameter = this.conf.nodesDiameter;
 };
 
-GroupP2SoftPhysicsManager.prototype.getBestMatchForGroupConstraint = function ($points)
+GroupP2SoftPhysicsManager.prototype.createAnchorFromPoint = function ($point)
 {
-	var closestDist = Infinity;
-	var closestPoint;
-	var closestNode;
-	var closestOffsetX;
-	var closestOffsetY;
+	var anchor = new AnchorP2SoftPhysicsManager(this.group);
+	anchor.setFromPoint($point);
+	return anchor;
+};
 
-	for (var i = 0, length = $points.length; i < length; i += 1)
+GroupP2SoftPhysicsManager.prototype.createAnchorFromLine = function ($linePoints)
+{
+	var closestPoint = this.group.getClosestPoint($linePoints);
+	var anchor = new AnchorP2SoftPhysicsManager(this.group);
+	anchor.setFromPoint(closestPoint);
+	return anchor;
+};
+
+GroupP2SoftPhysicsManager.prototype.createAnchors = function ($points)
+{
+	var toReturn = [];
+	var nodes = this.group.getNodesInside($points);
+	for (var i = 0, length = nodes.length; i < length; i += 1)
 	{
-		var currPoint = $points[i];
-		for (var k = 0, nodesLength = this.group.nodes.length; k < nodesLength; k += 1)
-		{
-			var currNode = this.group.nodes[k];
-			var offsetX = currPoint[0] - currNode.oX;
-			var offsetY = currPoint[1] - currNode.oY;
-			var cX = Math.abs(offsetX);
-			var cY = Math.abs(offsetY);
-			var dist = Math.sqrt(cX * cX + cY * cY);
-			if (dist < closestDist)
-			{
-				closestNode = currNode;
-				closestPoint = currPoint;
-				closestDist = dist;
-				closestOffsetX = offsetX;
-				closestOffsetY = offsetY;
-			}
-		}
+		var node = nodes[i];
+		var currAnchorA = new AnchorP2SoftPhysicsManager(this.group);
+		currAnchorA.setFromPoint([node.oX, node.oY]);
+		toReturn.push(currAnchorA);
 	}
-
-	return { node: closestNode, point: closestPoint, offset: [closestOffsetX, closestOffsetY] };
+	return toReturn;
 };
 
 GroupP2SoftPhysicsManager.prototype.addJointsToWorld = function ()
@@ -93,10 +90,13 @@ GroupP2SoftPhysicsManager.prototype.addNodesToWorld = function ()
 	for (var i = 0, length = this.group.nodes.length; i < length; i += 1)
 	{
 		var node = this.group.nodes[i];
+		//var fractionMass = this.conf.mass / this.group.nodes.length;
+		var area = this.group.structureProperties.area;
+		var nodeMass = area * this.conf.mass / this.group.nodes.length;
 		//var mass = 500;
-		var mass = this.conf.mass;//Math.random() * 10 + 1;
+		//var mass = this.conf.mass;//Math.random() * 10 + 1;
 		var body = new p2.Body({
-			mass: this.group.conf.fixed ? 0 : mass,
+			mass: node.fixed ? 0 : nodeMass,
 			position: [node.oX, this.worldHeight - node.oY]
 		});
 		//if (node.fixed) { body.type = p2.Body.STATIC; }
@@ -104,22 +104,26 @@ GroupP2SoftPhysicsManager.prototype.addNodesToWorld = function ()
 		//this.body.fixedRotation = true;
 		body.gravityScale = this.conf.gravityScale || 1;//0;// -1;
 
-		// var radius = this.nodesDiameter;
-		// var circleShape = new p2.Circle(radius);
-		// body.addShape(circleShape);
-		var particleShape = new p2.Particle();
-		body.addShape(particleShape);
+		var radius = this.conf.nodeRadius;
+		var circleShape = new p2.Circle(radius);
+		body.addShape(circleShape);
+		// var particleShape = new p2.Particle();
+		// body.addShape(particleShape);
 
 		//console.log(this.body.getArea());
 
 		//this.body.setDensity(node.type === 'line' ? 1 : 5000);
-		console.log('masm', body.mass);
 
 		// this.body.damping = 0.8;
 		//body.mass = mass;
 		node.physicsManager = new NodeP2SoftPhysicsManager(p2, body, this.worldHeight);
 		//node.physicsManager.setFixed(node.fixed);
 		this.world.addBody(body);
+		//body.mass = body.getArea() * this.conf.mass;
+		//body.gravityScale = 0.1;
+		//body.updateMassProperties();
+		// body.mass = 0;
+		// body.setDensity(0);
 		//node.physicsManager.applyForce([0, 0]);
 	}
 };

@@ -8,8 +8,13 @@ var AnchorP2GhostPhysicsManager = function ($p2, $p2World, $worldHeight)
 
 AnchorP2GhostPhysicsManager.prototype.setFromPoint = function ($point)
 {
+	this.point = $point;
+};
+
+AnchorP2GhostPhysicsManager.prototype.addToWorld = function ()
+{
 	this.body = new this.p2.Body({
-		position: [$point[0], this.worldHeight - $point[1]]
+		position: [this.point[0], this.worldHeight - this.point[1]]
 	});
 	this.p2World.addBody(this.body);
 };

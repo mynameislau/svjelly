@@ -26,6 +26,8 @@ P2PhysicsManager.prototype.step = function ($time)
 
 P2PhysicsManager.prototype.constrainGroups = function ($anchorA, $anchorB)
 {
+	$anchorA.addToWorld();
+	$anchorB.addToWorld();
 	var constraint = new p2.DistanceConstraint($anchorA.body, $anchorB.body,
 	{
 		localAnchorA: $anchorA.offset, // Point on bodyA

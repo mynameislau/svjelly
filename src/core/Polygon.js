@@ -8,6 +8,21 @@ var Polygon =
 		return polygon;
 	},
 
+	getArea: function ()
+	{
+		var sumA = 0;
+		var sumB = 0;
+		for (var i = 0, length = this.points.length; i < length; i += 1)
+		{
+			var currPoint = this.points[i];
+			var next = i === length - 1 ? this.points[0] : this.points[i + 1];
+			sumA += currPoint[0] * next[1];
+			sumB += currPoint[1] * next[0];
+		}
+
+		return Math.abs((sumA - sumB) * 0.5);
+	},
+
 	getBoundingBox: function ()
 	{
 		if (!this._boundingBox)

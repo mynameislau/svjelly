@@ -7,7 +7,6 @@ var SVJellyWorld = function ($physicsManager, $conf)
 	this.groupsArray = [];
 	this.conf = $conf;
 	this.worldNodes = [];
-	this.toConstrain = [];
 	this.groupConstraints = [];
 	this.worldWidth = this.physicsManager.worldWidth = $conf.worldWidth;
 };
@@ -43,53 +42,35 @@ SVJellyWorld.prototype.createGroup = function ($type, $ID)
 
 SVJellyWorld.prototype.constrainGroups = function ($groupA, $groupB, $points)
 {
-	this.toConstrain.push({ groupA: $groupA, groupB: $groupB, points: $points });
-};
+	var points = $points;
+	var groupA = $groupA;
+	var groupB = $groupB;
 
-SVJellyWorld.prototype.addConstraintToWorld = function ($toConstrain)
-{
-	var curr = $toConstrain;
-	var points = curr.points;
-	var groupA = curr.groupA;
-	var groupB = curr.groupB;
-
-	var closestPointA = groupA.getClosestPoint(points);
 	if (points.length < 3)
 	{
-		var anchorA = this.physicsManager.getAnchorPhysicsManager(groupA);
-		var anchorB = this.physicsManager.getAnchorPhysicsManager(groupB);
-		anchorA.setFromPoint(closestPointA);
-		points.splice(points.indexOf(closestPointA), 1);
-		anchorB.setFromPoint(points[0]);
-		this.physicsManager.constrainGroups(anchorA, anchorB);
+		var anchorA = groupA.physicsManager.createAnchorFromLine(points);
+		points.splice(points.indexOf(anchorA.point), 1);
+		var anchorB = groupB ? groupB.physicsManager.createAnchorFromPoint(points[0]) : this.physicsManager.getAnchorPhysicsManager(points[0]);
 		this.groupConstraints.push({ anchorA: anchorA, anchorB: anchorB });
 	}
 	else
 	{
-		var ANodes = groupA.getNodesInside(points);
-		for (var i = 0, nodesLength = ANodes.length; i < nodesLength; i += 1)
+		var anchorsA = groupA.physicsManager.createAnchors(points);
+		//console.log('A', groupA.ID, anchorsA.length, 'B', groupB ? groupB.ID : groupB);
+		for (var i = 0, nodesLength = anchorsA.length; i < nodesLength; i += 1)
 		{
-			var currANode = ANodes[i];
+			var currAnchorA = anchorsA[i];
 			if (!groupB)
 			{
-				currANode.setFixed(true);
+				currAnchorA.setFixed(true);
 			}
 			else
 			{
-				var currAnchorA = this.physicsManager.getAnchorPhysicsManager(groupA);
-				currAnchorA.setFromPoint([currANode.oX, currANode.oY]);
-				var currAnchorB = this.physicsManager.getAnchorPhysicsManager(groupB);
-				var BNodes = groupB.getNodesInside(points);
-				var closestBNode = groupB.getClosestNode([currANode.oX, currANode.oY], BNodes);
-				if (closestBNode)
+				var anchorsB = groupB.physicsManager.createAnchors(points);
+				for (var k = 0, anchorsBLength = anchorsB.length; k < anchorsBLength; k += 1)
 				{
-					currAnchorB.setFromPoint([closestBNode.oX, closestBNode.oY]);
-					this.physicsManager.constrainGroups(currAnchorA, currAnchorB);
+					var currAnchorB = anchorsB[k];
 					this.groupConstraints.push({ anchorA: currAnchorA, anchorB: currAnchorB });
-				}
-				else
-				{
-					console.warn('constraint problem');
 				}
 			}
 		}
@@ -106,11 +87,11 @@ SVJellyWorld.prototype.addGroupsToWorld = function ()
 		this.worldNodes = this.worldNodes.concat(currGroup.nodes);
 	}
 
-	var toConstrainLength = this.toConstrain.length;
+	var toConstrainLength = this.groupConstraints.length;
 	for (i = 0; i < toConstrainLength; i += 1)
 	{
-		var currToConstrain = this.toConstrain[i];
-		this.addConstraintToWorld(currToConstrain);
+		var currToConstrain = this.groupConstraints[i];
+		this.physicsManager.constrainGroups(currToConstrain.anchorA, currToConstrain.anchorB);
 	}
 };
 

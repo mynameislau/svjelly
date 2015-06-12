@@ -1,3 +1,4 @@
+
 var SVGParser = function () {};
 //var isPolygon = /polygon|rect/ig;
 var isLine = /polyline|line|path/ig;
@@ -13,7 +14,7 @@ SVGParser.prototype.parse = function ($world, $SVG)
 	this.world.setHeight(this.viewBoxHeight * this.ratio);
 
 	//temp
-	var elementsQuery = '*:not(g):not(linearGradient):not(stop):not([id*="joint"]):not([id*="constraint"])';
+	var elementsQuery = '*:not(g):not(linearGradient):not(radialGradient):not(stop):not([id*="joint"]):not([id*="constraint"])';
 	var elemRaws = this.SVG.querySelectorAll(elementsQuery);
 
 	var i = 0;
@@ -25,7 +26,6 @@ SVGParser.prototype.parse = function ($world, $SVG)
 		var rawElement = elemRaws[i];
 		//if (rawElement.nodeType === 3) { continue; }
 		var groupInfos = this.getGroupInfos(rawElement);
-		console.log(groupInfos);
 		var currGroup = $world.createGroup(groupInfos.type, groupInfos.ID);
 
 		//var elements = rawElement;
@@ -96,6 +96,7 @@ SVGParser.prototype.parseConstraints = function ($rawGroup, $group)
 		var parentGroupID = result ? result[1] : undefined;
 		var parentGroup = parentGroupID ? this.world.getGroupByID(parentGroupID) : undefined;
 		var points = this.parseElement(currConstraint).points;
+		// console.log($group.ID, parentGroup ? parentGroup.ID : undefined);
 		this.world.constrainGroups($group, parentGroup, points);
 	}
 };
@@ -156,42 +157,57 @@ SVGParser.prototype.setGraphicInstructions = function ($group, $rawElement, $nod
 	var opacity = $rawElement.getAttribute('opacity');
 	startNode.drawing.fill = fill;//fill === undefined ? 'none' : fill;
 	startNode.drawing.stroke = stroke;
-	startNode.drawing.radius = $group.structureInfos.radius / this.ratio;
+	startNode.drawing.radius = $group.structureProperties.radius / this.ratio;
 	startNode.drawing.lineWidth = lineWidth * this.ratio || 1 * this.ratio;//lineWidth === undefined ? 'none' : lineWidth * this.ratio;
 	startNode.drawing.lineCap = $rawElement.getAttribute('stroke-linecap') || 'round';
 	startNode.drawing.lineJoin = $rawElement.getAttribute('stroke-linejoin') || 'round';
 	startNode.drawing.opacity = opacity ? opacity : undefined;
-	startNode.drawing.closePath = $group.type !== 'line' && $group.structureInfos.radius === undefined;
-	//startNode.gradient = { x1: startNode.x, y1: startNode.y, x2: endNode.x, y2: endNode.y };
-	//console.log(startNode, startNode.gradient);
-	// debugger;
-	var gradientStroke = /url\(#(.*)\)/im.exec(stroke);
-	if (gradientStroke)
+	startNode.drawing.closePath = $group.type !== 'line' && $group.structureProperties.radius === undefined;
+
+	startNode.drawing.strokeGradient = this.getGradient(stroke);
+	startNode.drawing.fillGradient = this.getGradient(fill);
+
+	startNode.endNode = endNode;
+	startNode.isStart = true;
+};
+
+SVGParser.prototype.getGradient = function ($value)
+{
+	var gradientID = /url\(#(.*)\)/im.exec($value);
+	if (gradientID)
 	{
-		var gradient = [];
-		// console.log(gradientStroke[1]);
-		var stops = this.SVG.querySelectorAll('#' + gradientStroke[1] + '>stop');
-		// console.log(stops);
+		var gradientElement = this.SVG.querySelector('#' + gradientID[1]);
+		if (gradientElement.tagName !== 'linearGradient' && gradientElement.tagName !== 'radialGradient') { return; }
+
+		var gradient = { stops: [], type: gradientElement.tagName };
+
+		if (gradientElement.tagName === 'linearGradient')
+		{
+			gradient.x1 = this.getCoordX(gradientElement.getAttribute('x1'));
+			gradient.y1 = this.getCoordX(gradientElement.getAttribute('y1'));
+			gradient.x2 = this.getCoordX(gradientElement.getAttribute('x2'));
+			gradient.y2 = this.getCoordX(gradientElement.getAttribute('y2'));
+		}
+		if (gradientElement.tagName === 'radialGradient')
+		{
+			gradient.cx = this.getCoordX(gradientElement.getAttribute('cx'));
+			gradient.cy = this.getCoordX(gradientElement.getAttribute('cy'));
+			gradient.fx = this.getCoordX(gradientElement.getAttribute('fx'));
+			gradient.fy = this.getCoordX(gradientElement.getAttribute('fy'));
+			gradient.r = this.getCoordX(gradientElement.getAttribute('r'));
+		}
+
+		var stops = gradientElement.querySelectorAll('stop');
 		for (var k = 0, stopLength = stops.length; k < stopLength; k += 1)
 		{
 			var currStop = stops[k];
 			var offset = Number(currStop.getAttribute('offset'));
-			var color = currStop.getAttribute('style').match(/#[0-9A-F]+/im)[0];
-			gradient.push({ offset: offset, color: color });
-			startNode.drawing.strokeGradient = gradient;
-			startNode.drawing.stroke = 'none';
+			var color = /stop-color:(#[0-9A-F]+)/im.exec(currStop.getAttribute('style'))[1];
+			gradient.stops.push({ offset: offset, color: color });
 		}
-	}
-	else
-	{
-		startNode.drawing.strokeGradient = 'none';
-	}
 
-	startNode.endNode = endNode;
-	// startNode.drawing.stroke = stroke;
-	// console.log('new start node', startNode.oX, startNode.oY, 'stroke : ', startNode.drawing.stroke);
-	// startNode.drawing.strokeWidth = $rawElement.getAttribute('stroke-width') * this.ratio;
-	startNode.isStart = true;
+		return gradient;
+	}
 };
 
 SVGParser.prototype.parseCircle = function ($rawCircle)
@@ -199,7 +215,7 @@ SVGParser.prototype.parseCircle = function ($rawCircle)
 	var xPos = this.getCoordX($rawCircle.getAttribute('cx'));
 	var yPos = this.getCoordY($rawCircle.getAttribute('cy'));
 	var radius = this.getCoordX($rawCircle.getAttribute('r'));
-	return { type: $rawCircle.tagName, points: [[xPos, yPos]], radius: radius };
+	return { type: 'circle', points: [[xPos, yPos]], radius: radius };
 };
 
 SVGParser.prototype.parseLine = function ($rawLine)
@@ -211,7 +227,8 @@ SVGParser.prototype.parseLine = function ($rawLine)
 	var points = [];
 	points.push([x1, y1]);
 	points.push([x2, y2]);
-	return { type: $rawLine.tagName, points: points };
+	var thickness = this.getCoordX($rawLine.getAttribute('stroke-width'));
+	return { type: 'line', points: points, thickness: thickness };
 };
 
 SVGParser.prototype.parseRect = function ($rawRect)
@@ -226,7 +243,7 @@ SVGParser.prototype.parseRect = function ($rawRect)
 	points.push([x2, y2]);
 	points.push([x2, y1]);
 
-	return { type: $rawRect.tagName, points: points };
+	return { type: 'polygon', points: points };
 };
 
 SVGParser.prototype.parsePoly = function ($rawPoly)
@@ -261,7 +278,9 @@ SVGParser.prototype.parsePoly = function ($rawPoly)
 		}
 	}
 
-	return { type: $rawPoly.tagName, points: points };
+	var thickness = this.getCoordX($rawPoly.getAttribute('stroke-width'));
+	var type = $rawPoly.tagName === 'polyline' ? 'line' : 'polygon';
+	return { type: type, points: points, thickness: thickness };
 };
 
 SVGParser.prototype.parsePath = function ($rawPath)
@@ -313,7 +332,8 @@ SVGParser.prototype.parsePath = function ($rawPath)
 		lastCoordY = numberCoordY;
 	}
 
-	return { type: $rawPath.tagName, points: points };
+	var thickness = this.getCoordX($rawPath.getAttribute('stroke-width'));
+	return { type: 'line', points: points, thickness: thickness };
 };
 
 SVGParser.prototype.round = function ($number)
