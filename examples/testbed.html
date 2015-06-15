@@ -2,22 +2,49 @@
 <html lang="en">
 <head>
 	<meta charset="UTF-8">
-	<title>Underwater</title>
+	<title>Testbed</title>
 </head>
 <body>
 	<canvas id="canvas"></canvas>
-	<script src="svjellymaker.js"></script>
+	<script src="../build/svjellymaker.js"></script>
 	<script>
 		var loadEventHandler = function ()
 		{
 			var canvas = document.getElementById('canvas');
 			canvas.width = document.body.clientWidth;
-			var svjellyMaker = window.svjellymaker.createFromConfig(canvas, 'assets/calanques.json');
+			var svjellyMaker = window.svjellymaker.createFromURL(canvas, '../examples/assets/testbed.svg');
 			svjellyMaker.promise.then(function ()
 			{
+
 				var world = svjellyMaker.svjellyWorld;
 				var p2 = world.physicsManager.p2;
 				var p2World = world.physicsManager.p2World;
+
+				//WIND
+				var windForce = world.conf.wind;
+				if (windForce)
+				{
+					var bodiesLength = p2World.bodies.length;
+					svjellyMaker.updateCallback = function ()
+					{
+						// console.log('wind');
+						for (var i = 0, length = bodiesLength; i < length; i += 1)
+						{
+							var curr = world.bodies[i];
+							var loc = [];
+							curr.toWorldFrame(loc, [0, 0]);
+							curr.applyForce([windForce, 0], loc);
+						}
+					};
+					window.setInterval(function ()
+					{
+						windForce = -windForce;
+					}, 4000);
+				}
+
+
+				//MOUSE
+
 				var mouseBody = new p2.Body();
 				p2World.addBody(mouseBody);
 

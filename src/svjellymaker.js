@@ -14,7 +14,14 @@ var SVJellyMaker =
 		svjellyMaker.canvas = $canvas;
 		svjellyMaker.renderer = $renderer;
 		svjellyMaker.physicsManager = $physicsManager;
-		svjellyMaker.loadFile($URL, function ($SVG) { svjellyMaker.create($SVG); }, true);
+		svjellyMaker.promise = new window.Promise(function (resolve)
+		{
+			svjellyMaker.loadFile($URL, function ($SVG)
+			{
+				svjellyMaker.create($SVG);
+				resolve();
+			}, true);
+		});
 		return svjellyMaker;
 	},
 	createFromConfig: function ($canvas, $configURL, $physicsManager, $renderer)
@@ -123,19 +130,22 @@ var SVJellyMaker =
 		var lastRender = window.performance.now();
 		var simDiff;
 		var diffRender;
-		var simTargetFPSMilliSeconds = 16;//$configData.simRenderFreq; //60fps
-		var renderTargetFPSMilliSeconds = 0;
+		var simTargetFPS = 1 / 60 * 1000;//$configData.simRenderFreq; //60fps
+		var simMinimumFPS = 1 / 12 * 1000;
+		var renderTargetFPS = 1 / 30 * 1000;
 
 		var update = function ($now)
 		{
+			if (this.updateCallback) { this.updateCallback(); }
+
 			simDiff = $now - lastSim;
 			diffRender = $now - lastRender;
-			if (simDiff >= simTargetFPSMilliSeconds)
+			if (simDiff >= simTargetFPS)
 			{
-				svjellyWorld.physicsManager.step(Math.min(1, simDiff / 1000));
+				svjellyWorld.physicsManager.step(Math.min(simMinimumFPS / 1000, simDiff / 1000));
 				lastSim = $now;
 			}
-			if (diffRender >= renderTargetFPSMilliSeconds)
+			if (diffRender >= renderTargetFPS)
 			{
 				svjellyDraw.draw();
 				lastRender = $now;

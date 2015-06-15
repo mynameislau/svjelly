@@ -6,6 +6,7 @@ var SVJellyGroup = function ($type, $conf, $ID)
 	this.physicsManager = undefined;
 	this.structure = undefined;
 	this.conf = $conf;
+	this.fixed = this.conf.fixed;
 	this.type = $type;
 	this.nodes = [];
 	this.joints = [];

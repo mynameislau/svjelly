@@ -1,14 +1,15 @@
 var SVJellyRenderer = function ($world, $canvas)
 {
-	this.canvas = $canvas;
+	this.mainCanvas = $canvas;
 	this.world = $world;
-	this.context = this.canvas.getContext('2d');
+	this.context = this.mainCanvas.getContext('2d');
 	this.debug = $world.conf.debug;
-	this.cached = [];
+	this.cachedStatic = [];
+	this.cachedHard = [];
 
-	this.width = this.canvas.width;
-	this.height = this.canvas.height;
-	this.drawScaleX = this.drawScaleY = this.canvas.width / this.world.getWidth();
+	this.width = this.mainCanvas.width;
+	this.height = this.mainCanvas.height;
+	this.drawScaleX = this.drawScaleY = this.mainCanvas.width / this.world.getWidth();
 
 	this.drawingGroups = [];
 	var k = 0;
@@ -26,15 +27,18 @@ var SVJellyRenderer = function ($world, $canvas)
 			{
 				if (currNode.drawing.fill || currNode.drawing.stroke)// && !currNode.drawing.notToDraw)
 				{
-					drawingGroup =
+					var drawingObject =
 					{
 						properties: currNode.drawing,
+						ID: currGroup.ID,
 						nodes: [],
 						type: currGroup.type,
+						bodyType: currGroup.conf.physics.bodyType,
 						structure: currGroup.conf.structure,
 						fixed: currGroup.conf.fixed
 					};
-					this.drawingGroups.push(drawingGroup);
+
+					drawingGroup = this.createDrawingGroup(drawingObject);
 				}
 				drawingGroup.nodes.push(currNode);
 			}
@@ -59,31 +63,40 @@ var SVJellyRenderer = function ($world, $canvas)
 	//caching ghosts
 	i = 0;
 	var previousDrawingGroup;
+	var canvas;
 	for (i; i < this.drawingGroupLength; i += 1)
 	{
 		drawingGroup = this.drawingGroups[i];
-		if (drawingGroup.type === 'ghost' || drawingGroup.fixed === true)
+		if (drawingGroup.bodyType === 'ghost' || drawingGroup.fixed === true)
 		{
-			var canvas;
-			if (this.cached[i - 1] === undefined)
-			{
-				canvas = window.document.createElement('canvas');
-				canvas.width = this.width;
-				canvas.height = this.height;
-			}
-			else
-			{
-				//if some ghost layers are on top of each other, no need to create
-				//a new canvas, you can just draw the layers on the same one
-				canvas = this.cached[i - 1];
-			}
-
-			var context = canvas.getContext('2d');
-			this.drawGroup(drawingGroup, context);
-			this.cached[i] = canvas;
+			//if some ghost layers are on top of each other, no need to create
+			//a new canvas, you can just draw the layers on the same one
+			canvas = this.cachedStatic[i - 1] || this.createCanvas();
+			this.drawGroup(drawingGroup, canvas.getContext('2d'));
+			this.cachedStatic[i] = canvas;
 		}
 		previousDrawingGroup = drawingGroup;
 	}
+
+	//caching hard stuff - not interesting performance-wise yet
+	// for (i = 0; i < this.drawingGroupLength; i += 1)
+	// {
+	// 	drawingGroup = this.drawingGroups[i];
+	// 	if (drawingGroup.bodyType === 'hard' && !drawingGroup.fixed)
+	// 	{
+	// 		canvas = this.createCanvas();
+	// 		this.drawGroup(drawingGroup, canvas.getContext('2d'));
+	// 		this.cachedHard[i] = canvas;
+	// 	}
+	// }
+};
+
+SVJellyRenderer.prototype.createCanvas = function ()
+{
+	var canvas = window.document.createElement('canvas');
+	canvas.width = this.width;
+	canvas.height = this.height;
+	return canvas;
 };
 
 SVJellyRenderer.prototype.createGradient = function ($properties)
@@ -114,13 +127,23 @@ SVJellyRenderer.prototype.createGradient = function ($properties)
 	return gradient;
 };
 
-SVJellyRenderer.prototype.getDrawingGroup = function ($comparison)
+SVJellyRenderer.prototype.createDrawingGroup = function ($object)
 {
+	var group;
+	//optim same drawing styles
 	for (var i = 0, length = this.drawingGroups.length; i < length; i += 1)
 	{
 		var currGroup = this.drawingGroups[i];
-		if (this.compareProperties(currGroup.properties, $comparison)) { return currGroup; }
+		if (this.compareProperties(currGroup.properties, $object.properties) && $object.bodyType === 'hard' && currGroup.bodyType === 'hard' && currGroup.fixed === false) { group = currGroup; }
 	}
+
+	if (!group)
+	{
+		group = $object;
+		this.drawingGroups.push($object);
+	}
+
+	return group;
 };
 
 SVJellyRenderer.prototype.compareProperties = function ($one, $two)
@@ -135,21 +158,25 @@ SVJellyRenderer.prototype.compareProperties = function ($one, $two)
 
 SVJellyRenderer.prototype.draw = function ()
 {
-	this.context.clearRect(0, 0, this.width, this.height);
+	//this.context.clearRect(0, 0, this.width, this.height);
 	this.context.miterLimit = 1;
 	var previousCached;
 	for (var i = 0; i < this.drawingGroupLength; i += 1)
 	{
 		var drawingGroup = this.drawingGroups[i];
-		if (this.cached[i] && this.cached[i] !== previousCached)
+		if (this.cachedStatic[i] && this.cachedStatic[i] !== previousCached)
 		{
-			this.context.drawImage(this.cached[i], 0, 0);
+			this.context.drawImage(this.cachedStatic[i], 0, 0);
 		}
+		// else if (this.cachedHard[i])
+		// {
+		// 	this.context.drawImage(this.cachedHard[i], 0, 0);
+		// }
 		else
 		{
 			this.drawGroup(drawingGroup, this.context);
 		}
-		previousCached = this.cached[i];
+		previousCached = this.cachedStatic[i];
 	}
 
 	if (this.debug) { this.debugDraw(); }
@@ -172,7 +199,7 @@ SVJellyRenderer.prototype.drawGroup = function ($drawingGroup, $context)
 	if ($drawingGroup.properties.lineWidth !== 'none') { $context.lineWidth = $drawingGroup.properties.lineWidth * this.drawScaleX; }
 	if ($drawingGroup.properties.lineCap) { $context.lineCap = $drawingGroup.properties.lineCap; }
 	if ($drawingGroup.properties.lineJoin) { $context.lineJoin = $drawingGroup.properties.lineJoin; }
-	$context.globalAlpha = $drawingGroup.properties.opacity ? $drawingGroup.properties.opacity : 1;
+	$context.globalAlpha = $drawingGroup.properties.opacity || 1;
 
 	for (var k = 0; k < nodesLength; k += 1)
 	{
@@ -199,7 +226,7 @@ SVJellyRenderer.prototype.drawGroup = function ($drawingGroup, $context)
 			$context.moveTo(currNode.getX() * this.drawScaleX, currNode.getY() * this.drawScaleY);
 			if ($drawingGroup.properties.radius)
 			{
-				$context.arc(currNode.getX() * this.drawScaleX, currNode.getY() * this.drawScaleY, $drawingGroup.properties.radius, 0, Math.PI * 2);
+				$context.arc(currNode.getX() * this.drawScaleX, currNode.getY() * this.drawScaleY, $drawingGroup.properties.radius * this.drawScaleY, 0, Math.PI * 2);
 			}
 		}
 		else
@@ -236,7 +263,9 @@ SVJellyRenderer.prototype.debugDraw = function ($clear)
 		{
 			var currNode = currGroup.nodes[i];
 			this.context.moveTo(currNode.getX() * this.drawScaleX, currNode.getY() * this.drawScaleY);
-			this.context.arc(currNode.getX() * this.drawScaleX, currNode.getY() * this.drawScaleY, currGroup.conf.physics.nodeRadius * this.drawScaleX, 0, Math.PI * 2);
+			var radius = currGroup.structureProperties.radius || currGroup.conf.physics.nodeRadius;
+			radius *= this.drawScaleX;
+			this.context.arc(currNode.getX() * this.drawScaleX, currNode.getY() * this.drawScaleY, radius, 0, Math.PI * 2);
 		}
 	}
 	this.context.stroke();

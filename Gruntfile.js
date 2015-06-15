@@ -32,7 +32,7 @@ module.exports = function(grunt)
 			{
 				options:
 				{
-					bases: ['build', 'examples'],
+					bases: ['./'],
 				}
 			}
 		},

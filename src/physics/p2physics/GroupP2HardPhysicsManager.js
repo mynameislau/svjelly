@@ -8,7 +8,6 @@ var AnchorP2HardPhysicsManager = require('./AnchorP2HardPhysicsManager');
 var GroupP2HardPhysicsManager = function ($P2World, $worldHeight, $group, $conf)
 {
 	this.group = $group;
-	this.group.fixed = this.group.conf.fixed;
 	this.worldHeight = $worldHeight;
 	this.P2World = $P2World;
 	this.conf = $conf;
@@ -105,7 +104,7 @@ GroupP2HardPhysicsManager.prototype.addNodesToWorld = function ()
 	this.P2World.addBody(this.body);
 	this.body.mass = this.body.getArea() * this.conf.mass;
 	this.body.updateMassProperties();
-	this.body.collisionResponse = false;
+	this.body.collisionResponse = !this.conf.noCollide;
 	//node.physicsManager.setFixed(this.group.conf.fixed);
 	// console.log(this.body.shapes);
 	// debugger;

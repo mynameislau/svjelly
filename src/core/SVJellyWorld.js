@@ -32,8 +32,8 @@ SVJellyWorld.prototype.getGroupByID = function ($ID)
 
 SVJellyWorld.prototype.createGroup = function ($type, $ID)
 {
-	var type = $type || 'default';
-	var group = new SVJellyGroup(type, this.conf.groups[type], $ID);
+	var conf = this.conf.groups[$type] || this.conf.groups.default;
+	var group = new SVJellyGroup($type, conf, $ID);
 	group.physicsManager = this.physicsManager.getGroupPhysicsManager(group);
 	group.structure = new Structure(group, this);
 	this.groupsArray.push(group);
@@ -50,7 +50,7 @@ SVJellyWorld.prototype.constrainGroups = function ($groupA, $groupB, $points)
 	{
 		var anchorA = groupA.physicsManager.createAnchorFromLine(points);
 		points.splice(points.indexOf(anchorA.point), 1);
-		var anchorB = groupB ? groupB.physicsManager.createAnchorFromPoint(points[0]) : this.physicsManager.getAnchorPhysicsManager(points[0]);
+		var anchorB = groupB ? groupB.physicsManager.createAnchorFromPoint(points[0]) : this.physicsManager.createGhostAnchorFromPoint(points[0]);
 		this.groupConstraints.push({ anchorA: anchorA, anchorB: anchorB });
 	}
 	else

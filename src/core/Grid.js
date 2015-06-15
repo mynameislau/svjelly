@@ -165,10 +165,10 @@ var Grid =
 				for (var k = 0, pointsLength = outlineGraph[i].length; k < pointsLength; k += 1)
 				{
 					var currPoint = outlineGraph[i][k];
-					if (currPoint)
-					{
-						console.log(currPoint, currentOutline.getNeighbours(currPoint[0], currPoint[1]));
-					}
+					// if (currPoint)
+					// {
+					// 	console.log(currPoint, currentOutline.getNeighbours(currPoint[0], currPoint[1]));
+					// }
 					if (currPoint && currentOutline.getNeighbours(currPoint[0], currPoint[1]).length === 2)
 					{
 						return currPoint;
@@ -179,8 +179,6 @@ var Grid =
 
 		var visited = [];
 		var startingIndex = getStartingIndex.call(this);
-		console.log(startingIndex);
-		debugger;
 		if (!startingIndex) { return; }
 
 		var getAngle = function ($index)

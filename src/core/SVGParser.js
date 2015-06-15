@@ -1,8 +1,8 @@
 
 var SVGParser = function () {};
 //var isPolygon = /polygon|rect/ig;
-var isLine = /polyline|line|path/ig;
-var lineTags = 'polyline, line, path';
+// var isLine = /polyline|line|path/ig;
+// var lineTags = 'polyline, line, path';
 
 SVGParser.prototype.parse = function ($world, $SVG)
 {
@@ -73,12 +73,17 @@ SVGParser.prototype.getGroupInfos = function ($rawGroup)
 	//var groupType = groupElement.id.match();
 	//if (groupType) { return groupType[1] || groupType[0]; }
 	//automatic for lines
-	if (!first && (groupElement.querySelectorAll(lineTags).length > 0 || groupElement.tagName.search(isLine) > -1))
-	{
-		type = 'line';
-	}
+	// if (!first && (groupElement.querySelectorAll(lineTags).length > 0 || groupElement.tagName.search(isLine) > -1))
+	// {
+	// 	type = 'line';
+	// }
 	type = first ? first[1] : undefined;
 	ID = second ? second[1] : null;
+	// if ($rawGroup.parentNode.id === 'tree-tree')
+	// {
+	// 	console.log($rawGroup, $rawGroup.id, type, ID);
+	// 	debugger;
+	// }
 
 	return { ID: ID, type: type };
 };
@@ -101,18 +106,18 @@ SVGParser.prototype.parseConstraints = function ($rawGroup, $group)
 	}
 };
 
-SVGParser.prototype.parseElements = function ($elements, $group)
-{
-	for (var i = 0, elementsLength = $elements.length; i < elementsLength; i += 1)
-	{
-		var rawElement = $elements[i];
+// SVGParser.prototype.parseElements = function ($elements, $group)
+// {
+// 	for (var i = 0, elementsLength = $elements.length; i < elementsLength; i += 1)
+// 	{
+// 		var rawElement = $elements[i];
 
-		var element = this.parseElement(rawElement);
+// 		var element = this.parseElement(rawElement);
 
-		var nodesToDraw = $group.structure.create(element);
-		this.setGraphicInstructions($group, rawElement, nodesToDraw, element);
-	}
-};
+// 		var nodesToDraw = $group.structure.create(element);
+// 		this.setGraphicInstructions($group, rawElement, nodesToDraw, element);
+// 	}
+// };
 
 SVGParser.prototype.parseElement = function ($rawElement)
 {
@@ -139,6 +144,7 @@ SVGParser.prototype.parseElement = function ($rawElement)
 
 SVGParser.prototype.setGraphicInstructions = function ($group, $rawElement, $nodes)
 {
+	//ordering nodes so the path is drawn correctly
 	for (var i = 0, length = $nodes.length; i < length; i += 1)
 	{
 		var currNode = $nodes[i];
@@ -157,12 +163,12 @@ SVGParser.prototype.setGraphicInstructions = function ($group, $rawElement, $nod
 	var opacity = $rawElement.getAttribute('opacity');
 	startNode.drawing.fill = fill;//fill === undefined ? 'none' : fill;
 	startNode.drawing.stroke = stroke;
-	startNode.drawing.radius = $group.structureProperties.radius / this.ratio;
+	startNode.drawing.radius = $group.structureProperties.radius;
 	startNode.drawing.lineWidth = lineWidth * this.ratio || 1 * this.ratio;//lineWidth === undefined ? 'none' : lineWidth * this.ratio;
-	startNode.drawing.lineCap = $rawElement.getAttribute('stroke-linecap') || 'round';
-	startNode.drawing.lineJoin = $rawElement.getAttribute('stroke-linejoin') || 'round';
+	startNode.drawing.lineCap = $rawElement.getAttribute('stroke-linecap') || 'butt';
+	startNode.drawing.lineJoin = $rawElement.getAttribute('stroke-linejoin') || 'miter';
 	startNode.drawing.opacity = opacity ? opacity : undefined;
-	startNode.drawing.closePath = $group.type !== 'line' && $group.structureProperties.radius === undefined;
+	startNode.drawing.closePath = $group.conf.structure !== 'line' && $group.structureProperties.radius === undefined;
 
 	startNode.drawing.strokeGradient = this.getGradient(stroke);
 	startNode.drawing.fillGradient = this.getGradient(fill);

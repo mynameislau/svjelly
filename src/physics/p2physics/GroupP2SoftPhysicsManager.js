@@ -104,17 +104,33 @@ GroupP2SoftPhysicsManager.prototype.addNodesToWorld = function ()
 		//this.body.fixedRotation = true;
 		body.gravityScale = this.conf.gravityScale || 1;//0;// -1;
 
-		var radius = this.conf.nodeRadius;
-		var circleShape = new p2.Circle(radius);
-		body.addShape(circleShape);
-		// var particleShape = new p2.Particle();
-		// body.addShape(particleShape);
+		// var radius = this.conf.nodeRadius;
+		// var circleShape = new p2.Circle(radius);
+		// body.addShape(circleShape);
+		if (this.group.structureProperties.radius)
+		{
+			var radius = this.group.structureProperties.radius;
+			var circleShape = new p2.Circle(radius);
+			body.addShape(circleShape);
+		}
+		else
+		{
+			var particleShape = new p2.Particle();
+			body.addShape(particleShape);
+			// var circledShape = new p2.Circle(this.conf.nodeRadius);
+			// body.addShape(circledShape);
+			body.mass = nodeMass;
+			body.updateMassProperties();
+		}
 
+		body.angularDamping = this.conf.angularDamping || body.angularDamping;
+		body.damping = this.conf.damping || body.damping;
+		body.inertia = this.conf.inertia || body.inertia;
 		//console.log(this.body.getArea());
 
 		//this.body.setDensity(node.type === 'line' ? 1 : 5000);
 
-		// this.body.damping = 0.8;
+		//body.damping = 1;
 		//body.mass = mass;
 		node.physicsManager = new NodeP2SoftPhysicsManager(p2, body, this.worldHeight);
 		//node.physicsManager.setFixed(node.fixed);
