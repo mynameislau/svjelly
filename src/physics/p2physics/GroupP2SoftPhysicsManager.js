@@ -76,11 +76,51 @@ GroupP2SoftPhysicsManager.prototype.addJointsToWorld = function ()
 		}
 		if (rotationalSpring)
 		{
-			console.log(rotationalSpring.stiffness, rotationalSpring.damping);
 			var constraint4 = new p2.RotationalSpring(joint.node1.physicsManager.body, joint.node2.physicsManager.body);
 			if (rotationalSpring.stiffness) { constraint4.stiffness = rotationalSpring.stiffness; }
 			if (rotationalSpring.damping) { constraint4.damping = rotationalSpring.damping; }
 			//this.world.addSpring(constraint4);
+		}
+	}
+};
+
+GroupP2SoftPhysicsManager.prototype.setNodesMassFromJoints = function ()
+{
+	var NodeGraph = require('../../core/NodeGraph');
+	var nodeGraph = new NodeGraph();
+	var i;
+	var startingVertices = [];
+	var nodesLength = this.group.nodes.length;
+	var jointsLength = this.group.joints.length;
+	for (i = 0; i < jointsLength; i += 1)
+	{
+		var currJoint = this.group.joints[i];
+		nodeGraph.connect(currJoint.node1, currJoint.node2);
+	}
+	for (i = 0; i < nodesLength; i += 1)
+	{
+		var node = this.group.nodes[i];
+		if (node.fixed)
+		{
+			startingVertices.push(nodeGraph.getVertex(node));
+		}
+	}
+	nodeGraph.traverse(startingVertices);
+	var verticesLength = nodeGraph.vertices.length;
+	for (i = 0; i < verticesLength; i += 1)
+	{
+		var vertex = nodeGraph.vertices[i];
+		var value = Math.pow(3, vertex.mapValue / 4);//Math.pow(2, vertex.mapValue / 7.33);
+		var body = vertex.node.physicsManager.body;
+		if (!vertex.node.fixed)
+		{
+			body.mass = this.conf.mass / value;
+			//body.mass = this.conf.mass / this.group.nodes.length / value * body.getArea();
+			//vertex.node.debugText = body.mass;
+			//body.updateMassProperties();
+			body.invMass = 1 / body.mass;
+			body.inertia = body.mass / 2;
+			body.invInertia = 1 / body.inertia;
 		}
 	}
 };
@@ -99,6 +139,7 @@ GroupP2SoftPhysicsManager.prototype.addNodesToWorld = function ()
 			mass: node.fixed ? 0 : nodeMass,
 			position: [node.oX, this.worldHeight - node.oY]
 		});
+
 		//if (node.fixed) { body.type = p2.Body.STATIC; }
 		//console.log(node.oX, node.oY);
 		//this.body.fixedRotation = true;
@@ -115,17 +156,16 @@ GroupP2SoftPhysicsManager.prototype.addNodesToWorld = function ()
 		}
 		else
 		{
-			var particleShape = new p2.Particle();
-			body.addShape(particleShape);
-			// var circledShape = new p2.Circle(this.conf.nodeRadius);
-			// body.addShape(circledShape);
-			body.mass = nodeMass;
-			body.updateMassProperties();
+			// var particleShape = new p2.Particle();
+			// body.addShape(particleShape);
+			var circledShape = new p2.Circle(this.conf.nodeRadius);
+			body.addShape(circledShape);
+			// body.mass = nodeMass;
+			// body.updateMassProperties();
 		}
 
 		body.angularDamping = this.conf.angularDamping || body.angularDamping;
 		body.damping = this.conf.damping || body.damping;
-		body.inertia = this.conf.inertia || body.inertia;
 		//console.log(this.body.getArea());
 
 		//this.body.setDensity(node.type === 'line' ? 1 : 5000);
@@ -134,6 +174,7 @@ GroupP2SoftPhysicsManager.prototype.addNodesToWorld = function ()
 		//body.mass = mass;
 		node.physicsManager = new NodeP2SoftPhysicsManager(p2, body, this.worldHeight);
 		//node.physicsManager.setFixed(node.fixed);
+		//body.setDensity(0.1);
 		this.world.addBody(body);
 		//body.mass = body.getArea() * this.conf.mass;
 		//body.gravityScale = 0.1;
@@ -141,7 +182,13 @@ GroupP2SoftPhysicsManager.prototype.addNodesToWorld = function ()
 		// body.mass = 0;
 		// body.setDensity(0);
 		//node.physicsManager.applyForce([0, 0]);
+		// body.mass = 10;
+		// body.invMass = 1 / 10;
+		// body.inertia = 5;
+		// body.invInertia = 1 / 5;
 	}
+
+	if (this.conf.structuralMassDecay) { this.setNodesMassFromJoints(); }
 };
 
 module.exports = GroupP2SoftPhysicsManager;

@@ -2,8 +2,8 @@ module.exports = {
 
 	definition: 1,
 	worldWidth: 60,
-	wind: 10,
-	debug: true,
+	wind: 1,
+	debug: false,
 	simRenderFreq: 50,
 	gravity: [0, -9.8],
 	groups:
@@ -20,21 +20,6 @@ module.exports = {
 					stiffness: 100000,
 					relaxation: 1
 				},
-				lockConstrainte:
-				{
-					stiffness: 100000,
-					relaxation: 1
-				},
-				linearSPrings:
-				{
-					stiffness: 1000,
-					damping: 1
-				},
-				rotationalSpringf:
-				{
-					stiffness: 10000,
-					damping: 1
-				},
 				nodeRadius: 0.1,
 				mass: 1
 			}
@@ -44,26 +29,32 @@ module.exports = {
 			structure: 'triangulate',
 			physics:
 			{
-				distanceConstraint:
+				distanceConstraint:null,
+				lockConstraint:
 				{
-					stiffness: 1000000000000000,
+					stiffness: 1000000,
 					relaxation: 0.9
 				},
-				lockConstraintdez:
-				{
-					stiffness: 1000000000000000,
-					relaxation: 1
-				},
-				linearSPrings:
+				mass: 10,
+				damping: 0.8,
+				nodeRadius: 0.1,
+				structuralMassDecay: 6
+			}
+		},
+		flora:
+		{
+			structure: 'line',
+			physics:
+			{
+				distanceConstraint:null,
+				lockConstraint:
 				{
 					stiffness: 100000,
-					damping: 1
+					relaxation: 1
 				},
-				mass: 0.00000000000000000000001,
+				mass: 100,
 				nodeRadius: 0.1,
-				damping: 1,
-				inertia: 1,
-				angularDamping: 1
+				structuralMassDecay: true
 			}
 		},
 		jelly:
@@ -72,13 +63,13 @@ module.exports = {
 			innerStructureDef: 0.01,
 			physics:
 			{
-				distanceConstraint:
+				distanceConstraint: null,
+				lockConstraint:
 				{
-					stiffness: 100,
+					stiffness: 1000000,
 					relaxation: 10
 				},
-				nodeRadius: 0.1,
-				mass: 0.001
+				mass: 10
 			}
 		},
 		line:
@@ -86,6 +77,7 @@ module.exports = {
 			structure: 'line',
 			physics:
 			{
+				distanceConstraint: null,
 				lockConstraint:
 				{
 					stiffness: 10,
@@ -130,7 +122,7 @@ module.exports = {
 		{
 			physics:
 			{
-				mass: 1,
+				mass: 0.1,
 				gravityScale: 0,
 				bodyType: 'hard',
 				noCollide: true
@@ -140,7 +132,7 @@ module.exports = {
 		{
 			physics:
 			{
-				mass: 10,
+				mass: 100,
 				bodyType: 'hard'
 			}
 		},
@@ -157,7 +149,7 @@ module.exports = {
 			physics:
 			{
 				mass: 1,
-				gravityScale: -1,
+				gravityScale: -10,
 				bodyType: 'hard'
 			}
 		},

@@ -12,13 +12,42 @@
 		{
 			var canvas = document.getElementById('canvas');
 			canvas.width = document.body.clientWidth;
-			var svjellyMaker = window.svjellymaker.createFromURL(canvas, '../examples/assets/testbed.svg');
-			svjellyMaker.promise.then(function ()
+			var maker = window.svjellymaker.createFromConfig(canvas, '../examples/assets/calanques.json');
+			maker.promise.then(function ()
 			{
 
-				var world = svjellyMaker.svjellyWorld;
+				var world = maker.svjellyWorld;
 				var p2 = world.physicsManager.p2;
 				var p2World = world.physicsManager.p2World;
+
+				//WIND
+				var windForce = world.conf.wind;
+				if (windForce)
+				{
+					var bodiesLength = p2World.bodies.length;
+					var coeff = 0;
+					var lastTime;
+					var twoPIs = Math.PI * 2;
+					var windInterval = 4000;
+					maker.updateCallback = function ($time)
+					{
+						if (!lastTime || coeff > Math.PI * 2)
+						{
+							lastTime = $time;
+							windInterval = 1000 + Math.random() * 7000;
+							coeff = 0;
+						}
+						coeff = ($time - lastTime) / windInterval * twoPIs;
+						//console.log(Math.sin(coeff));
+						for (var i = 0, length = bodiesLength; i < length; i += 1)
+						{
+							var curr = p2World.bodies[i];
+							var loc = [];
+							curr.toWorldFrame(loc, [0, 0]);
+							curr.applyForce([Math.sin(coeff) * windForce, 0], loc);
+						}
+					};
+				}
 
 
 				//MOUSE

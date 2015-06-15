@@ -30,9 +30,9 @@ PixiRenderer.prototype.draw = function ()
 	// var strokeStyle;
 	// var fillStyle;
 
-	for (var k = 0, groupsLength = this.world.groupsArray.length; k < groupsLength; k += 1)
+	for (var k = 0, groupsLength = this.world.groups.length; k < groupsLength; k += 1)
 	{
-		var currGroup = this.world.groupsArray[k];
+		var currGroup = this.world.groups[k];
 		// console.log('new group.', 'group nodes :', currGroup.nodesArray.length);
 
 		/*for (var i = 0, nodesLength = currGroup.nodesArray.length; i < nodesLength; i += 1)

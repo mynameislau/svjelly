@@ -96,7 +96,7 @@ GroupP2HardPhysicsManager.prototype.addNodesToWorld = function ()
 		this.body.addShape(circleShape);
 	}
 
-	this.body.gravityScale = this.conf.gravityScale || 1;
+	this.body.gravityScale = this.conf.gravityScale !== undefined ? this.conf.gravityScale : 1;
 	// console.log(startX, this.worldHeight - startY, this.body.position[0], this.body.position[1]);
 	//this.body.mass = this.conf.mass;
 	//if (this.group.conf.fixed) { node.physicsManager.setFixed(this.group.conf.fixed); }

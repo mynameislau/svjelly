@@ -4,7 +4,7 @@ var Structure = require('./Structure');
 var SVJellyWorld = function ($physicsManager, $conf)
 {
 	this.physicsManager = $physicsManager;
-	this.groupsArray = [];
+	this.groups = [];
 	this.conf = $conf;
 	this.worldNodes = [];
 	this.groupConstraints = [];
@@ -23,9 +23,9 @@ SVJellyWorld.prototype.getWidth = function ()
 
 SVJellyWorld.prototype.getGroupByID = function ($ID)
 {
-	for (var i = 0, length = this.groupsArray.length; i < length; i += 1)
+	for (var i = 0, length = this.groups.length; i < length; i += 1)
 	{
-		var currGroup = this.groupsArray[i];
+		var currGroup = this.groups[i];
 		if (currGroup.ID === $ID) { return currGroup; }
 	}
 };
@@ -36,7 +36,7 @@ SVJellyWorld.prototype.createGroup = function ($type, $ID)
 	var group = new SVJellyGroup($type, conf, $ID);
 	group.physicsManager = this.physicsManager.getGroupPhysicsManager(group);
 	group.structure = new Structure(group, this);
-	this.groupsArray.push(group);
+	this.groups.push(group);
 	return group;
 };
 
@@ -79,9 +79,9 @@ SVJellyWorld.prototype.constrainGroups = function ($groupA, $groupB, $points)
 
 SVJellyWorld.prototype.addGroupsToWorld = function ()
 {
-	for (var i = 0, groupsArrayLength = this.groupsArray.length; i < groupsArrayLength; i += 1)
+	for (var i = 0, groupsLength = this.groups.length; i < groupsLength; i += 1)
 	{
-		var currGroup = this.groupsArray[i];
+		var currGroup = this.groups[i];
 		currGroup.addNodesToWorld();
 		currGroup.addJointsToWorld();
 		this.worldNodes = this.worldNodes.concat(currGroup.nodes);

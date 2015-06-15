@@ -10,6 +10,7 @@ module.exports =
 	SVJellyNode: require('./core/SVJellyNode'),
 	SVJellyUtils: require('./core/SVJellyUtils'),
 	SVJellyWorld: require('./core/SVJellyWorld'),
-	Triangulator: require('./core/Triangulator')
+	Triangulator: require('./core/Triangulator'),
+	NodeGraph: require('./core/NodeGraph'),
 };
 

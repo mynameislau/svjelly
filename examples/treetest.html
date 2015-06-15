@@ -12,13 +12,35 @@
 		{
 			var canvas = document.getElementById('canvas');
 			canvas.width = document.body.clientWidth;
-			var svjellyMaker = window.svjellymaker.createFromURL(canvas, '../examples/assets/testbed.svg');
+			var svjellyMaker = window.svjellymaker.createFromURL(canvas, '../examples/assets/treetest.svg');
 			svjellyMaker.promise.then(function ()
 			{
 
 				var world = svjellyMaker.svjellyWorld;
 				var p2 = world.physicsManager.p2;
 				var p2World = world.physicsManager.p2World;
+
+				//WIND
+				var windForce = world.conf.wind;
+				if (windForce)
+				{
+					var bodiesLength = p2World.bodies.length;
+					svjellyMaker.updateCallback = function ()
+					{
+						// console.log('wind');
+						for (var i = 0, length = bodiesLength; i < length; i += 1)
+						{
+							var curr = world.bodies[i];
+							var loc = [];
+							curr.toWorldFrame(loc, [0, 0]);
+							curr.applyForce([windForce, 0], loc);
+						}
+					};
+					window.setInterval(function ()
+					{
+						windForce = -windForce;
+					}, 4000);
+				}
 
 
 				//MOUSE

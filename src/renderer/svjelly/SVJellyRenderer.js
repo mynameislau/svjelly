@@ -15,9 +15,9 @@ var SVJellyRenderer = function ($world, $canvas)
 	var k = 0;
 	var i;
 	var drawingGroup;
-	for (var groupsLength = this.world.groupsArray.length; k < groupsLength; k += 1)
+	for (var groupsLength = this.world.groups.length; k < groupsLength; k += 1)
 	{
-		var currGroup = this.world.groupsArray[k];
+		var currGroup = this.world.groups[k];
 
 		i = 0;
 		for (var nodesLength = currGroup.nodes.length; i < nodesLength; i += 1)
@@ -199,7 +199,7 @@ SVJellyRenderer.prototype.drawGroup = function ($drawingGroup, $context)
 	if ($drawingGroup.properties.lineWidth !== 'none') { $context.lineWidth = $drawingGroup.properties.lineWidth * this.drawScaleX; }
 	if ($drawingGroup.properties.lineCap) { $context.lineCap = $drawingGroup.properties.lineCap; }
 	if ($drawingGroup.properties.lineJoin) { $context.lineJoin = $drawingGroup.properties.lineJoin; }
-	$context.globalAlpha = $drawingGroup.properties.opacity || 1;
+	$context.globalAlpha = $drawingGroup.properties.opacity !== undefined ? $drawingGroup.properties.opacity : 1;
 
 	for (var k = 0; k < nodesLength; k += 1)
 	{
@@ -253,12 +253,13 @@ SVJellyRenderer.prototype.debugDraw = function ($clear)
 	var currGroup;
 	var i;
 	var k;
-	var groupsLength = this.world.groupsArray.length;
+	var groupsLength = this.world.groups.length;
+	var nodesLength;
 	for (k = 0; k < groupsLength; k += 1)
 	{
-		currGroup = this.world.groupsArray[k];
+		currGroup = this.world.groups[k];
 
-		var nodesLength = currGroup.nodes.length;
+		nodesLength = currGroup.nodes.length;
 		for (i = 0; i < nodesLength; i += 1)
 		{
 			var currNode = currGroup.nodes[i];
@@ -274,7 +275,7 @@ SVJellyRenderer.prototype.debugDraw = function ($clear)
 	this.context.beginPath();
 	for (k = 0; k < groupsLength; k += 1)
 	{
-		currGroup = this.world.groupsArray[k];
+		currGroup = this.world.groups[k];
 		var jointsLength = currGroup.joints.length;
 
 		for (i = 0; i < jointsLength; i += 1)
@@ -296,6 +297,18 @@ SVJellyRenderer.prototype.debugDraw = function ($clear)
 		this.context.lineTo(currLock.anchorB.getX() * this.drawScaleX, currLock.anchorB.getY() * this.drawScaleY);
 	}
 	this.context.stroke();
+
+	this.context.fillStyle = 'black';
+	for (k = 0; k < groupsLength; k += 1)
+	{
+		var group = this.world.groups[k];
+		nodesLength = group.nodes.length;
+		for (i = 0; i < nodesLength; i += 1)
+		{
+			var node = group.nodes[i];
+			if (node.debugText) { this.context.fillText(node.debugText, node.getX() * this.drawScaleX, node.getY() * this.drawScaleY); }
+		}
+	}
 };
 
 module.exports = SVJellyRenderer;

@@ -132,11 +132,12 @@ var SVJellyMaker =
 		var diffRender;
 		var simTargetFPS = 1 / 60 * 1000;//$configData.simRenderFreq; //60fps
 		var simMinimumFPS = 1 / 12 * 1000;
-		var renderTargetFPS = 1 / 30 * 1000;
+		var renderTargetFPS = 0;
 
+		var self = this;
 		var update = function ($now)
 		{
-			if (this.updateCallback) { this.updateCallback(); }
+			if (self.updateCallback) { self.updateCallback($now); }
 
 			simDiff = $now - lastSim;
 			diffRender = $now - lastRender;
