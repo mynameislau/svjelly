@@ -131,7 +131,7 @@ GroupP2SoftPhysicsManager.prototype.addNodesToWorld = function ()
 	{
 		var node = this.group.nodes[i];
 		//var fractionMass = this.conf.mass / this.group.nodes.length;
-		var area = this.group.structureProperties.area;
+		var area = this.group.structure.area;
 		var nodeMass = area * this.conf.mass / this.group.nodes.length;
 		//var mass = 500;
 		//var mass = this.conf.mass;//Math.random() * 10 + 1;
@@ -148,9 +148,9 @@ GroupP2SoftPhysicsManager.prototype.addNodesToWorld = function ()
 		// var radius = this.conf.nodeRadius;
 		// var circleShape = new p2.Circle(radius);
 		// body.addShape(circleShape);
-		if (this.group.structureProperties.radius)
+		if (this.group.structure.innerRadius)
 		{
-			var radius = this.group.structureProperties.radius;
+			var radius = this.group.structure.innerRadius;
 			var circleShape = new p2.Circle(radius);
 			body.addShape(circleShape);
 		}

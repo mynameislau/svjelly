@@ -12,10 +12,16 @@ var Structure = function ($group, $world)
 Structure.prototype.create = function ($properties)
 {
 	var nodesToDraw;
-	var points = $properties.points;
-	this.group.structureProperties = $properties;
+	var points = [];
+	for (var i = 0, length = $properties.pointInfos.length; i < length; i += 1)
+	{
+		var curr = $properties.pointInfos[i];
+		points.push(curr.point);
+	}
 
-	this.calculateArea(points);
+	this.area = this.calculateArea(points, $properties);
+	this.radiusX = $properties.radiusX;
+	this.radiusY = $properties.radiusY;
 
 	switch (this.group.conf.structure)
 	{
@@ -43,14 +49,18 @@ Structure.prototype.create = function ($properties)
 	return nodesToDraw;
 };
 
-Structure.prototype.calculateArea = function ($points)
+Structure.prototype.calculateArea = function ($points, $properties)
 {
-	if (this.group.structureProperties.type === 'polygon')
+	if ($properties.type === 'ellipse')
+	{
+		return Math.pow(Math.PI * $properties.radiusX, 2);
+	}
+	if (this.group.conf.structure !== 'line')
 	{
 		var polygon = Polygon.init($points);
-		this.group.structureProperties.area = polygon.getArea();
+		return polygon.getArea();
 	}
-	else if (this.group.structureProperties.type === 'line')
+	else
 	{
 		var area = 0;
 		for (var i = 1, length = $points.length; i < length; i += 1)
@@ -61,11 +71,7 @@ Structure.prototype.calculateArea = function ($points)
 			var dY = Math.abs(currPoint[1] - lastPoint[1]);
 			area += Math.sqrt(dX * dX + dY * dY);
 		}
-		this.group.structureProperties.area = area;
-	}
-	else if (this.group.structureProperties.type === 'circle')
-	{
-		this.group.structureProperties.area = Math.pow(Math.PI * this.group.structureProperties.radius, 2);
+		return area;
 	}
 };
 
@@ -126,7 +132,7 @@ Structure.prototype.createInnerStructure = function ($coordsArray)
 {
 	var polygon = Polygon.init($coordsArray);
 	var diam = this.world.getWidth() * this.group.conf.innerStructureDef;//width / 10;//this.world.getWidth() / 30;
-	this.group.structureProperties.radius = diam / 2;
+	this.innerRadius = diam / 2;
 	this.innerStructure = Grid.createFromPolygon(polygon, diam, true);
 	var structureNodes = this.group.createNodesFromPoints(this.innerStructure.getNodesArray());
 

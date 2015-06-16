@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Physic-o-matic</title>
+	<link rel="stylesheet" href="assets/styles.css">
+</head>
+<body>
+	<div id="canvas-holder">
+		<canvas id="canvas"></canvas>
+	</div>
+	<div id="textarea-holder">
+		<textarea id="svg-paste" cols="30" rows="10"></textarea>
+		<button id="load-svg">Load SVG</button>
+	</div>
+	<script src="../build/svjellymaker.js"></script>
+	<script>
+		window.addEventListener('load', function ()
+		{
+			var button = document.getElementById('load-svg');
+			var textarea = document.getElementById('svg-paste');
+			var canvas = document.getElementById('canvas');
+			canvas.width = canvas.parentNode.clientWidth;
+
+			var maker;
+			maker = window.svjellymaker.createFromURL(canvas, 'assets/google.svg');
+			button.addEventListener('click', function ()
+			{
+				if (maker)
+				{
+					maker.remove();
+					maker.removeBasicMouseControls();
+				}
+				maker = window.svjellymaker.createFromString(canvas, textarea.value);
+				maker.promise.then(function ()
+				{
+					maker.setBasicMouseControls();
+				});
+			});
+		});
+	</script>
+</body>
+</html>

@@ -5,6 +5,14 @@ var P2PhysicsManager = require('./physics/p2physics/P2PhysicsManager');
 var SVJellyUtils = require('./core/SVJellyUtils');
 var confObject = require('./core/ConfObject');
 
+var requestAnimFrame = window.requestAnimationFrame ||
+						window.webkitRequestAnimationFrame ||
+						window.mozRequestAnimationFrame;
+
+var cancelAnimFrame = window.cancelAnimationFrame ||
+						window.webkitCancelAnimationFrame ||
+						window.mozCancelAnimationFrame;
+
 //TODO promise polyfill
 var SVJellyMaker =
 {
@@ -18,7 +26,7 @@ var SVJellyMaker =
 		{
 			svjellyMaker.loadFile($URL, function ($SVG)
 			{
-				svjellyMaker.create($SVG);
+				svjellyMaker.create($canvas, $SVG);
 				resolve();
 			}, true);
 		});
@@ -40,13 +48,25 @@ var SVJellyMaker =
 
 				SVJellyMaker.loadFile(svjellyMaker.conf.source, function ($SVG)
 				{
-					svjellyMaker.create($SVG);
+					svjellyMaker.create($canvas, $SVG);
 					resolve();
 				}, true);
 			};
 			SVJellyMaker.loadFile($configURL, loadConfigComplete);
 		});
 
+		return svjellyMaker;
+	},
+	createFromString: function ($canvas, $string)
+	{
+		var parser = new DOMParser();
+		var doc = parser.parseFromString($string, 'image/svg+xml');
+		var svjellyMaker = Object.create(SVJellyMaker);
+		svjellyMaker.promise = new window.Promise(function (resolve)
+		{
+			svjellyMaker.create($canvas, doc);
+			resolve();
+		});
 		return svjellyMaker;
 	},
 	createFromPageSVG: function ($physicsManager, $renderer)
@@ -70,7 +90,7 @@ var SVJellyMaker =
 				svjellyMaker.physicsManager = $physicsManager;
 				var wrapper = document.createElement('div');
 				wrapper.appendChild(currSVG);
-				svjellyMaker.create(wrapper);
+				svjellyMaker.create(canvas, wrapper);
 			};
 			var configURL = currSVG.getAttribute('data-svjelly');
 			if (configURL)
@@ -93,39 +113,31 @@ var SVJellyMaker =
 			createViewer(currSVG);
 		}
 	},
-	create: function ($SVG)
+
+	create: function ($canvas, $SVG)
 	{
-		var requestAnimFrame = window.requestAnimationFrame ||
-								window.webkitRequestAnimationFrame ||
-								window.mozRequestAnimationFrame;
-
-		var cancelAnimFrame = window.cancelAnimationFrame ||
-								window.webkitCancelAnimationFrame ||
-								window.mozCancelAnimationFrame;
-
 		var conf = this.conf || confObject;
-		var canvas = this.canvas;
+		this.canvas = $canvas;
 
 		this.physicsManager = this.physicsManager || new P2PhysicsManager(conf);
 		var svjellyWorld = this.svjellyWorld = new SVJellyWorld(this.physicsManager, conf);
-
-		var requestID = '';
 
 		var canvasDefinition = conf.definition;
 		var svgDef = $SVG.querySelector('svg');
 		var parser = new SVGParser();
 		parser.parse(svjellyWorld, svgDef);
-		var canvasWidth = canvas.clientWidth * canvasDefinition;
-		var canvasHeight = canvas.clientWidth * (parser.viewBoxHeight / parser.viewBoxWidth) * canvasDefinition;
+		var canvasWidth = this.canvas.clientWidth * canvasDefinition;
+		var canvasHeight = this.canvas.clientWidth * (parser.viewBoxHeight / parser.viewBoxWidth) * canvasDefinition;
 
-		canvas.width = canvasWidth;
-		canvas.height = canvasHeight;
-		canvas.style.transformOrigin = '0 0';
-		canvas.style.transform = 'scale(' + 1 / canvasDefinition + ')';
+		this.canvas.width = canvasWidth;
+		this.canvas.height = canvasHeight;
+		this.canvas.style.transformOrigin = '0 0';
+		this.canvas.style.transform = 'scale(' + 1 / canvasDefinition + ')';
 
 		var Renderer = this.renderer || SVJellyRenderer;
-		var svjellyDraw = new Renderer(svjellyWorld, canvas);
+		this.svjellyDraw = new Renderer(svjellyWorld, this.canvas);
 
+		var requestID = '';
 		var lastSim = window.performance.now();
 		var lastRender = window.performance.now();
 		var simDiff;
@@ -133,31 +145,47 @@ var SVJellyMaker =
 		var simTargetFPS = 1 / 60 * 1000;//$configData.simRenderFreq; //60fps
 		var simMinimumFPS = 1 / 12 * 1000;
 		var renderTargetFPS = 0;
+		var that = this;
 
-		var self = this;
 		var update = function ($now)
 		{
-			if (self.updateCallback) { self.updateCallback($now); }
+			if (that.updateCallback) { that.updateCallback($now); }
 
 			simDiff = $now - lastSim;
 			diffRender = $now - lastRender;
 			if (simDiff >= simTargetFPS)
 			{
-				svjellyWorld.physicsManager.step(Math.min(simMinimumFPS / 1000, simDiff / 1000));
+				that.svjellyWorld.physicsManager.step(Math.min(simMinimumFPS / 1000, simDiff / 1000));
 				lastSim = $now;
 			}
 			if (diffRender >= renderTargetFPS)
 			{
-				svjellyDraw.draw();
+				that.svjellyDraw.draw();
 				lastRender = $now;
 			}
 			requestID = requestAnimFrame(update);
 		};
 
-		window.addEventListener('focus', function () { requestID = requestAnimFrame(update); });
-		window.addEventListener('blur', function () { cancelAnimFrame(requestID); });
+		var addAnimRequest = function ()
+		{
+			cancelAnimFrame(requestID);
+			requestID = requestAnimFrame(update);
+		};
+		var cancelAnimRequest = function ()
+		{
+			cancelAnimFrame(requestID);
+		};
 
-		requestID = requestAnimFrame(update);
+		window.addEventListener('focus', addAnimRequest);
+		window.addEventListener('blur', cancelAnimRequest);
+		addAnimRequest();
+
+		this.remove = function ()
+		{
+			cancelAnimRequest();
+			window.removeEventListener('focus', addAnimRequest);
+			window.removeEventListener('blur', cancelAnimRequest);
+		};
 	},
 
 	loadFile: function ($URL, $successCallback, $XML)
@@ -177,6 +205,86 @@ var SVJellyMaker =
 		request.addEventListener('error', error);
 		request.open('get', $URL, true);
 		request.send();
+	},
+
+	setBasicMouseControls: function ()
+	{
+		var world = this.svjellyWorld;
+		var p2 = world.physicsManager.p2;
+		var p2World = world.physicsManager.p2World;
+
+		//MOUSE
+		var mouseBody = new p2.Body();
+		p2World.addBody(mouseBody);
+
+		var mouseConstraint;
+		var bodies = p2World.bodies.concat();
+		var body;
+		var scale = this.canvas.width / world.getWidth();
+
+		var getPhysicsCoord = function (mouseEvent)
+		{
+			var rect = this.canvas.getBoundingClientRect();
+			var x = mouseEvent.clientX - rect.left;
+			var y = mouseEvent.clientY - rect.top;
+
+			x = x / scale;
+			y = (this.canvas.height - y) / scale;
+			return [x, y];
+		};
+
+		var canvas = this.canvas;
+		var mouseMove = function (event)
+		{
+			var position = getPhysicsCoord(event);
+			mouseBody.position[0] = position[0];
+			mouseBody.position[1] = position[1];
+		};
+
+		var mouseDown = function (event)
+		{
+			var position = getPhysicsCoord(event);
+
+			// Check if the cursor is inside the box
+			var hitBodies = p2World.hitTest(position, bodies, 1000);
+
+			if (hitBodies.length)
+			{
+				body = hitBodies[0];
+				// Move the mouse body to the cursor position
+
+				mouseBody.position[0] = position[0];
+				mouseBody.position[1] = position[1];
+
+				// Create a RevoluteConstraint.
+				// This constraint lets the bodies rotate around a common point
+				mouseConstraint = new p2.RevoluteConstraint(mouseBody, body,
+				{
+					worldPivot: position,
+					collideConnected: false
+				});
+				p2World.addConstraint(mouseConstraint);
+				canvas.addEventListener('mousemove', mouseMove);
+			}
+		};
+
+		var mouseUp = function ()
+		{
+			p2World.removeConstraint(mouseConstraint);
+			mouseConstraint = null;
+			canvas.removeEventListener('mousemove', mouseMove);
+		};
+
+		canvas.addEventListener('mousedown', mouseDown);
+		// Remove the mouse constraint on mouse up
+		canvas.addEventListener('mouseup', mouseUp);
+
+		this.removeBasicMouseControls = function ()
+		{
+			canvas.removeEventListener('mousemove', mouseMove);
+			canvas.removeEventListener('mousedown', mouseDown);
+			canvas.removeEventListener('mouseup', mouseUp);
+		};
 	}
 };
 

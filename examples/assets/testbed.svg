@@ -5,7 +5,7 @@
 	 width="1200px" height="800px" viewBox="0 0 1200 800" enable-background="new 0 0 1200 800" xml:space="preserve">
 <g id="back">
 	
-		<radialGradient id="SVGID_1_" cx="512.6602" cy="-44.4023" r="1086.4591" fx="610.4371" fy="-205.0511" gradientTransform="matrix(0.9714 0 0 0.9489 374.0187 233.3724)" gradientUnits="userSpaceOnUse">
+		<radialGradient id="SVGID_1_" cx="144.0898" cy="-261.4961" r="1086.4591" fx="241.8667" fy="-422.1449" gradientTransform="matrix(0.9714 0 0 0.9489 732.0475 439.3724)" gradientUnits="userSpaceOnUse">
 		<stop  offset="0" style="stop-color:#E9F2BF"/>
 		<stop  offset="1" style="stop-color:#415C5C"/>
 	</radialGradient>
@@ -71,7 +71,7 @@
 		<polyline fill="none" stroke="#42210B" stroke-width="8.9762" stroke-linecap="square" stroke-miterlimit="10" points="
 			1159.545,719.279 1154.486,710.303 1140.812,693.289 1118.47,647.011 		"/>
 		
-			<rect id="constraint_2_" x="1140.982" y="689.782" transform="matrix(-0.9475 0.3199 -0.3199 -0.9475 2496.1826 1008.5451)" opacity="0.4" fill="#006837" enable-background="new    " width="48.555" height="39.002"/>
+			<rect id="constraint_2_" x="1140.98" y="689.78" transform="matrix(-0.9475 0.3199 -0.3199 -0.9475 2496.1792 1008.5602)" opacity="0.4" fill="#006837" enable-background="new    " width="48.56" height="39.004"/>
 	</g>
 	<g id="rope_1_">
 		
@@ -79,7 +79,7 @@
 			455,545.929 463.704,562.881 471.21,577.912 478.714,592.939 486.219,607.969 493.723,622.996 501.229,638.025 508.732,653.055 
 			516.237,668.084 		"/>
 		
-			<rect id="constraint-tree_1_" x="449.979" y="539.596" opacity="0.1" fill="#E9AB00" enable-background="new    " width="10.042" height="10.377"/>
+			<rect id="constraint-tree_1_" x="449.979" y="539.596" opacity="0.1" fill="#E9AB00" enable-background="new    " width="10.043" height="10.377"/>
 	</g>
 </g>
 <g id="foreground">

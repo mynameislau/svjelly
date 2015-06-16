@@ -4,6 +4,7 @@ var SVJellyJoint = require('./SVJellyJoint');
 var SVJellyGroup = function ($type, $conf, $ID)
 {
 	this.physicsManager = undefined;
+	this.drawing = undefined;
 	this.structure = undefined;
 	this.conf = $conf;
 	this.fixed = this.conf.fixed;

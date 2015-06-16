@@ -14,42 +14,25 @@ var SVJellyRenderer = function ($world, $canvas)
 	this.drawingGroups = [];
 	var k = 0;
 	var i;
-	var drawingGroup;
 	for (var groupsLength = this.world.groups.length; k < groupsLength; k += 1)
 	{
 		var currGroup = this.world.groups[k];
-
-		i = 0;
-		for (var nodesLength = currGroup.nodes.length; i < nodesLength; i += 1)
-		{
-			var currNode = currGroup.nodes[i];
-			if (currNode.drawing)
-			{
-				if (currNode.drawing.fill || currNode.drawing.stroke)// && !currNode.drawing.notToDraw)
-				{
-					var drawingObject =
-					{
-						properties: currNode.drawing,
-						ID: currGroup.ID,
-						nodes: [],
-						type: currGroup.type,
-						bodyType: currGroup.conf.physics.bodyType,
-						structure: currGroup.conf.structure,
-						fixed: currGroup.conf.fixed
-					};
-
-					drawingGroup = this.createDrawingGroup(drawingObject);
-				}
-				drawingGroup.nodes.push(currNode);
-			}
-		}
+		this.createDrawingGroup(currGroup);
 	}
 	this.drawingGroupLength = this.drawingGroups.length;
 
-	//caching gradients
+	var drawingGroup;
+
+	//caching gradients and precalculating
 	for (i = 0; i < this.drawingGroupLength; i += 1)
 	{
 		drawingGroup = this.drawingGroups[i];
+		//precalculating some instructions
+		drawingGroup.properties.lineWidth = drawingGroup.properties.lineWidth * this.drawScaleX;
+		drawingGroup.properties.radiusX = drawingGroup.properties.radiusX * this.drawScaleX;
+		drawingGroup.properties.radiusY = drawingGroup.properties.radiusY * this.drawScaleY;
+		drawingGroup.nodesLength = drawingGroup.nodes.length;
+		//
 		if (drawingGroup.properties.strokeGradient)
 		{
 			drawingGroup.properties.stroke = this.createGradient(drawingGroup.properties.strokeGradient);
@@ -114,36 +97,45 @@ SVJellyRenderer.prototype.createGradient = function ($properties)
 
 	var gradient = $properties.type === 'linearGradient' ? this.context.createLinearGradient(x1, y1, x2, y2) : this.context.createRadialGradient(cx, cy, 0, fx, fy, r);
 
-	//gradient = this.context.createLinearGradient(0, 0, 500, 500);
-
 	for (var stopN = 0, stopLength = $properties.stops.length; stopN < stopLength; stopN += 1)
 	{
 		gradient.addColorStop($properties.stops[stopN].offset, $properties.stops[stopN].color);
 	}
 
-	// var gueugueu = this.context.createLinearGradient(0, 0, 500, 500);
-	// gueugueu.addColorStop(0, 'red');
-	// gueugueu.addColorStop(1, 'blue');
 	return gradient;
 };
 
-SVJellyRenderer.prototype.createDrawingGroup = function ($object)
+SVJellyRenderer.prototype.createDrawingGroup = function ($group)
 {
-	var group;
+	var drawingGroup;
 	//optim same drawing styles
 	for (var i = 0, length = this.drawingGroups.length; i < length; i += 1)
 	{
-		var currGroup = this.drawingGroups[i];
-		if (this.compareProperties(currGroup.properties, $object.properties) && $object.bodyType === 'hard' && currGroup.bodyType === 'hard' && currGroup.fixed === false) { group = currGroup; }
+		var currDrawingGroup = this.drawingGroups[i];
+		if (this.compareProperties(currDrawingGroup.properties, $group.drawing.properties) &&
+			$group.conf.physics.bodyType === 'hard' &&
+			currDrawingGroup.bodyType === 'hard' &&
+			currDrawingGroup.fixed === false &&
+			$group.conf.fixed === false)
+		{
+			drawingGroup = currDrawingGroup;
+		}
 	}
 
-	if (!group)
+	if (!drawingGroup)
 	{
-		group = $object;
-		this.drawingGroups.push($object);
+		drawingGroup =
+		{
+			properties: $group.drawing.properties,
+			bodyType: $group.conf.physics.bodyType,
+			fixed: $group.conf.fixed,
+			nodes: $group.drawing.nodes
+		};
+		this.drawingGroups.push(drawingGroup);
 	}
 
-	return group;
+	drawingGroup.nodes = drawingGroup.nodes.concat($group.drawing.nodes);
+	return drawingGroup;
 };
 
 SVJellyRenderer.prototype.compareProperties = function ($one, $two)
@@ -158,8 +150,8 @@ SVJellyRenderer.prototype.compareProperties = function ($one, $two)
 
 SVJellyRenderer.prototype.draw = function ()
 {
-	//this.context.clearRect(0, 0, this.width, this.height);
-	this.context.miterLimit = 1;
+	this.context.clearRect(0, 0, this.width, this.height);
+	//this.context.miterLimit = 1;
 	var previousCached;
 	for (var i = 0; i < this.drawingGroupLength; i += 1)
 	{
@@ -182,63 +174,66 @@ SVJellyRenderer.prototype.draw = function ()
 	if (this.debug) { this.debugDraw(); }
 };
 
-SVJellyRenderer.prototype.drawGroup = function ($drawingGroup, $context)
+SVJellyRenderer.prototype.drawGroup = function (drawing, context)
 {
-	var nodesLength = $drawingGroup.nodes.length;
-	$context.beginPath();
+	context.beginPath();
 
-	// console.log($context.fillStyle, $context.strokeStyle);
-	// console.log($drawingGroup.properties.fill, $drawingGroup.properties.stroke);
-	// debugger;
+	if (context.fillStyle !== drawing.properties.fill) { context.fillStyle = drawing.properties.fill; }
+	if (context.strokeStyle !== drawing.properties.stroke) { context.strokeStyle = drawing.properties.stroke; }
+	if (context.lineWidth !== drawing.properties.lineWidth) { context.lineWidth = drawing.properties.lineWidth; }
+	if (context.lineCap !== drawing.properties.lineCap) { context.lineCap = drawing.properties.lineCap; }
+	if (context.lineJoin !== drawing.properties.lineJoin) { context.lineJoin = drawing.properties.lineJoin; }
+	if (context.globalAlpha !== drawing.properties.opacity) { context.globalAlpha = drawing.properties.opacity; }
 
-	// if ($drawingGroup.properties.fill !== 'none') { $context.fillStyle = $drawingGroup.properties.fill; }
-	// if ($drawingGroup.properties.stroke !== 'none') { $context.strokeStyle = $drawingGroup.properties.stroke; }
-	if ($context.fillStyle !== $drawingGroup.properties.fill) { $context.fillStyle = $drawingGroup.properties.fill; }
-	if ($context.strokeStyle !== $drawingGroup.properties.stroke) { $context.strokeStyle = $drawingGroup.properties.stroke; }
-
-	if ($drawingGroup.properties.lineWidth !== 'none') { $context.lineWidth = $drawingGroup.properties.lineWidth * this.drawScaleX; }
-	if ($drawingGroup.properties.lineCap) { $context.lineCap = $drawingGroup.properties.lineCap; }
-	if ($drawingGroup.properties.lineJoin) { $context.lineJoin = $drawingGroup.properties.lineJoin; }
-	$context.globalAlpha = $drawingGroup.properties.opacity !== undefined ? $drawingGroup.properties.opacity : 1;
-
-	for (var k = 0; k < nodesLength; k += 1)
+	for (var k = 0; k < drawing.nodesLength; k += 1)
 	{
-		var currNode = $drawingGroup.nodes[k];
-		if (currNode.drawing && currNode.drawing.notToDraw) { continue; }
-		if (currNode.isStart)
+		var currNode = drawing.nodes[k];
+		if (currNode.drawing.isStart)
 		{
-			//line gradient
-			if ($drawingGroup.type === 'line' && $drawingGroup.properties.strokeGradient)
+			//special case for lines with nice dynamic gradients
+			if (drawing.properties.dynamicGradient)
 			{
 				var x1 = currNode.getX() * this.drawScaleX;
 				var y1 = currNode.getY() * this.drawScaleY;
 				var x2 = currNode.endNode.getX() * this.drawScaleX;
 				var y2 = currNode.endNode.getY() * this.drawScaleY;
-				var gradient = $context.createLinearGradient(x1, y1, x2, y2);
+				var gradient = context.createLinearGradient(x1, y1, x2, y2);
 				for (var stopN = 0, stopLength = currNode.drawing.strokeGradient.length; stopN < stopLength; stopN += 1)
 				{
 					gradient.addColorStop(1 - currNode.drawing.strokeGradient[stopN].offset, currNode.drawing.strokeGradient[stopN].color);
 				}
-				$context.strokeStyle = gradient;
+				context.strokeStyle = gradient;
 			}
 			//
 
-			$context.moveTo(currNode.getX() * this.drawScaleX, currNode.getY() * this.drawScaleY);
-			if ($drawingGroup.properties.radius)
+			context.moveTo(currNode.getX() * this.drawScaleX, currNode.getY() * this.drawScaleY);
+			if (drawing.properties.radiusX)
 			{
-				$context.arc(currNode.getX() * this.drawScaleX, currNode.getY() * this.drawScaleY, $drawingGroup.properties.radius * this.drawScaleY, 0, Math.PI * 2);
+				context.arc(currNode.getX() * this.drawScaleX, currNode.getY() * this.drawScaleY, drawing.properties.radiusX, 0, Math.PI * 2);
 			}
 		}
 		else
 		{
-			$context.lineTo(currNode.getX() * this.drawScaleX, currNode.getY() * this.drawScaleY);
+			if (currNode.drawing.command === 'bezierCurveTo')
+			{
+				var options = currNode.drawing.options;
+				var baseX = currNode.getX() * this.drawScaleX;
+				var baseY = currNode.getY() * this.drawScaleY;
+				var cp1x = baseX + options[0][0] * this.drawScaleX;
+				var cp1y = baseY + options[0][1] * this.drawScaleY;
+				var cp2x = baseX + options[1][0] * this.drawScaleX;
+				var cp2y = baseY + options[1][1] * this.drawScaleY;
+				context.bezierCurveTo(cp1x, cp1y, cp2x, cp2y, baseX, baseY);
+				console.log(options[0][0], options[0][1], options[1][0], options[1][1]);
+				console.log(cp1x, cp1y, cp2x, cp2y, baseX, baseY);
+				//context.lineTo(baseX, baseY);
+			}
+			else { context.lineTo(currNode.getX() * this.drawScaleX, currNode.getY() * this.drawScaleY); }
 		}
-		// $context.moveTo(currNode.getX() * this.drawScaleX, this.height - currNode.getY() * this.drawScaleY);
-		// $context.arc(currNode.getX() * this.drawScaleX, this.height - currNode.getY() * this.drawScaleY, 2, 0, Math.PI * 2);
 	}
-	if ($drawingGroup.properties.closePath) { $context.closePath(); }
-	if ($drawingGroup.properties.fill !== 'none') { $context.fill(); }
-	if ($drawingGroup.properties.stroke !== 'none') { $context.stroke(); }
+	if (drawing.properties.closePath) { context.closePath(); }
+	if (drawing.properties.fill !== 'none') { context.fill(); }
+	if (drawing.properties.stroke !== 'none') { context.stroke(); }
 };
 
 SVJellyRenderer.prototype.debugDraw = function ($clear)
@@ -264,7 +259,7 @@ SVJellyRenderer.prototype.debugDraw = function ($clear)
 		{
 			var currNode = currGroup.nodes[i];
 			this.context.moveTo(currNode.getX() * this.drawScaleX, currNode.getY() * this.drawScaleY);
-			var radius = currGroup.structureProperties.radius || currGroup.conf.physics.nodeRadius;
+			var radius = currGroup.structure.radiusX || currGroup.conf.physics.nodeRadius;
 			radius *= this.drawScaleX;
 			this.context.arc(currNode.getX() * this.drawScaleX, currNode.getY() * this.drawScaleY, radius, 0, Math.PI * 2);
 		}

@@ -46,7 +46,7 @@ module.exports = {
 			structure: 'line',
 			physics:
 			{
-				distanceConstraint:null,
+				distanceConstraint: null,
 				lockConstraint:
 				{
 					stiffness: 100000,

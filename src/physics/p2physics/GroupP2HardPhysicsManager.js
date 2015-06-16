@@ -91,7 +91,7 @@ GroupP2HardPhysicsManager.prototype.addNodesToWorld = function ()
 	}
 	else
 	{
-		var radius = this.group.structureProperties.radius;
+		var radius = this.group.structure.radiusX;
 		var circleShape = new p2.Circle(radius);
 		this.body.addShape(circleShape);
 	}
