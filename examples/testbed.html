@@ -1,3 +1,5 @@
+
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -12,75 +14,43 @@
 		{
 			var canvas = document.getElementById('canvas');
 			canvas.width = document.body.clientWidth;
-			var svjellyMaker = window.svjellymaker.createFromURL(canvas, '../examples/assets/lineTo2.svg');
-			svjellyMaker.promise.then(function ()
+			var maker = window.svjellymaker.createFromURL(canvas, '../examples/assets/testbed.svg');
+			maker.promise.then(function ()
 			{
-
-				var world = svjellyMaker.svjellyWorld;
+				var world = maker.svjellyWorld;
 				var p2 = world.physicsManager.p2;
 				var p2World = world.physicsManager.p2World;
 
-
-				//MOUSE
-
-				var mouseBody = new p2.Body();
-				p2World.addBody(mouseBody);
-
-				var mouseConstraint;
-				var bodies = p2World.bodies.concat();
-				var body;
-				var scale = canvas.width / world.getWidth();
-				// Convert a canvas coordiante to physics coordinate
-				function getPhysicsCoord (mouseEvent){
-					var rect = canvas.getBoundingClientRect();
-					var x = mouseEvent.clientX - rect.left;
-					var y = mouseEvent.clientY - rect.top;
-
-					x = x / scale;
-					y = (canvas.height - y) / scale;
-					return [x, y];
+				//WIND
+				var windForce = world.conf.wind;
+				if (windForce)
+				{
+					var bodiesLength = p2World.bodies.length;
+					var coeff = 0;
+					var lastTime;
+					var twoPIs = Math.PI * 2;
+					var windInterval = 4000;
+					maker.updateCallback = function ($time)
+					{
+						if (!lastTime || coeff > Math.PI * 2)
+						{
+							lastTime = $time;
+							windInterval = 1000 + Math.random() * 7000;
+							coeff = 0;
+						}
+						coeff = ($time - lastTime) / windInterval * twoPIs;
+						//console.log(Math.sin(coeff));
+						for (var i = 0, length = bodiesLength; i < length; i += 1)
+						{
+							var curr = p2World.bodies[i];
+							var loc = [];
+							curr.toWorldFrame(loc, [0, 0]);
+							curr.applyForce([Math.sin(coeff) * windForce, 0], loc);
+						}
+					};
 				}
 
-				var mouseMove = function (event)
-				{
-					var position = getPhysicsCoord(event);
-					mouseBody.position[0] = position[0];
-					mouseBody.position[1] = position[1];
-				};
-
-				canvas.addEventListener('mousedown', function (event)
-				{
-					var position = getPhysicsCoord(event);
-
-					// Check if the cursor is inside the box
-					var hitBodies = p2World.hitTest(position, bodies, 1000);
-
-					if(hitBodies.length)
-					{
-						body = hitBodies[0];
-						// Move the mouse body to the cursor position
-
-						mouseBody.position[0] = position[0];
-						mouseBody.position[1] = position[1];
-
-						// Create a RevoluteConstraint.
-						// This constraint lets the bodies rotate around a common point
-						mouseConstraint = new p2.RevoluteConstraint(mouseBody, body,
-						{
-							worldPivot: position,
-							collideConnected:false
-						});
-						p2World.addConstraint(mouseConstraint);
-						canvas.addEventListener('mousemove', mouseMove);
-					}
-				});
-
-					// Remove the mouse constraint on mouse up
-				canvas.addEventListener('mouseup', function (){
-					p2World.removeConstraint(mouseConstraint);
-					mouseConstraint = null;
-					canvas.removeEventListener('mousemove');
-				});
+				maker.addBasicMouseControls();
 			});
 		};
 

@@ -1,15 +1,16 @@
 module.exports = {
 
 	definition: 1,
-	worldWidth: 60,
-	wind: 1,
-	debug: false,
+	worldWidth: 150,
+	multiCanvas: true,
+	wind: 5,
+	debug: true,
 	simRenderFreq: 50,
 	gravity: [0, -9.8],
 	groups:
 	{
-		default: { physics: { bodyType: 'ghost' } },
-		ghost: { physics: { bodyType: 'ghost' } },
+		default: { fixed: true, physics: { bodyType: 'ghost' } },
+		ghost: { fixed: true, physics: { bodyType: 'ghost' } },
 		soft:
 		{
 			structure: 'triangulate',
@@ -21,7 +22,8 @@ module.exports = {
 					relaxation: 1
 				},
 				nodeRadius: 0.1,
-				mass: 1
+				mass: 1,
+				bodyType: 'soft'
 			}
 		},
 		tree:
@@ -29,16 +31,17 @@ module.exports = {
 			structure: 'triangulate',
 			physics:
 			{
-				distanceConstraint:null,
+				distanceConstraint: null,
 				lockConstraint:
 				{
-					stiffness: 1000000,
+					stiffness: 10000,
 					relaxation: 0.9
 				},
-				mass: 10,
+				mass: 5,
 				damping: 0.8,
 				nodeRadius: 0.1,
-				structuralMassDecay: 6
+				structuralMassDecay: 3,
+				bodyType: 'soft'
 			}
 		},
 		flora:
@@ -54,7 +57,8 @@ module.exports = {
 				},
 				mass: 100,
 				nodeRadius: 0.1,
-				structuralMassDecay: true
+				structuralMassDecay: true,
+				bodyType: 'soft'
 			}
 		},
 		jelly:
@@ -69,7 +73,8 @@ module.exports = {
 					stiffness: 1000000,
 					relaxation: 10
 				},
-				mass: 10
+				mass: 10,
+				bodyType: 'soft'
 			}
 		},
 		line:
@@ -84,7 +89,8 @@ module.exports = {
 					relaxation: 1
 				},
 				nodeRadius: 0.1,
-				mass: 1
+				mass: 1,
+				bodyType: 'soft'
 			}
 		},
 		rope:
@@ -98,7 +104,8 @@ module.exports = {
 					relaxation: 1
 				},
 				nodeRadius: 0.1,
-				mass: 1
+				mass: 1,
+				bodyType: 'soft'
 			}
 		},
 		hard:
@@ -132,7 +139,7 @@ module.exports = {
 		{
 			physics:
 			{
-				mass: 100,
+				mass: 10,
 				bodyType: 'hard'
 			}
 		},
@@ -148,7 +155,7 @@ module.exports = {
 		{
 			physics:
 			{
-				mass: 1,
+				mass: 0.01,
 				gravityScale: -10,
 				bodyType: 'hard'
 			}

@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Testbed</title>
+</head>
+<body>
+	<img src="../examples/assets/drawingTest.svg" style="width:400px;" alt="">
+	<br/>
+	<canvas id="canvas" width="400" height="400"></canvas>
+	<script src="../build/svjellymaker.js"></script>
+	<script>
+		var loadEventHandler = function ()
+		{
+			var canvas = document.getElementById('canvas');
+			//canvas.width = document.body.clientWidth;
+			var svjellyMaker = window.svjellymaker.createFromURL(canvas, '../examples/assets/drawingTest.svg');
+		};
+
+		window.addEventListener('load', loadEventHandler);
+	</script>
+</body>
+</html>

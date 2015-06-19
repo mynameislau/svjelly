@@ -20,12 +20,12 @@ AnchorP2SoftPhysicsManager.prototype.setFixed = function ($fixed)
 
 AnchorP2SoftPhysicsManager.prototype.getX = function ()
 {
-	return this.body.position[0];
+	return this.body.interpolatedPosition[0];
 };
 
 AnchorP2SoftPhysicsManager.prototype.getY = function ()
 {
-	return this.worldHeight - this.body.position[1];
+	return this.worldHeight - this.body.interpolatedPosition[1];
 };
 
 module.exports = AnchorP2SoftPhysicsManager;

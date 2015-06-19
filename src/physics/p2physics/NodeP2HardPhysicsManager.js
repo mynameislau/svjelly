@@ -33,22 +33,22 @@ NodeP2HardPhysicsManager.prototype.setOffset = function ($offset)
 
 NodeP2HardPhysicsManager.prototype.getXSimple = function ()
 {
-	return this.body.position[0];
+	return this.body.interpolatedPosition[0];
 };
 
 NodeP2HardPhysicsManager.prototype.getYSimple = function ()
 {
-	return this.worldHeight - this.body.position[1];
+	return this.worldHeight - this.body.interpolatedPosition[1];
 };
 
 NodeP2HardPhysicsManager.prototype.getXOffset = function ()
 {
-	return this.body.position[0] + this.hyp * Math.cos(this.body.angle + this.angle);
+	return this.body.interpolatedPosition[0] + this.hyp * Math.cos(this.body.interpolatedAngle + this.angle);
 };
 
 NodeP2HardPhysicsManager.prototype.getYOffset = function ()
 {
-	return this.worldHeight - (this.body.position[1] + this.hyp * Math.sin(this.body.angle + this.angle));
+	return this.worldHeight - (this.body.interpolatedPosition[1] + this.hyp * Math.sin(this.body.interpolatedAngle + this.angle));
 };
 
 module.exports = NodeP2HardPhysicsManager;

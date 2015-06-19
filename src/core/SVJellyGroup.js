@@ -166,41 +166,6 @@ SVJellyGroup.prototype.createJoint = function ($node1, $node2)
 	//this.physicsManager.addJointToWorld(joint);
 };
 
-SVJellyGroup.prototype.createNodesFromPoints = function ($coordsArray)
-{
-	var coordsArrayLength = $coordsArray.length;
-	var toReturn = [];
-	for (var i = 0; i < coordsArrayLength; i += 1)
-	{
-		var currPoint = $coordsArray[i];
-		toReturn.push(this.createNode(currPoint[0], currPoint[1], undefined, false));
-	}
-	return toReturn;
-};
-
-SVJellyGroup.prototype.getBestMatchForGroupConstraint = function ($points, $anchor)
-{
-	return this.physicsManager.getBestMatchForGroupConstraint($points, $anchor);
-};
-
-SVJellyGroup.prototype.createJointsFromPoints = function ($coordsArray, $noClose)
-{
-	var coordsArrayLength = $coordsArray.length;
-	for (var i = 1; i < coordsArrayLength; i += 1)
-	{
-		var currPoint = $coordsArray[i];
-		var lastPoint = $coordsArray[i - 1];
-		var lastNode = this.getNodeAtPoint(lastPoint[0], lastPoint[1]);
-		var currNode = this.getNodeAtPoint(currPoint[0], currPoint[1]);
-		this.createJoint(lastNode, currNode);
-		if (i === coordsArrayLength - 1 && $noClose !== true)
-		{
-			var firstNode = this.getNodeAtPoint($coordsArray[0][0], $coordsArray[0][1]);
-			this.createJoint(currNode, firstNode);
-		}
-	}
-};
-
 SVJellyGroup.prototype.addNodesToWorld = function ()
 {
 	this.physicsManager.addNodesToWorld();

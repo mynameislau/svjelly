@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Generator: Adobe Illustrator 16.0.0, SVG Export Plug-In . SVG Version: 6.00 Build 0)  -->
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" width="1200px"
+	 height="800px" viewBox="0 0 1200 800" enable-background="new 0 0 1200 800" xml:space="preserve">
+<g id="static">
+	<rect y="761.572" fill="#666666" width="1200" height="38.428"/>
+	
+		<rect x="6.353" y="89.33" transform="matrix(0.8179 0.5753 -0.5753 0.8179 69.6594 -29.7612)" fill="#666666" width="151.001" height="11.707"/>
+</g>
+<g id="moving">
+	<circle id="metal" fill="#F7931E" cx="52.611" cy="29.609" r="25.109"/>
+	<rect id="static_1_" x="187.604" y="184.101" fill="#F7931E" width="428.979" height="23.999"/>
+	<g id="metal_1_">
+		<rect x="253.601" y="80.606" fill="#F7931E" width="9" height="103.495"/>
+		<rect x="315.098" y="80.606" fill="#F7931E" width="9" height="103.495"/>
+		<rect x="379.595" y="80.606" fill="#F7931E" width="9" height="103.495"/>
+		<rect x="444.092" y="80.606" fill="#F7931E" width="9" height="103.495"/>
+		<rect x="510.088" y="80.606" fill="#F7931E" width="9" height="103.495"/>
+		<rect x="603" y="80.606" fill="#F7931E" width="8.999" height="103.495"/>
+	</g>
+	<polygon id="static_3_" fill="#F7931E" points="975.691,761.572 936.693,761.572 936.693,552.856 975.691,540.893 	"/>
+	<polygon id="static_2_" fill="#F7931E" points="1169.182,761.572 1139.184,761.572 1139.184,490.738 1169.182,481.535 	"/>
+	
+		<rect id="metal_2_" x="778.144" y="528.364" transform="matrix(0.956 -0.2933 0.2933 0.956 -113.2264 311.1894)" fill="#F7931E" width="405.926" height="9.61"/>
+	<circle id="balloon" fill="#F7931E" cx="1062.687" cy="592.08" r="35.998"/>
+</g>
+</svg>

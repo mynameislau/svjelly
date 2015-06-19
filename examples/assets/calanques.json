@@ -10,10 +10,10 @@
 				"lockConstraint":
 				{
 					"stiffness": 100000,
-					"relaxation": 0.9
+					"relaxation": 1
 				},
-				"mass": 100,
-				"structuralMassDecay": 4
+				"mass": 1,
+				"structuralMassDecay": 1.3
 			}
 		}
 	}

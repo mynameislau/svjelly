@@ -23,7 +23,7 @@
 			canvas.width = canvas.parentNode.clientWidth;
 
 			var maker;
-			maker = window.svjellymaker.createFromURL(canvas, 'assets/google.svg');
+			//maker = window.svjellymaker.createFromURL(canvas, 'assets/google.svg');
 			button.addEventListener('click', function ()
 			{
 				if (maker)
@@ -34,7 +34,7 @@
 				maker = window.svjellymaker.createFromString(canvas, textarea.value);
 				maker.promise.then(function ()
 				{
-					maker.setBasicMouseControls();
+					maker.addBasicMouseControls();
 				});
 			});
 		});

@@ -27,12 +27,12 @@ NodeP2SoftPhysicsManager.prototype.setFixed = function ($fixed)
 NodeP2SoftPhysicsManager.prototype.getX = function ()
 {
 	//console.log(this.body.GetWorldCenter().get_x());
-	return this.body.position[0];
+	return this.body.interpolatedPosition[0];
 };
 
 NodeP2SoftPhysicsManager.prototype.getY = function ()
 {
-	return this.worldHeight - this.body.position[1];
+	return this.worldHeight - this.body.interpolatedPosition[1];
 };
 
 module.exports = NodeP2SoftPhysicsManager;

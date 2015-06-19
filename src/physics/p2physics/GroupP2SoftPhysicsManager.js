@@ -105,19 +105,24 @@ GroupP2SoftPhysicsManager.prototype.setNodesMassFromJoints = function ()
 			startingVertices.push(nodeGraph.getVertex(node));
 		}
 	}
+	if (startingVertices.length === 0)
+	{
+		return;
+	}
 	nodeGraph.traverse(startingVertices);
 	var verticesLength = nodeGraph.vertices.length;
 	for (i = 0; i < verticesLength; i += 1)
 	{
 		var vertex = nodeGraph.vertices[i];
-		var value = Math.pow(3, vertex.mapValue / 4);//Math.pow(2, vertex.mapValue / 7.33);
+		var decay = Number(this.group.conf.physics.structuralMassDecay);
+		var value = Math.pow(decay, vertex.mapValue / 4);//Math.pow(2, vertex.mapValue / 7.33);
 		var body = vertex.node.physicsManager.body;
 		if (!vertex.node.fixed)
 		{
-			body.mass = this.conf.mass / value;
 			//body.mass = this.conf.mass / this.group.nodes.length / value * body.getArea();
 			//vertex.node.debugText = body.mass;
 			//body.updateMassProperties();
+			body.mass = this.group.structure.area * this.conf.mass / value;
 			body.invMass = 1 / body.mass;
 			body.inertia = body.mass / 2;
 			body.invInertia = 1 / body.inertia;
@@ -139,6 +144,8 @@ GroupP2SoftPhysicsManager.prototype.addNodesToWorld = function ()
 			mass: node.fixed ? 0 : nodeMass,
 			position: [node.oX, this.worldHeight - node.oY]
 		});
+		body.interpolatedPosition[0] = body.position[0];
+		body.interpolatedPosition[1] = body.position[1];
 
 		//if (node.fixed) { body.type = p2.Body.STATIC; }
 		//console.log(node.oX, node.oY);
@@ -176,6 +183,7 @@ GroupP2SoftPhysicsManager.prototype.addNodesToWorld = function ()
 		//node.physicsManager.setFixed(node.fixed);
 		//body.setDensity(0.1);
 		this.world.addBody(body);
+
 		//body.mass = body.getArea() * this.conf.mass;
 		//body.gravityScale = 0.1;
 		//body.updateMassProperties();

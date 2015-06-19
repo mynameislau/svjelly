@@ -14,12 +14,16 @@ var P2PhysicsManager = function ($conf)
 	this.conf = $conf;
 	this.worldWidth = undefined;
 	this.worldHeight = undefined;
+	this.newTime = undefined;
+	this.lastTime = undefined;
 	//this.p2World.gravity = this.conf.gravity;
 };
 
 P2PhysicsManager.prototype.step = function ($time)
 {
-	this.p2World.step($time);
+	this.newTime = $time - this.lastTime || 0;
+	this.lastTime = $time;
+	this.p2World.step(1 / 60, this.newTime, 5);
 };
 
 P2PhysicsManager.prototype.constrainGroups = function ($anchorA, $anchorB)
@@ -47,7 +51,7 @@ P2PhysicsManager.prototype.getGroupPhysicsManager = function ($group)
 	{
 		case 'ghost': return new GroupGhostPhysicsManager($group);
 		case 'hard': return new GroupP2HardPhysicsManager(this.p2World, this.worldHeight, $group, $group.conf.physics);
-		default: return new GroupP2SoftPhysicsManager(this.p2World, this.worldHeight, $group, $group.conf.physics);
+		case 'soft': return new GroupP2SoftPhysicsManager(this.p2World, this.worldHeight, $group, $group.conf.physics);
 	}
 };
 

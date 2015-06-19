@@ -105,6 +105,14 @@ GroupP2HardPhysicsManager.prototype.addNodesToWorld = function ()
 	this.body.mass = this.body.getArea() * this.conf.mass;
 	this.body.updateMassProperties();
 	this.body.collisionResponse = !this.conf.noCollide;
+
+	if (this.group.ID === 'ground')
+	{
+		console.log(this.body);
+	}
+
+	this.body.interpolatedPosition[0] = this.body.position[0];
+	this.body.interpolatedPosition[1] = this.body.position[1];
 	//node.physicsManager.setFixed(this.group.conf.fixed);
 	// console.log(this.body.shapes);
 	// debugger;
