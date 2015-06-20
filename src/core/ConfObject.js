@@ -4,7 +4,7 @@ module.exports = {
 	worldWidth: 150,
 	multiCanvas: true,
 	wind: 5,
-	debug: true,
+	debug: false,
 	simRenderFreq: 50,
 	gravity: [0, -9.8],
 	groups:
@@ -14,6 +14,7 @@ module.exports = {
 		soft:
 		{
 			structure: 'triangulate',
+			nodeRadius: 0.1,
 			physics:
 			{
 				distanceConstraint:
@@ -21,7 +22,6 @@ module.exports = {
 					stiffness: 100000,
 					relaxation: 1
 				},
-				nodeRadius: 0.1,
 				mass: 1,
 				bodyType: 'soft'
 			}
@@ -29,6 +29,7 @@ module.exports = {
 		tree:
 		{
 			structure: 'triangulate',
+			nodeRadius: 0.1,
 			physics:
 			{
 				distanceConstraint: null,
@@ -39,7 +40,6 @@ module.exports = {
 				},
 				mass: 5,
 				damping: 0.8,
-				nodeRadius: 0.1,
 				structuralMassDecay: 3,
 				bodyType: 'soft'
 			}
@@ -47,17 +47,17 @@ module.exports = {
 		flora:
 		{
 			structure: 'line',
+			nodeRadius: 0.1,
 			physics:
 			{
 				distanceConstraint: null,
 				lockConstraint:
 				{
-					stiffness: 100000,
+					stiffness: 1000,
 					relaxation: 1
 				},
-				mass: 100,
-				nodeRadius: 0.1,
-				structuralMassDecay: true,
+				mass: 0.1,
+				structuralMassDecay: 3,
 				bodyType: 'soft'
 			}
 		},
@@ -65,21 +65,22 @@ module.exports = {
 		{
 			structure: 'hexaFill',
 			innerStructureDef: 0.01,
+			nodeRadius: 0.1,
 			physics:
 			{
-				distanceConstraint: null,
-				lockConstraint:
+				distanceConstraint:
 				{
-					stiffness: 1000000,
-					relaxation: 10
+					stiffness: 10000,
+					relaxation: 30
 				},
-				mass: 10,
+				mass: 1,
 				bodyType: 'soft'
 			}
 		},
 		line:
 		{
 			structure: 'line',
+			nodeRadius: 0.1,
 			physics:
 			{
 				distanceConstraint: null,
@@ -88,7 +89,6 @@ module.exports = {
 					stiffness: 10,
 					relaxation: 1
 				},
-				nodeRadius: 0.1,
 				mass: 1,
 				bodyType: 'soft'
 			}
@@ -96,6 +96,7 @@ module.exports = {
 		rope:
 		{
 			structure: 'line',
+			nodeRadius: 0.1,
 			physics:
 			{
 				distanceConstraint:
@@ -103,7 +104,6 @@ module.exports = {
 					stiffness: 1000,
 					relaxation: 1
 				},
-				nodeRadius: 0.1,
 				mass: 1,
 				bodyType: 'soft'
 			}
@@ -114,25 +114,6 @@ module.exports = {
 			{
 				mass: 1,
 				bodyType: 'hard'
-			}
-		},
-		noCollide:
-		{
-			physics:
-			{
-				mass: 1,
-				bodyType: 'hard',
-				noCollide: true
-			}
-		},
-		cloud:
-		{
-			physics:
-			{
-				mass: 0.1,
-				gravityScale: 0,
-				bodyType: 'hard',
-				noCollide: true
 			}
 		},
 		metal:
@@ -167,6 +148,25 @@ module.exports = {
 			{
 				mass: 0,
 				bodyType: 'hard'
+			}
+		},
+		noCollide:
+		{
+			physics:
+			{
+				mass: 1,
+				bodyType: 'hard',
+				noCollide: true
+			}
+		},
+		leaves:
+		{
+			physics:
+			{
+				mass: 0.001,
+				gravityScale: 0,
+				bodyType: 'hard',
+				noCollide: true
 			}
 		}
 	}

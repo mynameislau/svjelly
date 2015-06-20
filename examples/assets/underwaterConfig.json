@@ -1,32 +1,27 @@
 {
-	"source": "assets/balloonsV1.svg",
-	"current": 2,
-	"debug": true,
-	"ground": true,
+	"source": "assets/underwater.svg",
+	"wind": 5,
 	"groups":
 	{
-		"default":
+		"algae":
 		{
-			"structure": "triangulate",
+			"structure": "line",
+			"nodeRadius": 0.1,
 			"physics":
 			{
-				"distanceConstraint":
-				{
-					"stiffness": 100000,
-					"relaxation": 10
-				}
-			}
-		},
-		"line":
-		{
-			"physics":
-			{
+				"distanceConstraint": null,
 				"lockConstraint":
 				{
 					"stiffness": 10,
-					"relaxation": 0.1
+					"relaxation": 10
 				},
-				"gravityScale": -1
+				"gravityScale": -0.5,
+				"damping": 0.9,
+				"angularDamping": 0.9,
+				"structuralMassDecay": 4,
+				"massVariance": 0.5,
+				"mass": 0.5,
+				"bodyType": "soft"
 			}
 		}
 	}

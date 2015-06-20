@@ -222,7 +222,6 @@ var SVJellyMaker =
 
 			x = x / scale;
 			// console.log(container.offsetLeft, container.offsetTop, mouseEvent.clientX, mouseEvent.clientY, scale);
-			console.log(container.clientHeight);
 			y = (renderer.height - y) / scale;
 			return [x, y];
 		};

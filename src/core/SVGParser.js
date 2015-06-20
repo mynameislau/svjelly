@@ -198,19 +198,20 @@ SVGParser.prototype.setGraphicInstructions = function ($group, $raw, $nodesToDra
 	var drawing = $group.drawing = {};
 	drawing.nodes = $nodesToDraw;
 	var props = drawing.properties = {};
-	//ordering nodesToDraw so the path is drawn correctly
+	//sorting nodesToDraw so the path is drawn correctly
+	var start;
 	for (var i = 0, length = $nodesToDraw.length; i < length; i += 1)
 	{
 		var currNode = $nodesToDraw[i];
+		if (currNode.drawing.command === MOVE_TO || i === length - 1)
+		{
+			if (start) { start.drawing.endNode = currNode; }
+			start = currNode;
+		}
+
 		$group.nodes.splice($group.nodes.indexOf(currNode), 1);
 		$group.nodes.splice(i, 0, currNode);
 	}
-	drawing.startNode = $nodesToDraw[0];
-	drawing.endNode = $nodesToDraw[$nodesToDraw.length - 1];
-
-	$nodesToDraw[0].drawing.isStart = true;
-	$nodesToDraw[$nodesToDraw.length - 1].drawing.isEnd = true;
-	$nodesToDraw[0].drawing.endNode = $nodesToDraw[$nodesToDraw.length - 1];
 
 	var rawFill = $raw.getAttribute('fill');
 	var rawStrokeWidth = $raw.getAttribute('stroke-width');

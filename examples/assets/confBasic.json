@@ -1,0 +1,23 @@
+{
+	"gravity": [0, -1],
+	"debug": true,
+	"ground": true,
+	"groups":
+	{
+		"default":
+		{
+			"structure": "triangulate",
+			"fixed": false,
+			"physics":
+			{
+				"bodyType": "soft",
+				"mass": 0.1,
+				"distanceConstraint":
+				{
+					"stiffness": 100,
+					"relaxation": 1
+				}
+			}
+		}
+	}
+}

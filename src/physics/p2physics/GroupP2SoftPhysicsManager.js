@@ -115,14 +115,18 @@ GroupP2SoftPhysicsManager.prototype.setNodesMassFromJoints = function ()
 	{
 		var vertex = nodeGraph.vertices[i];
 		var decay = Number(this.group.conf.physics.structuralMassDecay);
-		var value = Math.pow(decay, vertex.mapValue / 4);//Math.pow(2, vertex.mapValue / 7.33);
+		var value = Math.pow(decay, vertex.mapValue / 5);//Math.pow(2, vertex.mapValue / 7.33);
 		var body = vertex.node.physicsManager.body;
 		if (!vertex.node.fixed)
 		{
 			//body.mass = this.conf.mass / this.group.nodes.length / value * body.getArea();
 			//vertex.node.debugText = body.mass;
 			//body.updateMassProperties();
-			body.mass = this.group.structure.area * this.conf.mass / value;
+			var massVariance = this.conf.massVariance || 0;
+			var random = -massVariance + Math.random() * massVariance * 2;
+			var baseMass = this.group.structure.area * this.conf.mass;
+			var mass = baseMass + baseMass * random;
+			body.mass = mass / value;
 			body.invMass = 1 / body.mass;
 			body.inertia = body.mass / 2;
 			body.invInertia = 1 / body.inertia;
@@ -165,14 +169,12 @@ GroupP2SoftPhysicsManager.prototype.addNodesToWorld = function ()
 		{
 			// var particleShape = new p2.Particle();
 			// body.addShape(particleShape);
-			var circledShape = new p2.Circle(this.conf.nodeRadius);
+			var circledShape = new p2.Circle(this.group.conf.nodeRadius);
 			body.addShape(circledShape);
 			// body.mass = nodeMass;
 			// body.updateMassProperties();
 		}
 
-		body.angularDamping = this.conf.angularDamping || body.angularDamping;
-		body.damping = this.conf.damping || body.damping;
 		//console.log(this.body.getArea());
 
 		//this.body.setDensity(node.type === 'line' ? 1 : 5000);
@@ -191,9 +193,16 @@ GroupP2SoftPhysicsManager.prototype.addNodesToWorld = function ()
 		// body.setDensity(0);
 		//node.physicsManager.applyForce([0, 0]);
 		// body.mass = 10;
-		// body.invMass = 1 / 10;
-		// body.inertia = 5;
-		// body.invInertia = 1 / 5;
+		var massVariance = this.conf.massVariance || 0;
+		var random = -massVariance + Math.random() * massVariance * 2;
+		body.mass = body.mass + body.mass * random;
+		//body.mass = body.mass;
+		body.invMass = 1 / body.mass;
+		body.inertia = body.mass * 0.5;
+		body.invInertia = 1 / body.inertia;
+		
+		body.angularDamping = this.conf.angularDamping || body.angularDamping;
+		body.damping = this.conf.damping || body.damping;
 	}
 
 	if (this.conf.structuralMassDecay) { this.setNodesMassFromJoints(); }

@@ -325,28 +325,28 @@ var SVJellyRenderer =//function ($world, $canvas)
 		if (context.lineJoin !== drawing.properties.lineJoin) { context.lineJoin = drawing.properties.lineJoin; }
 		if (context.globalAlpha !== drawing.properties.opacity) { context.globalAlpha = drawing.properties.opacity; }
 
-		//special case for lines with nice dynamic gradients
-		if (drawing.properties.dynamicGradient)
-		{
-			var x1 = drawing.startNode.getX() * this.scaleX;
-			var y1 = drawing.startNode.getY() * this.scaleY;
-			var x2 = drawing.endNode.getX() * this.scaleX;
-			var y2 = drawing.endNode.getY() * this.scaleY;
-			var gradient = context.createLinearGradient(x1, y1, x2, y2);
-			for (var stopN = 0, stopLength = drawing.strokeGradient.stops.length; stopN < stopLength; stopN += 1)
-			{
-				gradient.addColorStop(1 - drawing.strokeGradient.stops[stopN].offset, drawing.strokeGradient.stops[stopN].color);
-			}
-			context.strokeStyle = gradient;
-		}
-		//
-
 		for (var k = 0; k < drawing.nodesLength; k += 1)
 		{
 			var currNode = drawing.nodes[k];
 			if (currNode.drawing.command === MOVE_TO)
 			{
 				context.moveTo(currNode.getX() * this.scaleX, currNode.getY() * this.scaleY);
+
+				//special case for lines with nice dynamic gradients
+				if (drawing.properties.dynamicGradient)
+				{
+					var x1 = currNode.getX() * this.scaleX;
+					var y1 = currNode.getY() * this.scaleY;
+					var x2 = currNode.drawing.endNode.getX() * this.scaleX;
+					var y2 = currNode.drawing.endNode.getY() * this.scaleY;
+					var gradient = context.createLinearGradient(x1, y1, x2, y2);
+					for (var stopN = 0, stopLength = drawing.properties.strokeGradient.stops.length; stopN < stopLength; stopN += 1)
+					{
+						gradient.addColorStop(1 - drawing.properties.strokeGradient.stops[stopN].offset, drawing.properties.strokeGradient.stops[stopN].color);
+					}
+					context.strokeStyle = gradient;
+				}
+				//
 			}
 			else if (currNode.drawing.command === LINE_TO)
 			{
@@ -405,7 +405,7 @@ var SVJellyRenderer =//function ($world, $canvas)
 	{
 		if ($clear !== undefined) { this.debugContext.clearRect(0, 0, this.width, this.height); }
 
-		this.debugContext.strokeStyle = 'rgba(255,255,1,1)';
+		this.debugContext.strokeStyle = 'yellow';
 		this.debugContext.lineCap = 'butt';
 		this.debugContext.lineJoin = 'miter';
 		this.debugContext.lineWidth = 1;
@@ -424,7 +424,11 @@ var SVJellyRenderer =//function ($world, $canvas)
 			{
 				var currNode = currGroup.nodes[i];
 				this.debugContext.moveTo(currNode.getX() * this.scaleX, currNode.getY() * this.scaleY);
-				var radius = currGroup.structure.innerRadius * this.scaleX || currGroup.structure.radiusX * this.scaleX || currGroup.conf.physics.nodeRadius * this.scaleX || 1;
+				var radius = currGroup.structure.innerRadius || currGroup.conf.nodeRadius || currGroup.structure.radiusX || 0.01;
+				radius *= this.scaleX;
+				// console.log(currGroup.structure.innerRadius, currGroup.conf.nodeRadius, currGroup.structure.radiusX);
+				// console.log(radius);
+				// debugger;
 				this.debugContext.arc(currNode.getX() * this.scaleX, currNode.getY() * this.scaleY, radius, 0, Math.PI * 2);
 			}
 		}

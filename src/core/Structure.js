@@ -197,9 +197,9 @@ Structure.prototype.createInnerStructure = function ($points)
 {
 	var polygon = Polygon.init($points);
 	var diam = this.world.getWidth() * this.group.conf.innerStructureDef;//width / 10;//this.world.getWidth() / 30;
-	this.innerRadius = diam / 2;
+	this.innerRadius = this.group.conf.nodeRadius || diam / 2;
 	this.innerStructure = Grid.createFromPolygon(polygon, diam, true);
-	var structureNodes = this.createNodesFromPoints(this.innerStructure.getNodesArray());
+	this.structureNodes = this.createNodesFromPoints(this.innerStructure.getNodesArray());
 
 	var network = this.innerStructure.getNetwork();
 	var i = 0;
@@ -211,7 +211,7 @@ Structure.prototype.createInnerStructure = function ($points)
 		var n2 = this.group.getNodeAtPoint(currLink[1][0], currLink[1][1]);
 		this.group.createJoint(n1, n2);
 	}
-	return structureNodes;
+	return this.structureNodes;
 };
 
 Structure.prototype.createJointsFromPoints = function ($points, $noClose)

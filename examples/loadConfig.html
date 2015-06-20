@@ -6,12 +6,48 @@
 </head>
 <body>
 	<canvas id="canvas"></canvas>
-	<script src="svjellymaker.js"></script>
+	<script src="../build/svjellymaker.js"></script>
 	<script>
 		var loadEventHandler = function ()
 		{
 			var canvas = document.getElementById('canvas');
-			window.svjellymaker.createFromConfig(canvas, 'assets/underwaterConfig.json');
+			canvas.width = document.body.clientWidth;
+			var maker = window.svjellymaker.createFromConfig(canvas, '../examples/assets/underwaterConfig.json');
+			maker.promise.then(function ()
+			{
+				var world = maker.svjellyWorld;
+				var p2World = world.physicsManager.p2World;
+
+				//WIND
+				var windForce = world.conf.wind;
+				if (windForce)
+				{
+					var bodiesLength = p2World.bodies.length;
+					var coeff = 0;
+					var lastTime;
+					var twoPIs = Math.PI * 2;
+					var windInterval = 10000;
+					maker.updateCallback = function ($time)
+					{
+						if (!lastTime || coeff > Math.PI * 2)
+						{
+							lastTime = $time;
+							coeff = 0;
+						}
+						coeff = ($time - lastTime) / windInterval * twoPIs;
+						//console.log(Math.sin(coeff));
+						for (var i = 0, length = bodiesLength; i < length; i += 1)
+						{
+							var curr = p2World.bodies[i];
+							var loc = [];
+							curr.toWorldFrame(loc, [0, 0]);
+							curr.applyForce([Math.sin(coeff) * windForce, 0], loc);
+						}
+					};
+				}
+
+				maker.addBasicMouseControls();
+			});
 		};
 
 		window.addEventListener('load', loadEventHandler);

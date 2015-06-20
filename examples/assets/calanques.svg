@@ -3,12 +3,12 @@
 <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
 <svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
 	 width="1200px" height="800px" viewBox="0 0 1200 800" enable-background="new 0 0 1200 800" xml:space="preserve">
-<radialGradient id="ghost_4_" cx="841" cy="-203" r="894.1968" gradientTransform="matrix(1 0 0 1 358 206)" gradientUnits="userSpaceOnUse">
+<radialGradient id="ghost_4_" cx="662" cy="1106.5" r="894.1968" gradientTransform="matrix(1 0 0 -1 537 1109.5)" gradientUnits="userSpaceOnUse">
 	<stop  offset="0" style="stop-color:#5C92BF"/>
 	<stop  offset="1" style="stop-color:#497DDD"/>
 </radialGradient>
 <rect id="ghost_2_" fill="url(#ghost_4_)" width="1200.732" height="298.982"/>
-<linearGradient id="ghost_5_" gradientUnits="userSpaceOnUse" x1="-19.5596" y1="793.4648" x2="503.5618" y2="-112.6082" gradientTransform="matrix(1 0 0 1 358 206)">
+<linearGradient id="ghost_5_" gradientUnits="userSpaceOnUse" x1="-198.5601" y1="110.0356" x2="324.561" y2="1016.108" gradientTransform="matrix(1 0 0 -1 537 1109.5)">
 	<stop  offset="0" style="stop-color:#00A99D"/>
 	<stop  offset="0.6" style="stop-color:#264D67"/>
 	<stop  offset="1" style="stop-color:#294663"/>
@@ -46,7 +46,7 @@
 	<polygon id="constraint" opacity="0.1" fill="#00A980" enable-background="new    " points="214.11,420.59 502.096,400 
 		487.923,437.688 422.821,600.581 272.607,680.763 89.5,530.085 	"/>
 </g>
-<g id="cloud">
+<g id="leaves_3_">
 	<rect id="constraint-trunk" x="155.75" y="128.125" fill="#FF00ED" width="31" height="16.75"/>
 	<rect id="constraint-trunk_3_" x="305" y="136.5" fill="#FF00ED" width="31" height="16.75"/>
 	<rect id="constraint-trunk_1_" x="89.5" y="122.625" fill="#FF00ED" width="31" height="16.75"/>
@@ -56,7 +56,7 @@
 		264,151 219.5,136 206.5,148 183,158.317 165.5,161 144.5,162 135.5,154 125.5,153 119.472,157.07 97.839,163.169 77.5,172 
 		70.5,172.153 34,179.5 6.5,182 	"/>
 </g>
-<g id="cloud_1_">
+<g id="leaves_2_">
 	
 		<rect id="constraint-trunk_6_" x="350.333" y="168.333" fill="#FF3F98" stroke="#627738" stroke-miterlimit="10" width="26" height="13.667"/>
 	
@@ -68,7 +68,7 @@
 		658.5,73 646.5,46.89 609.5,40 557.5,40 519.5,55 482.55,68 435.5,81 421.5,94.171 418.5,101 391.5,104 361.5,105 331.5,130 
 		317.345,163 317.345,182 	"/>
 </g>
-<g id="cloud_2_">
+<g id="leaves_1_">
 	<polygon id="constraint-trunk_9_" fill="#C800D4" stroke="#627738" stroke-miterlimit="10" points="671.25,159 675,161 
 		691.25,141.25 682,139 	"/>
 	<polygon id="constraint-trunk_8_" fill="#C800D4" stroke="#627738" stroke-miterlimit="10" points="756.75,150.125 772.5,168.125 
@@ -82,7 +82,7 @@
 		826.5,167 839.5,182 862.5,182 896.5,158 906.5,149.684 930.5,153 952.602,151.854 978.5,139 991.5,102 978.5,78 918.5,66 
 		856.5,85 831.5,104 797.5,99 739.5,94.171 714.5,107 670.5,108 627.5,135 	"/>
 </g>
-<g id="cloud_3_">
+<g id="leaves">
 	<polygon id="constraint-trunk_10_" fill="#FF15E2" stroke="#627738" stroke-miterlimit="10" points="725,324.333 737.666,342 
 		751,329.667 	"/>
 	<polygon id="constraint-trunk_11_" fill="#FF15E2" stroke="#627738" stroke-miterlimit="10" points="762,345.667 782.333,365 
