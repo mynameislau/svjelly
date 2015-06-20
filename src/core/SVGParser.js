@@ -297,8 +297,19 @@ SVGParser.prototype.getGradient = function ($value)
 		{
 			var currStop = stops[k];
 			var offset = Number(currStop.getAttribute('offset'));
-			var color = currStop.getAttribute('stop-color') || /stop-color:(#[0-9A-F]+)/im.exec(currStop.getAttribute('style'))[1];
-			var opacity = currStop.getAttribute('stop-opacity');
+			var colorRegexResult = /stop-color:(.+?)(;|$)/g.exec(currStop.getAttribute('style'));
+			var color = currStop.getAttribute('stop-color') || colorRegexResult ? colorRegexResult[1] : undefined;
+			var opacityRegexResult = /stop-opacity:([\d.-]+)/g.exec(currStop.getAttribute('style'));
+			var opacity = currStop.getAttribute('stop-opacity') || opacityRegexResult ? opacityRegexResult[1] : 1;
+			if (color.startsWith('#'))
+			{
+				var R = parseInt(color.substr(1, 2), 16);
+				var G = parseInt(color.substr(3, 2), 16);
+				var B = parseInt(color.substr(5, 2), 16);
+				color = 'rgba(' + R + ',' + G + ',' + B + ',' + opacity + ')';
+			}
+			if (color.startsWith('rgb(')) { color = 'rgba' + color.substring(4, -1) + ',' + opacity + ')'; }
+			if (color.startsWith('hsl(')) { color = 'hsla' + color.substring(4, -1) + ',' + opacity + ')'; }
 			gradient.stops.push({ offset: offset, color: color, opacity: opacity });
 		}
 
