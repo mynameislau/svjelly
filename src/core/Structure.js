@@ -45,6 +45,11 @@ Structure.prototype.create = function ($drawingCommands)
 		case 'hexaFill':
 			nodesToDraw = this.createHexaFillStructure(this.points);
 			break;
+		case 'simple':
+			nodesToDraw = this.createNodesFromPoints(this.points);
+			this.createJointsFromPoints(this.points);
+			this.setNodeDrawingCommands(nodesToDraw);
+		break;
 		default:
 			nodesToDraw = this.createNodesFromPoints(this.points);
 			this.setNodeDrawingCommands(nodesToDraw);
@@ -75,6 +80,7 @@ Structure.prototype.calculateArea = function ($points, $drawingCommands)
 			var dX = Math.abs(currPoint[0] - lastPoint[0]);
 			var dY = Math.abs(currPoint[1] - lastPoint[1]);
 			area += Math.sqrt(dX * dX + dY * dY);
+			area = area * 0.5 + area * $drawingCommands.thickness * 0.5;
 		}
 		return area;
 	}

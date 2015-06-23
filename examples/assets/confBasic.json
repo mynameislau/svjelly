@@ -12,10 +12,14 @@
 			{
 				"bodyType": "soft",
 				"mass": 0.1,
-				"distanceConstraint":
-				{
-					"stiffness": 100,
-					"relaxation": 1
+				"joints": {
+					"default": {
+						"distanceConstraint":
+						{
+							"stiffness": 100,
+							"relaxation": 1
+						}
+					}
 				}
 			}
 		}

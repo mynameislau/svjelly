@@ -9,13 +9,17 @@
 			"nodeRadius": 0.1,
 			"physics":
 			{
-				"distanceConstraint": null,
-				"lockConstraint":
-				{
-					"stiffness": 10,
-					"relaxation": 10
+				"joints": {
+					"default": {
+						"distanceConstraint": null,
+						"lockConstraint":
+						{
+							"stiffness": 10,
+							"relaxation": 10
+						}
+					}
 				},
-				"gravityScale": -0.5,
+				"gravityScale": -0.1,
 				"damping": 0.9,
 				"angularDamping": 0.9,
 				"structuralMassDecay": 4,

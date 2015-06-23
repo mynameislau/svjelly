@@ -7,11 +7,17 @@
 		{
 			"physics":
 			{
-				"distanceConstraint": null,
-				"lockConstraint":
+				"joints":
 				{
-					"stiffness": 100000,
-					"relaxation": 0.9
+					"default":
+					{
+						"distanceConstraint": null,
+						"lockConstraint":
+						{
+							"stiffness": 100000,
+							"relaxation": 0.9
+						}
+					}
 				},
 				"mass": 1,
 				"structuralMassDecay": 2

@@ -5,12 +5,12 @@ var p2 = require('../../../libs/p2');
 var NodeP2HardPhysicsManager = require('./NodeP2HardPhysicsManager');
 var AnchorP2HardPhysicsManager = require('./AnchorP2HardPhysicsManager');
 
-var GroupP2HardPhysicsManager = function ($P2World, $worldHeight, $group, $conf)
+var GroupP2HardPhysicsManager = function ($group, $P2World, $worldHeight)
 {
 	this.group = $group;
 	this.worldHeight = $worldHeight;
 	this.P2World = $P2World;
-	this.conf = $conf;
+	this.conf = $group.conf.physics;
 };
 
 GroupP2HardPhysicsManager.prototype.createAnchorFromPoint = function ($point)
@@ -116,6 +116,12 @@ GroupP2HardPhysicsManager.prototype.addNodesToWorld = function ()
 	//node.physicsManager.setFixed(this.group.conf.fixed);
 	// console.log(this.body.shapes);
 	// debugger;
+};
+
+GroupP2HardPhysicsManager.prototype.hitTest = function ($point)
+{
+	var result = this.P2World.hitTest($point, [this.body]);
+	return result ? result[0] : undefined;
 };
 
 module.exports = GroupP2HardPhysicsManager;

@@ -5,7 +5,7 @@
 	 width="1200px" height="800px" viewBox="0 0 1200 800" enable-background="new 0 0 1200 800" xml:space="preserve">
 <g id="back">
 	
-		<radialGradient id="SVGID_1_" cx="-408.7656" cy="1387.6367" r="1086.4591" fx="-310.9887" fy="1226.9879" gradientTransform="matrix(0.9714 0 0 -0.9489 1269.0914 1507.9661)" gradientUnits="userSpaceOnUse">
+		<radialGradient id="SVGID_1_" cx="-593.0508" cy="-695.6836" r="1086.4591" fx="-495.2739" fy="-856.3324" gradientTransform="matrix(0.9714 0 0 0.9489 1448.1061 851.3714)" gradientUnits="userSpaceOnUse">
 		<stop  offset="0" style="stop-color:#E9F2BF"/>
 		<stop  offset="1" style="stop-color:#415C5C"/>
 	</radialGradient>
@@ -34,15 +34,15 @@
 </g>
 <g id="moving">
 	<g>
-		<circle id="hard" fill="#262626" cx="597.06" cy="526.295" r="21"/>
+		<circle id="stone" fill="#262626" cx="597.06" cy="526.295" r="21"/>
 		
-			<line id="constraint" fill="none" stroke="#262626" stroke-width="4" stroke-miterlimit="10" x1="597.06" y1="526.295" x2="670.554" y2="478.7"/>
+			<line id="constraint-world-wire" fill="none" stroke="#262626" stroke-width="4" stroke-miterlimit="10" x1="597.06" y1="526.295" x2="670.554" y2="478.7"/>
 	</g>
 	<g>
 		<polygon id="metal-big" fill="#262626" points="822.157,485.087 813.222,471.848 813.222,447.575 824.417,434.335 850.55,434.335 
 			867.952,445.368 869.571,465.228 861.585,480.423 841.396,485.087 		"/>
 		<polygon id="metal_1_" fill="#262626" points="874.575,492.503 871.965,488.634 871.965,481.54 875.237,477.671 882.875,477.671 
-			887.961,480.896 888.435,486.699 886.101,491.14 880.2,492.503 		"/>
+			887.961,480.896 888.436,486.699 886.102,491.14 880.2,492.503 		"/>
 		<polygon id="metal_2_" fill="#262626" points="787.765,474.544 785.153,470.675 785.153,463.58 788.425,459.711 796.062,459.711 
 			801.149,462.936 801.622,468.739 799.288,473.181 793.388,474.544 		"/>
 	</g>
@@ -56,30 +56,30 @@
 			426.554,542.366 458.97,539.045 482.054,544.366 502.554,536.845 488.554,547.295 503.054,560.366 490.554,552.366 
 			458.554,547.295 420.554,554.45 383.554,568.866 354.554,596.974 368.054,641.822 400.458,670.075 418.275,722.601 		"/>
 		
-			<rect id="constraint_1_" x="289.054" y="697.896" opacity="0.2" fill="#39B54A" enable-background="new    " width="167.5" height="38.292"/>
+			<rect id="constraint_1_" x="289.054" y="697.896" opacity="0.2" fill="#39B54A" enable-background="new    " width="167.5" height="38.291"/>
 	</g>
 	<g id="flora-weed">
 		<polyline fill="none" stroke="#42210B" stroke-width="6.1318" stroke-linecap="square" stroke-miterlimit="10" points="
-			1160.87,714.848 1154.817,696.785 1152.932,687.541 1152.046,677.717 1152.146,647.44 1150.603,637.718 		"/>
+			1160.87,714.848 1154.817,696.785 1152.932,687.541 1152.046,677.717 1152.146,647.44 1150.604,637.718 		"/>
 		<polyline fill="none" stroke="#42210B" stroke-width="5.8204" stroke-linecap="square" stroke-miterlimit="10" points="
-			1166.733,713.388 1160.782,692.2 1159.039,681.505 1158.191,670.195 1158.819,635.225 1157.519,623.86 		"/>
+			1166.733,713.388 1160.782,692.2 1159.039,681.505 1158.191,670.195 1158.819,635.225 1157.52,623.86 		"/>
 		<polyline fill="none" stroke="#42210B" stroke-width="5.4452" stroke-linecap="square" stroke-miterlimit="10" points="
 			1164.42,714.94 1151.9,682.359 1135.657,625.954 		"/>
 		<polyline fill="none" stroke="#42210B" stroke-width="3.9969" stroke-linecap="square" stroke-miterlimit="10" points="
-			1166.603,709.313 1164.842,701.827 1163.823,694.392 1163.603,686.631 1163.991,678.395 1165.032,669.953 1166.54,661.585 
-			1167.349,653.298 1167.019,645.059 		"/>
+			1166.604,709.312 1164.842,701.827 1163.823,694.392 1163.604,686.631 1163.991,678.395 1165.032,669.953 1166.54,661.585 
+			1167.349,653.298 1167.02,645.059 		"/>
 		<polyline fill="none" stroke="#42210B" stroke-width="2.7438" stroke-linecap="square" stroke-miterlimit="10" points="
-			1169.659,713.334 1169.1,708.741 1169.198,704.208 1170.232,699.407 1171.967,694.212 1174.414,688.706 1177.579,683.103 
+			1169.659,713.334 1169.1,708.741 1169.198,704.208 1170.232,699.407 1171.967,694.212 1174.414,688.706 1177.579,683.104 
 			1180.196,677.557 1181.472,672.236 		"/>
 		<polyline fill="none" stroke="#42210B" stroke-width="8.9762" stroke-linecap="square" stroke-miterlimit="10" points="
 			1163.099,720.646 1158.04,711.669 1144.366,694.655 1122.023,648.377 		"/>
 		
-			<rect id="constraint_2_" x="1144.47" y="691.127" transform="matrix(0.9475 -0.3199 0.3199 0.9475 -165.9066 411.1917)" opacity="0.4" fill="#006837" enable-background="new    " width="48.566" height="39.01"/>
+			<rect id="constraint_2_" x="1144.534" y="691.126" transform="matrix(-0.9475 0.3199 -0.3199 -0.9475 2503.541 1010.0431)" opacity="0.4" fill="#006837" enable-background="new    " width="48.568" height="39.011"/>
 	</g>
 	<g id="rope_1_">
 		
 			<polyline fill="none" stroke="#603813" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" stroke-miterlimit="10" points="
-			458.554,547.295 467.258,564.247 474.764,579.278 482.268,594.306 489.772,609.335 497.276,624.362 504.782,639.392 
+			458.554,547.295 467.258,564.247 474.764,579.278 482.268,594.306 489.771,609.335 497.276,624.362 504.782,639.392 
 			512.286,654.421 519.791,669.45 		"/>
 		
 			<rect id="constraint-tree_1_" x="453.532" y="540.962" opacity="0.1" fill="#E9AB00" enable-background="new    " width="10.043" height="10.377"/>
@@ -88,7 +88,7 @@
 		<rect id="metal-plank" x="659" y="460.834" fill="#262626" width="92.167" height="6.333"/>
 		<g>
 			
-				<line id="constraint-plank" fill="none" stroke="#2A2300" stroke-width="1.5298" stroke-miterlimit="10" x1="746.12" y1="464.583" x2="767.396" y2="307.5"/>
+				<line id="constraint-plank-wire_1_" fill="none" stroke="#2A2300" stroke-width="1.5298" stroke-miterlimit="10" x1="746.12" y1="464.583" x2="767.396" y2="307.5"/>
 			
 				<circle id="balloon_1_" fill="#F2EEE2" stroke="#E5E4DF" stroke-width="1.9964" stroke-miterlimit="10" cx="767.396" cy="307.5" r="31.276"/>
 		</g>
@@ -96,12 +96,12 @@
 			
 				<circle id="balloon" fill="#F2EEE2" stroke="#E5E4DF" stroke-width="1.9355" stroke-miterlimit="10" cx="659" cy="323.412" r="30.319"/>
 			
-				<line id="constraint-plank_1_" fill="none" stroke="#2A2300" stroke-width="1.384" stroke-miterlimit="10" x1="662.806" y1="464" x2="659" y2="323.412"/>
+				<line id="constraint-plank-wire" fill="none" stroke="#2A2300" stroke-width="1.384" stroke-miterlimit="10" x1="662.806" y1="464" x2="659" y2="323.412"/>
 		</g>
 	</g>
-	<g id="soft_3_">
+	<g id="rubber_3_">
 		<rect id="constraint_4_" x="-4" y="334.345" fill="#FF5815" width="12.654" height="35.531"/>
-		<polygon id="soft_1_" fill="#2A1F00" points="269.049,337.266 239.36,337.266 209.67,337.266 179.98,337.266 150.29,337.266 
+		<polygon id="rubber_1_" fill="#2A1F00" points="269.049,337.266 239.36,337.266 209.67,337.266 179.98,337.266 150.29,337.266 
 			120.6,337.266 120.6,337.264 90.91,337.264 61.22,337.264 31.53,337.264 1.841,337.264 1.841,366.956 31.53,366.956 
 			61.22,366.956 90.91,366.956 120.6,366.956 120.6,366.956 150.29,366.956 179.98,366.956 209.67,366.956 239.36,366.956 
 			269.049,366.956 		"/>

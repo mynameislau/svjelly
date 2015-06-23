@@ -37,37 +37,15 @@ SVGParser.prototype.parse = function ($world, $SVG)
 		var currGroup = $world.createGroup(groupInfos.type, groupInfos.ID);
 		currGroup.rawSVGElement = rawElement;
 
-		//var elements = rawElement;
-		//this.parseElements(elements, currGroup);
-
 		var drawingCommands = this.parseElement(rawElement);
 		var nodesToDraw = currGroup.structure.create(drawingCommands);
 		this.setGraphicInstructions(currGroup, rawElement, nodesToDraw, drawingCommands);
 
-		// var hasGroup;
-		// for (var k = 0, length = rawGroupPairings.length; k < length; k += 1)
-		// {
-		// 	var curr = rawGroupPairings[k];
-		// 	if (curr.group === currGroup)
-		// 	{
-		// 		hasGroup = true;
-		// 		break;
-		// 	}
-		// }
-		// if (!hasGroup) { rawGroupPairings.push({ group: currGroup, raw: rawElement.parentNode }); }
 		rawGroupPairings.push({ group: currGroup, raw: rawElement.parentNode });
 	}
 
-	// var pairingsLength = rawGroupPairings.length;
-	// for (i = 0; i < pairingsLength; i += 1)
-	// {
-	// 	var pairing = rawGroupPairings[i];
-	// 	// this.parseAnchors(pairing.raw, pairing.group);
-	// 	this.parseConstraints(pairing.raw, pairing.group);
-	// 	this.parseCustomJoints(pairing.raw, pairing.group);
-	// }
-
 	this.parseConstraints();
+	this.parseCustomJoints();
 
 	this.world.addGroupsToWorld();
 };
@@ -80,23 +58,12 @@ SVGParser.prototype.getGroupInfos = function ($rawGroup)
 	var regex = /([a-z\d]+)\w*/igm;
 	var first = regex.exec(groupElement.id);
 	var second = regex.exec(groupElement.id);
-	//if (first) { type = second ? second[1] : first[1]; }
-	//var groupType = groupElement.id.match();
-	//if (groupType) { return groupType[1] || groupType[0]; }
-	//automatic for lines
-	// if (!first && (groupElement.querySelectorAll(lineTags).length > 0 || groupElement.tagName.search(isLine) > -1))
-	// {
-	// 	type = 'line';
-	// }
+
 	type = first ? first[1] : undefined;
 	ID = second ? second[1] : null;
 	var title = groupElement.querySelector('title');
 	if (ID === null) { ID = title ? title.nodeValue : ID; }
-	// if ($rawGroup.parentNode.id === 'tree-tree')
-	// {
-	// 	console.log($rawGroup, $rawGroup.id, type, ID);
-	// 	debugger;
-	// }
+
 	return { ID: ID, type: type };
 };
 
@@ -128,8 +95,10 @@ SVGParser.prototype.parseConstraints = function ()
 		var currRawConstraint = rawConstraints[i];
 		var rawElements = currRawConstraint.parentNode.querySelectorAll(this.elementsQuery);
 		var points = this.getPoints(this.parseElement(currRawConstraint).pointCommands);
-		var result = /constraint-([a-z\d]*)/ig.exec(currRawConstraint.id);
+		var result = /constraint-([a-z\d]*)-?([a-z\d]*)?/ig.exec(currRawConstraint.id);
 		var parentGroupID = result ? result[1] : undefined;
+		if (parentGroupID === 'world') { parentGroupID = undefined; }
+		var constraintType = result && result[2] ? result[2] : 'default';
 		var parentGroup = parentGroupID ? this.world.getGroupByID(parentGroupID) : undefined;
 
 		for (var k = 0, rawElementsLength = rawElements.length; k < rawElementsLength; k += 1)
@@ -137,37 +106,50 @@ SVGParser.prototype.parseConstraints = function ()
 			var currRawElement = rawElements[k];
 			var group = this.getGroupFromRawSVGElement(currRawElement);
 			//console.log(group);
-			this.world.constrainGroups(group, parentGroup, points);
+			this.world.constrainGroups(group, parentGroup, points, constraintType);
+		}
+	}
+};
+
+SVGParser.prototype.parseCustomJoints = function ()
+{
+	var rawJoint = this.SVG.querySelectorAll('[id*="joint"]');
+	for (var i = 0, length = rawJoint.length; i < length; i += 1)
+	{
+		var currRawJoint = rawJoint[i];
+		var rawElements = currRawJoint.parentNode.querySelectorAll(this.elementsQuery);
+		var points = this.getPoints(this.parseElement(currRawJoint).pointCommands);
+		var result = /joint-([a-z\d]*)/ig.exec(currRawJoint.id);
+		var type = result ? result[1] : undefined;
+
+		for (var k = 0, rawElementsLength = rawElements.length; k < rawElementsLength; k += 1)
+		{
+			var currRawElement = rawElements[k];
+			var group = this.getGroupFromRawSVGElement(currRawElement);
+			var nodeA = group.getNodeAtPoint(points[0][0], points[0][1]);
+			var nodeB = group.getNodeAtPoint(points[1][0], points[1][1]);
+			group.createJoint(nodeA, nodeB, type, true);
+			//console.log(group);
+			//this.world.constrainGroups(group, parentGroup, points);
 		}
 	}
 	// var children = $rawGroup.childNodes;//$rawGroup.querySelectorAll('[id*="constraint"]');
 
 	// for (var i = 0, childrenLength = children.length; i < childrenLength; i += 1)
 	// {
-	// 	if (children[i].nodeType === Node.TEXT_NODE || children[i].id.search(/constraint/i) < 0) { continue; }
-	// 	var currConstraint = children[i];
-	// 	var result = /constraint-([a-z\d]*)/ig.exec(currConstraint.id);
+	// 	if (children[i].nodeType === Node.TEXT_NODE || children[i].id.search(/joint/i) < 0) { continue; }
 
-	// 	var parentGroupID = result ? result[1] : undefined;
-	// 	var parentGroup = parentGroupID ? this.world.getGroupByID(parentGroupID) : undefined;
-	// 	var pointCommands = this.parseElement(currConstraint).pointCommands;
-	// 	// console.log($group.ID, parentGroup ? parentGroup.ID : undefined);
-	// 	this.world.constrainGroups($group, parentGroup, this.getPoints(pointCommands));
+	// 	var currRawJoint = children[i];
+	// 	var p1x = this.getCoord(currRawJoint.getAttribute('x1'));
+	// 	var p1y = this.getCoord(currRawJoint.getAttribute('y1'));
+	// 	var p2x = this.getCoord(currRawJoint.getAttribute('x2'));
+	// 	var p2y = this.getCoord(currRawJoint.getAttribute('y2'));
+
+	// 	var n1 = $group.getNodeAtPoint(p1x, p1y) || $group.createNode(p1x, p1y);
+	// 	var n2 = $group.getNodeAtPoint(p2x, p2y) || $group.createNode(p2x, p2y);
+	// 	$group.createJoint(n1, n2);
 	// }
 };
-
-// SVGParser.prototype.parseElements = function ($elements, $group)
-// {
-// 	for (var i = 0, elementsLength = $elements.length; i < elementsLength; i += 1)
-// 	{
-// 		var rawElement = $elements[i];
-
-// 		var element = this.parseElement(rawElement);
-
-// 		var nodesToDraw = $group.structure.create(element);
-// 		this.setGraphicInstructions($group, rawElement, nodesToDraw, element);
-// 	}
-// };
 
 SVGParser.prototype.parseElement = function ($rawElement)
 {
@@ -214,14 +196,13 @@ SVGParser.prototype.setGraphicInstructions = function ($group, $raw, $nodesToDra
 	}
 
 	var rawFill = $raw.getAttribute('fill');
-	var rawStrokeWidth = $raw.getAttribute('stroke-width');
 	var rawStroke = $raw.getAttribute('stroke');
 	var rawLinecap = $raw.getAttribute('stroke-linecap');
 	var rawLinejoin = $raw.getAttribute('stroke-linejoin');
 	var rawOpacity = $raw.getAttribute('opacity');
 
 	props.fill = rawFill || '#000000';
-	props.lineWidth = rawStrokeWidth * this.ratio || 0;
+	props.lineWidth = this.getThickness($raw);//rawStrokeWidth * this.ratio || 0;
 	props.stroke = rawStroke && props.lineWidth !== 0 ? rawStroke : 'none';
 	props.lineCap = rawLinecap && rawLinecap !== 'null' ? rawLinecap : 'butt';
 	props.lineJoin = rawLinejoin && rawLinejoin !== 'null' ? rawLinejoin : 'miter';
@@ -258,15 +239,13 @@ SVGParser.prototype.getGradient = function ($value)
 
 			if (m)
 			{
-				var tfX1 = m[0] * gradient.x1 + m[1] * gradient.y1 + m[2];
-				var tfY1 = m[3] * gradient.x1 + m[4] * gradient.y1 + m[5];
-				var tfX2 = m[0] * gradient.x2 + m[1] * gradient.y2 + m[2];
-				var tfY2 = m[3] * gradient.x2 + m[4] * gradient.y2 + m[5];
+				var p1 = this.multiplyPointByMatrix([gradient.x1, gradient.y1], m);
+				var p2 = this.multiplyPointByMatrix([gradient.x2, gradient.y2], m);
 
-				gradient.x1 = tfX1;
-				gradient.y1 = tfY1;
-				gradient.x2 = tfX2;
-				gradient.y2 = tfY2;
+				gradient.x1 = p1[0];
+				gradient.y1 = p1[1];
+				gradient.x2 = p2[0];
+				gradient.y2 = p2[1];
 			}
 		}
 		if (gradientElement.tagName === 'radialGradient')
@@ -279,16 +258,13 @@ SVGParser.prototype.getGradient = function ($value)
 
 			if (m)
 			{
-				var tfCX = m[0] * gradient.cx + m[1] * gradient.cy + m[2];
-				var tfCY = m[3] * gradient.cx + m[4] * gradient.cy + m[5];
-				var tfFX = m[0] * gradient.fx + m[1] * gradient.fy + m[2];
-				var tfFY = m[3] * gradient.fx + m[4] * gradient.fy + m[5];
+				var c = this.multiplyPointByMatrix([gradient.cx, gradient.cy], m);
+				var f = this.multiplyPointByMatrix([gradient.fx, gradient.fy], m);
 
-				gradient.cx = tfCX;
-				gradient.cy = tfCY;
-				gradient.fx = tfFX;
-				gradient.fy = tfFY;
-				// gradient.r = 10;
+				gradient.cx = c[0];
+				gradient.cy = c[1];
+				gradient.fx = f[0];
+				gradient.fy = f[1];
 			}
 		}
 
@@ -327,7 +303,7 @@ SVGParser.prototype.parseCircle = function ($rawCircle)
 	var radiusY = this.getCoord(radiusAttrY) || radiusX;
 	var rotation = this.getRotation($rawCircle.getAttribute('transform'));
 	var pointCommands = [{ command: radiusY !== radiusX ? ELLIPSE : ARC, point: [xPos, yPos], options: [radiusX, radiusY, rotation] }];
-	return { type: 'ellipse', pointCommands: pointCommands, radiusX: radiusX, radiusY: radiusY, closePath: false };
+	return { type: 'ellipse', pointCommands: pointCommands, radiusX: radiusX, radiusY: radiusY, closePath: false, thickness: this.getThickness($rawCircle) };
 };
 
 SVGParser.prototype.parseLine = function ($rawLine)
@@ -339,7 +315,7 @@ SVGParser.prototype.parseLine = function ($rawLine)
 	var pointCommands = [];
 	pointCommands.push({ command: MOVE_TO, point: [x1, y1], options: [] });
 	pointCommands.push({ command: LINE_TO, point: [x2, y2], options: [] });
-	return { type: 'line', pointCommands: pointCommands, closePath: false };
+	return { type: 'line', pointCommands: pointCommands, closePath: false, thickness: this.getThickness($rawLine) };
 };
 
 SVGParser.prototype.parseRect = function ($rawRect)
@@ -366,10 +342,6 @@ SVGParser.prototype.parseRect = function ($rawRect)
 			this.multiplyPointByMatrix(points[1], m),
 			this.multiplyPointByMatrix(points[2], m),
 			this.multiplyPointByMatrix(points[3], m)
-			// [m[0] * x1 + m[1] * y1 + m[2], m[3] * x1 + m[4] * y1 + m[5]],
-			// [m[0] * x1 + m[1] * y2 + m[2], m[3] * x1 + m[4] * y2 + m[5]],
-			// [m[0] * x2 + m[1] * y2 + m[2], m[3] * x2 + m[4] * y2 + m[5]],
-			// [m[0] * x2 + m[1] * y1 + m[2], m[3] * x2 + m[4] * y1 + m[5]]
 		];
 	}
 
@@ -379,7 +351,7 @@ SVGParser.prototype.parseRect = function ($rawRect)
 	pointCommands.push({ command: LINE_TO, point: points[2], options: [] });
 	pointCommands.push({ command: LINE_TO, point: points[3], options: [] });
 
-	return { type: 'polygon', pointCommands: pointCommands, closePath: true };
+	return { type: 'polygon', pointCommands: pointCommands, closePath: true, thickness: this.getThickness($rawRect) };
 };
 
 SVGParser.prototype.parsePoly = function ($rawPoly)
@@ -395,41 +367,7 @@ SVGParser.prototype.parsePoly = function ($rawPoly)
 		pointCommands.push({ command: command, point: point, options: [] });
 		result = regex.exec($rawPoly.getAttribute('points'));
 	}
-	return { type: $rawPoly.tagName, pointCommands: pointCommands, closePath: $rawPoly.tagName !== 'polyline' };
-
-	// var splits = $rawPoly.getAttribute('points').split(' ');
-	// var pointCommands = {};
-
-	// for (var i = 0, splitsLength = splits.length; i < splitsLength; i += 1)
-	// {
-	// 	var currSplit = splits[i];
-
-	// 	if (currSplit !== '')
-	// 	{
-	// 		var point = currSplit.split(',');
-	// 		var pointX = this.getCoord(point[0]);
-	// 		var pointY = this.getCoord(point[1]);
-	// 		var exists = false;
-	// 		for (var k = 0, otherCoordsArrayLength = points.length; k < otherCoordsArrayLength; k += 1)
-	// 		{
-	// 			var otherPoint = points[k];
-	// 			var otherX = otherPoint[0];
-	// 			var otherY = otherPoint[1];
-	// 			if (otherX === pointX && otherY === pointY)
-	// 			{
-	// 				exists = true;
-	// 			}
-	// 		}
-	// 		if (exists === false)
-	// 		{
-	// 			points.push([pointX, pointY]);
-	// 		}
-	// 	}
-	//}
-
-	// var thickness = this.getCoord($rawPoly.getAttribute('stroke-width'));
-	// var type = $rawPoly.tagName === 'polyline' ? 'polyline' : 'polygon';
-	// return { type: type, pointCommands: points, thickness: thickness };
+	return { type: $rawPoly.tagName, pointCommands: pointCommands, closePath: $rawPoly.tagName !== 'polyline', thickness: this.getThickness($rawPoly) };
 };
 
 SVGParser.prototype.parsePath = function ($rawPath)
@@ -450,8 +388,8 @@ SVGParser.prototype.parsePath = function ($rawPath)
 		var y = $y === undefined ? lastY : that.getCoord($y);
 		if ($relative)
 		{
-			x = lastX + x;
-			y = lastY + y;
+			x = $x === undefined ? x : lastX + x;
+			y = $y === undefined ? y : lastY + y;
 		}
 		return [x, y];
 	};
@@ -483,13 +421,10 @@ SVGParser.prototype.parsePath = function ($rawPath)
 	var cubic2;
 	var quadra1;
 
-	do
+	result = pathReg.exec(d);
+
+	while (result)
 	{
-		result = pathReg.exec(d);
-		if (result === null)
-		{
-			break;
-		}
 		var instruction = result[1].toLowerCase();
 		var coords = result[2].match(coordsRegex);
 		var isLowserCase = /[a-z]/.test(result[1]);
@@ -556,63 +491,11 @@ SVGParser.prototype.parsePath = function ($rawPath)
 				console.warn('not supported');
 				break;
 		}
+
+		result = pathReg.exec(d);
 	}
-	while (result);
 
-	return { type: 'path', pointCommands: pointCommands, closePath: closePath };
-	//var points =
-	// var pathReg = /([mlscvh])(-?[\d\.]*[,-]+[\d\.]*),?(-?[\d\.]*,?-?[\d\.]*),?(-?[\d\.]*,?-?[\d\.]*)/igm;
-	// var points = [];
-	// var lastCoordX = this.getCoord(0);
-	// var lastCoordY = this.getCoord(0);
-	// console.log(pathReg.exec(d));
-	// debugger;
-	// for (var array = pathReg.exec(d); array !== null; array = pathReg.exec(d))
-	// {
-	// 	var coordString;
-	// 	var numberCoordX;
-	// 	var numberCoordY;
-	// 	if (array[1] === 'v')
-	// 	{
-	// 		numberCoordX = lastCoordX;
-	// 		numberCoordY = lastCoordY + this.getCoord(array[2]);
-	// 	}
-	// 	else if (array[1] === 'h')
-	// 	{
-	// 		numberCoordX = lastCoordX + this.getCoord(array[2]);
-	// 		numberCoordY = lastCoordY;
-	// 	}
-	// 	else
-	// 	{
-	// 		if (array[4] !== '')
-	// 		{
-	// 			coordString = array[4];
-	// 		}
-	// 		else if (array[3] !== '')
-	// 		{
-	// 			coordString = array[3];
-	// 		}
-	// 		else
-	// 		{
-	// 			coordString = array[2];
-	// 		}
-	// 		var coordReg = /(-?\d+\.?\d*)/igm;
-	// 		var coords = coordString.match(coordReg);
-
-	// 		numberCoordX = lastCoordX + this.getCoord(coords[0]);
-	// 		numberCoordY = lastCoordY + this.getCoord(coords[1]);
-	// 	}
-	// 	//console.log(numberCoordX, numberCoordY);
-	// 	points.push([numberCoordX, numberCoordY]);
-
-	// 	lastCoordX = numberCoordX;
-	// 	lastCoordY = numberCoordY;
-	// }
-	// console.log(points);
-	// debugger;
-
-	// var thickness = this.getCoord($rawPath.getAttribute('stroke-width'));
-	// return { type: 'path', points: points, thickness: thickness };
+	return { type: 'path', pointCommands: pointCommands, closePath: closePath, thickness: this.getThickness($rawPath) };
 };
 
 SVGParser.prototype.round = function ($number)
@@ -621,6 +504,12 @@ SVGParser.prototype.round = function ($number)
 	// return Math.floor(number * 100) / 100;
 	return $number;
 	//return Math.floor(Number($number));
+};
+
+SVGParser.prototype.getThickness = function ($raw)
+{
+	var rawThickness = $raw.getAttribute('stroke-width') || 1;
+	return this.getCoord(rawThickness);
 };
 
 SVGParser.prototype.getMatrix = function ($attribute)
@@ -719,26 +608,6 @@ SVGParser.prototype.getCoord = function ($coordSTR)
 {
 	var number = this.round($coordSTR);
 	return number * this.ratio;
-};
-
-SVGParser.prototype.parseCustomJoints = function ($rawGroup, $group)
-{
-	var children = $rawGroup.childNodes;//$rawGroup.querySelectorAll('[id*="constraint"]');
-
-	for (var i = 0, childrenLength = children.length; i < childrenLength; i += 1)
-	{
-		if (children[i].nodeType === Node.TEXT_NODE || children[i].id.search(/joint/i) < 0) { continue; }
-
-		var currRawJoint = children[i];
-		var p1x = this.getCoord(currRawJoint.getAttribute('x1'));
-		var p1y = this.getCoord(currRawJoint.getAttribute('y1'));
-		var p2x = this.getCoord(currRawJoint.getAttribute('x2'));
-		var p2y = this.getCoord(currRawJoint.getAttribute('y2'));
-
-		var n1 = $group.getNodeAtPoint(p1x, p1y) || $group.createNode(p1x, p1y);
-		var n2 = $group.getNodeAtPoint(p2x, p2y) || $group.createNode(p2x, p2y);
-		$group.createJoint(n1, n2);
-	}
 };
 
 module.exports = SVGParser;

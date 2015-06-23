@@ -4,22 +4,22 @@
 <svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
 	 width="1200px" height="800px" viewBox="0 0 1200 800" enable-background="new 0 0 1200 800" xml:space="preserve">
 <rect x="58.923" y="48.891" fill="#FF0000" width="64.177" height="64.177"/>
-<rect x="161.13" y="48.889" transform="matrix(-0.7071 -0.7071 0.7071 -0.7071 272.585 274.8616)" fill="#FF0000" width="64.176" height="64.176"/>
+<rect x="161.132" y="48.891" transform="matrix(0.7071 0.7071 -0.7071 0.7071 113.8531 -112.9086)" fill="#FF0000" width="64.175" height="64.175"/>
 <polygon fill="#FF0000" points="306.092,93.121 290.481,57.563 339.048,63.634 363.938,41.085 382.411,87.917 426.641,67.104 
 	372.871,133.015 342.517,93.989 295.685,113.068 "/>
 <line fill="none" stroke="#FF0000" stroke-width="5.0735" stroke-miterlimit="10" x1="451.792" y1="136.484" x2="520.305" y2="41.085"/>
 <polyline fill="none" stroke="#FF0000" stroke-width="5.0735" stroke-miterlimit="10" points="573.208,143.422 559.332,122.608 
 	615.703,95.723 563.668,61.9 637.385,28.077 "/>
 <path fill="none" stroke="#FF0000" stroke-width="9" stroke-miterlimit="10" d="M749.363,169.617
-	c0-56.883-58.883-53.886-58.883-85.405s18.397-35.728,35.728-35.728s23.846,23.846,23.846,23.846s5.387-28.665,28.665-28.665
+	c0-56.883-58.883-53.886-58.883-85.405s18.396-35.728,35.728-35.728s23.846,23.846,23.846,23.846s5.388-28.665,28.665-28.665
 	c23.279,0,29.527,11.566,29.527,29.528C808.246,126.36,749.363,114.191,749.363,169.617z"/>
 <g>
 	<path fill="#FF0000" d="M981.998,41.085c-35.385,26.854-44.615,26.993-78.461,7.806s-30.771,33.033-12.309,64.177
-		c0,0,46.153-40.375,43.077,0c-3.075,40.375,7.691,53.472,40.432,5.78c32.739-47.692,33.415,38.461,82.646,7.512
+		c0,0,46.152-40.375,43.076,0c-3.074,40.375,7.691,53.472,40.433,5.78c32.739-47.692,33.415,38.461,82.646,7.512
 		C1106.614,95.411,1017.383,14.232,981.998,41.085z M985.076,80.979c-0.001,11.714-9.23,20.903-18.462,4.77
 		c-11.278-19.71,13.846-25.364,36.923-16.133C1026.614,78.847,985.077,69.266,985.076,80.979z"/>
 </g>
-<linearGradient id="SVGID_1_" gradientUnits="userSpaceOnUse" x1="-91.9443" y1="554.9746" x2="-51.7568" y2="580.6683" gradientTransform="matrix(1 0 0 -1 179 903.5)">
+<linearGradient id="SVGID_1_" gradientUnits="userSpaceOnUse" x1="-270.9434" y1="142.5259" x2="-230.756" y2="116.8323" gradientTransform="matrix(1 0 0 1 358 206)">
 	<stop  offset="0" style="stop-color:#CCE0F4"/>
 	<stop  offset="0.0641" style="stop-color:#C3DCF2"/>
 	<stop  offset="0.1706" style="stop-color:#A9D2EE"/>
@@ -30,7 +30,7 @@
 	<stop  offset="0.9944" style="stop-color:#005B97"/>
 </linearGradient>
 <rect x="58.923" y="295.771" fill="url(#SVGID_1_)" stroke="#000000" stroke-width="0.4282" stroke-miterlimit="10" width="86.304" height="86.304"/>
-<radialGradient id="SVGID_2_" cx="287.3662" cy="1111.3594" r="60.2152" gradientTransform="matrix(0.7987 -0.6017 -0.362 -0.4805 459.6631 1027.7322)" gradientUnits="userSpaceOnUse">
+<radialGradient id="SVGID_2_" cx="206.4756" cy="-627.1396" r="60.2153" gradientTransform="matrix(0.7987 -0.6017 0.362 0.4805 348.9827 746.393)" gradientUnits="userSpaceOnUse">
 	<stop  offset="0" style="stop-color:#CCE0F4"/>
 	<stop  offset="0.0641" style="stop-color:#C3DCF2"/>
 	<stop  offset="0.1706" style="stop-color:#A9D2EE"/>
@@ -41,14 +41,19 @@
 	<stop  offset="0.9944" style="stop-color:#005B97"/>
 </radialGradient>
 <circle fill="url(#SVGID_2_)" cx="259.542" cy="338.923" r="43.152"/>
-<rect x="524.305" y="405" transform="matrix(0.9543 -0.2988 0.2988 0.9543 -98.5842 190.9915)" fill="#2A33FF" stroke="#000000" stroke-width="0.3512" stroke-miterlimit="10" width="102.206" height="25.894"/>
-<rect x="635.777" y="439.428" transform="matrix(0.8046 0.5938 -0.5938 0.8046 403.5594 -319.2681)" fill="#2A33FF" stroke="#000000" stroke-width="0.3667" stroke-miterlimit="10" width="102.206" height="28.223"/>
-<rect x="697.431" y="526.193" transform="matrix(0.0752 0.9972 -0.9972 0.0752 1217.1357 -236.2379)" fill="#2A33FF" stroke="#000000" stroke-width="0.2917" stroke-miterlimit="10" width="76.99" height="23.714"/>
-<rect x="682.713" y="619.188" transform="matrix(-0.6514 0.7587 -0.7587 -0.6514 1669.8005 494.9111)" fill="#2A33FF" stroke="#000000" stroke-width="0.2917" stroke-miterlimit="10" width="76.991" height="23.714"/>
-<rect x="592.678" y="662.953" transform="matrix(-0.9994 0.0359 -0.0359 -0.9994 1286.1711 1326.5193)" fill="#2A33FF" stroke="#000000" stroke-width="0.2917" stroke-miterlimit="10" width="76.991" height="23.714"/>
-<rect x="514.904" y="641.096" transform="matrix(-0.7258 -0.6879 0.6879 -0.7258 505.8412 1507.55)" fill="#2A33FF" stroke="#000000" stroke-width="0.2917" stroke-miterlimit="10" width="76.991" height="23.713"/>
-<rect x="472.712" y="565.469" transform="matrix(-0.126 -0.992 0.992 -0.126 2.8751 1157.1854)" fill="#2A33FF" stroke="#000000" stroke-width="0.2917" stroke-miterlimit="10" width="76.991" height="23.713"/>
-<rect x="472.712" y="481.365" transform="matrix(0.3074 -0.9516 0.9516 0.3074 -115.2634 828.0872)" fill="#2A33FF" stroke="#000000" stroke-width="0.2917" stroke-miterlimit="10" width="76.992" height="23.713"/>
+<rect x="524.308" y="404.959" transform="matrix(-0.9543 0.2988 -0.2988 -0.9543 1249.4054 644.7855)" fill="#2A33FF" stroke="#000000" stroke-width="0.3512" stroke-miterlimit="10" width="102.204" height="25.894"/>
+<rect x="635.809" y="439.408" transform="matrix(-0.8046 -0.5938 0.5938 -0.8046 970.3074 1226.3154)" fill="#2A33FF" stroke="#000000" stroke-width="0.3667" stroke-miterlimit="10" width="102.205" height="28.223"/>
+<rect x="697.438" y="526.232" transform="matrix(-0.0752 -0.9972 0.9972 -0.0752 254.7034 1312.3987)" fill="#2A33FF" stroke="#000000" stroke-width="0.2917" stroke-miterlimit="10" width="76.992" height="23.715"/>
+<rect x="682.737" y="619.172" transform="matrix(0.6514 -0.7587 0.7587 0.6514 -227.3671 767.1671)" fill="#2A33FF" stroke="#000000" stroke-width="0.2917" stroke-miterlimit="10" width="76.989" height="23.714"/>
+<rect x="592.653" y="662.916" transform="matrix(0.9994 -0.0359 0.0359 0.9994 -23.8138 23.0895)" fill="#2A33FF" stroke="#000000" stroke-width="0.2917" stroke-miterlimit="10" width="76.995" height="23.714"/>
+<rect x="514.855" y="641.097" transform="matrix(0.7258 0.6879 -0.6879 0.7258 600.8954 -201.613)" fill="#2A33FF" stroke="#000000" stroke-width="0.2917" stroke-miterlimit="10" width="76.99" height="23.713"/>
+<rect x="472.676" y="565.469" transform="matrix(0.126 0.992 -0.992 0.126 1019.4816 -2.5182)" fill="#2A33FF" stroke="#000000" stroke-width="0.2917" stroke-miterlimit="10" width="76.989" height="23.712"/>
+<rect x="472.735" y="481.381" transform="matrix(-0.3074 0.9516 -0.9516 -0.3074 1137.7372 158.3772)" fill="#2A33FF" stroke="#000000" stroke-width="0.2917" stroke-miterlimit="10" width="76.992" height="23.713"/>
 <polygon id="parellelo" fill="#2A33FF" stroke="#000000" stroke-width="0.2025" stroke-miterlimit="10" points="848.998,372.842 
-	667.618,363.65 761.431,321.813 942.811,331.004 "/>
+	667.618,363.65 761.431,321.812 942.811,331.004 "/>
+<radialGradient id="SVGID_3_" cx="448.2109" cy="635.2256" r="86.1367" gradientUnits="userSpaceOnUse">
+	<stop  offset="0" style="stop-color:#80C2E7"/>
+	<stop  offset="0.9944" style="stop-color:#005B97;stop-opacity:0"/>
+</radialGradient>
+<circle fill="url(#SVGID_3_)" stroke="#000000" stroke-width="6" stroke-miterlimit="10" cx="448.211" cy="635.226" r="86.136"/>
 </svg>

@@ -33,6 +33,7 @@ module.exports = function(grunt)
 				options:
 				{
 					bases: ['./'],
+					showStack: true
 				}
 			}
 		},
@@ -48,6 +49,7 @@ module.exports = function(grunt)
 					watchifyOptions:
 					{
 						verbose: true,
+						debug: true
 					},
 					browserifyOptions:
 					{
@@ -65,7 +67,8 @@ module.exports = function(grunt)
 					watch: true,
 					watchifyOptions:
 					{
-						verbose: true,
+						debug: true,
+						verbose: true
 					},
 					browserifyOptions:
 					{
@@ -83,7 +86,8 @@ module.exports = function(grunt)
 					watch: true,
 					watchifyOptions:
 					{
-						verbose: true,
+						debug: true,
+						verbose: true
 					},
 					browserifyOptions:
 					{

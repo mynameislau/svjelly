@@ -131,10 +131,10 @@ var SVJellyMaker =
 
 		this.canvas.width = canvasWidth;
 		this.canvas.height = canvasHeight;
-		this.canvas.style.transformOrigin = '0 0';
-		this.canvas.style.transform = 'scale(' + 1 / canvasDefinition + ')';
-
 		this.renderer = this.Renderer ? this.Renderer.create(svjellyWorld, this.canvas) : SVJellyRenderer.create(svjellyWorld, this.canvas);
+
+		this.renderer.container.style.transformOrigin = '0 0';
+		this.renderer.container.style.transform = 'scale(' + 1 / canvasDefinition + ')';
 
 		var requestID = '';
 		var lastRender = window.performance.now();
@@ -198,7 +198,7 @@ var SVJellyMaker =
 		request.send();
 	},
 
-	addBasicMouseControls: function ()
+	addBasicMouseControls: function ($stiffness)
 	{
 		var world = this.svjellyWorld;
 		var p2 = world.physicsManager.p2;
@@ -210,7 +210,9 @@ var SVJellyMaker =
 		p2World.addBody(mouseBody);
 
 		var mouseConstraint;
-		var bodies = p2World.bodies.concat();
+		var worldWidth = world.worldWidth;
+		//var bodies = p2World.bodies.concat();
+		var groups = world.groups;
 		var body;
 		var scale = this.renderer.scaleX;
 		var renderer = this.renderer;
@@ -226,23 +228,37 @@ var SVJellyMaker =
 			return [x, y];
 		};
 
+		var lastPos;
+		// var acceleration;
 		var mouseMove = function (event)
 		{
 			var position = getPhysicsCoord(event);
 			mouseBody.position[0] = position[0];
 			mouseBody.position[1] = position[1];
+			lastPos = lastPos || position;
+			// acceleration = [position[0] - lastPos[0], position[1] - lastPos[1]];
+			lastPos = position;
 		};
 
 		var mouseDown = function (event)
 		{
 			var position = getPhysicsCoord(event);
+			for (var i = 0, length = groups.length; i < length; i += 1)
+			{
+				var currGroup = groups[i];
+				if (currGroup.physicsManager.hitTest)
+				{
+					body = currGroup.physicsManager.hitTest(position, worldWidth / 50);
+					if (body) { break; }
+				}
+			}
 
 			// Check if the cursor is inside the box
-			var hitBodies = p2World.hitTest(position, bodies);
+			//var hitBodies = p2World.hitTest(position, bodies, 100);
 
-			if (hitBodies.length)
+			if (body)//hitBodies.length)
 			{
-				body = hitBodies[0];
+				//body = hitBodies[0];
 				// Move the mouse body to the cursor position
 
 				mouseBody.position[0] = position[0];
@@ -250,11 +266,15 @@ var SVJellyMaker =
 
 				// Create a RevoluteConstraint.
 				// This constraint lets the bodies rotate around a common point
-				mouseConstraint = new p2.RevoluteConstraint(mouseBody, body,
+				mouseConstraint = new p2.DistanceConstraint(mouseBody, body,
 				{
-					worldPivot: position,
+					//worldPivot: position,
 					collideConnected: false
 				});
+
+				mouseConstraint.setStiffness($stiffness || 200);
+				mouseConstraint.setRelaxation(1);
+
 				p2World.addConstraint(mouseConstraint);
 				container.addEventListener('mousemove', mouseMove);
 			}
@@ -262,13 +282,18 @@ var SVJellyMaker =
 
 		var mouseUp = function ()
 		{
+			// acceleration[0] *= 100;
+			// acceleration[1] *= 100;
+
+			// console.log(acceleration);
+			//body.toWorldFrame(bodyWorldPosition, [0, 0]);
 			p2World.removeConstraint(mouseConstraint);
+			//body.applyForce(acceleration, body.position);
 			mouseConstraint = null;
 			container.removeEventListener('mousemove', mouseMove);
 		};
 
 		container.addEventListener('mousedown', mouseDown);
-		// Remove the mouse constraint on mouse up
 		container.addEventListener('mouseup', mouseUp);
 
 		this.removeBasicMouseControls = function ()

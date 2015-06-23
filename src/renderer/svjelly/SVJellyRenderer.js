@@ -84,11 +84,11 @@ var SVJellyRenderer =//function ($world, $canvas)
 				var options = currNode.drawing.options;
 				if (drawingGroup.isSimpleDrawing && (command === BEZIER_TO || command === QUADRA_TO))
 				{
-					command = LINE_TO;
+					currNode.drawing.command = LINE_TO;
 				}
 				if (drawingGroup.isSimpleDrawing && (command === ELLIPSE))
 				{
-					command = ARC;
+					currNode.drawing.command = ARC;
 				}
 				//precalculationg control points and radix;
 				if (command === BEZIER_TO || command === QUADRA_TO)
@@ -211,14 +211,17 @@ var SVJellyRenderer =//function ($world, $canvas)
 	createDrawingGroup: function ($group)
 	{
 		var drawingGroup;
+		if ($group.drawing.opacity === 0) { return; }
+
 		for (var i = 0, length = this.world.groups.length; i < length; i += 1)
 		{
 			var currGroup = this.world.groups[i];
 			if (!currGroup.drawingGroup) { continue; }
 			if (this.compareProperties(currGroup.drawingGroup.properties, $group.drawing.properties) &&
 				this.willNotIntersect(currGroup, $group) &&
-				!this.isStatic($group) &&
-				this.isSimpleDrawing($group) === this.isSimpleDrawing(currGroup))
+				this.isStatic($group) === false &&
+				this.isSimpleDrawing($group) === this.isSimpleDrawing(currGroup) &&
+				$group.drawing.opacity === 1)
 			{
 				drawingGroup = $group.drawingGroup = currGroup.drawingGroup;
 			}
@@ -328,6 +331,7 @@ var SVJellyRenderer =//function ($world, $canvas)
 		for (var k = 0; k < drawing.nodesLength; k += 1)
 		{
 			var currNode = drawing.nodes[k];
+
 			if (currNode.drawing.command === MOVE_TO)
 			{
 				context.moveTo(currNode.getX() * this.scaleX, currNode.getY() * this.scaleY);
@@ -355,7 +359,7 @@ var SVJellyRenderer =//function ($world, $canvas)
 			}
 			else if (currNode.drawing.command === ARC)
 			{
-				context.moveTo(currNode.getX() * this.scaleX, currNode.getY() * this.scaleY);
+				context.moveTo(currNode.getX() * this.scaleX + currNode.drawing.options[0], currNode.getY() * this.scaleY);
 				context.arc(currNode.getX() * this.scaleX, currNode.getY() * this.scaleY, currNode.drawing.options[0], 0, Math.PI * 2);
 			}
 			if (!drawing.isSimpleDrawing)
@@ -382,10 +386,6 @@ var SVJellyRenderer =//function ($world, $canvas)
 				else if (currNode.drawing.command === QUADRA_TO)
 				{
 					context.quadraticCurveTo(cp1x, cp1y, baseX, baseY);
-				}
-				else if (currNode.drawing.command === MOVE_TO)
-				{
-					context.moveTo(currNode.getX() * this.scaleX, currNode.getY() * this.scaleY);
 				}
 				else if (currNode.drawing.command === ELLIPSE)
 				{
@@ -423,13 +423,22 @@ var SVJellyRenderer =//function ($world, $canvas)
 			for (i = 0; i < nodesLength; i += 1)
 			{
 				var currNode = currGroup.nodes[i];
-				this.debugContext.moveTo(currNode.getX() * this.scaleX, currNode.getY() * this.scaleY);
-				var radius = currGroup.structure.innerRadius || currGroup.conf.nodeRadius || currGroup.structure.radiusX || 0.01;
+				var xPos = currNode.getX() * this.scaleX;
+				var yPos = currNode.getY() * this.scaleY;
+				var radius = currNode.physicsManager.radius || currGroup.structure.radiusX || 0.01;
 				radius *= this.scaleX;
+				radius = Math.max(radius, 1);
 				// console.log(currGroup.structure.innerRadius, currGroup.conf.nodeRadius, currGroup.structure.radiusX);
 				// console.log(radius);
 				// debugger;
-				this.debugContext.arc(currNode.getX() * this.scaleX, currNode.getY() * this.scaleY, radius, 0, Math.PI * 2);
+				this.debugContext.moveTo(xPos + radius, yPos);
+				this.debugContext.arc(xPos, yPos, radius, 0, Math.PI * 2);
+				if (currNode.physicsManager.body)
+				{
+					this.debugContext.moveTo(xPos, yPos);
+					var angle = currNode.physicsManager.body.angle;
+					this.debugContext.lineTo(xPos + Math.cos(angle) * radius, yPos + Math.sin(angle) * radius);
+				}
 			}
 		}
 		this.debugContext.stroke();
@@ -444,8 +453,8 @@ var SVJellyRenderer =//function ($world, $canvas)
 			for (i = 0; i < jointsLength; i += 1)
 			{
 				var currJoint = currGroup.joints[i];
-				this.debugContext.moveTo(currJoint.node1.getX() * this.scaleX, currJoint.node1.getY() * this.scaleY);
-				this.debugContext.lineTo(currJoint.node2.getX() * this.scaleX, currJoint.node2.getY() * this.scaleY);
+				this.debugContext.moveTo(currJoint.nodeA.getX() * this.scaleX, currJoint.nodeA.getY() * this.scaleY);
+				this.debugContext.lineTo(currJoint.nodeB.getX() * this.scaleX, currJoint.nodeB.getY() * this.scaleY);
 			}
 		}
 		this.debugContext.stroke();

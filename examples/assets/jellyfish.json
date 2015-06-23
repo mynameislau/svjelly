@@ -1,0 +1,110 @@
+{
+	"source": "assets/jellyfish.svg",
+	"debug": false,
+	"wind": 0.5,
+	"groups":
+	{
+		"tentacles":
+		{
+			"structure": "line",
+			"nodeRadius": 0.1,
+			"physics":
+			{
+				"gravityScale": 0,
+				"noCollide": true,
+				"joints": {
+					"default": {
+						"distanceConstraint": {
+							"stiffness": 100,
+							"relaxation": 1
+						}
+					}
+				},
+				"mass": 1,
+				"damping": 0.2,
+				"angularDamping": 0.2,
+				"bodyType": "soft"
+			}
+		},
+		"stuff":
+		{
+			"structure": "triangulate",
+			"nodeRadius": 0.1,
+			"physics":
+			{
+				"gravityScale": 0,
+				"noCollide": true,
+				"joints": {
+					"default": {
+						"distanceConstraint": {
+							"stiffness": 10,
+							"relaxation": 10
+						}
+					}
+				},
+				"mass": 1,
+				"damping": 0.2,
+				"angularDamping": 0.2,
+				"bodyType": "soft"
+			}
+		},
+		"head":
+		{
+			"structure": "triangulate",
+			"physics":
+			{
+				"joints": {
+					"default": {
+						"distanceConstraint":
+						{
+							"stiffness": 100,
+							"relaxation": 10
+						},
+						"revoluteConstraint":
+						{
+							"stiffness": 30,
+							"relaxation": 10
+						}
+					},
+					"muscle": {
+						"distanceConstraint":
+						{
+							"stiffness": 100,
+							"relaxation": 1
+						}
+					}
+				},
+				"gravityScale": 0,
+				"damping": 0,
+				"angularDamping": 1,
+				"bodyType": "soft",
+				"mass": 1
+			}
+		},
+		"algae":
+		{
+			"structure": "line",
+			"nodeRadius": 0.1,
+			"physics":
+			{
+				"joints": {
+					"default": {
+						"distanceConstraint": null,
+						"lockConstraint":
+						{
+							"stiffness": 1,
+							"relaxation": 10
+						}
+					}
+				},
+				"gravityScale": -0.5,
+				"damping": 0.9,
+				"angularDamping": 0.9,
+				"structuralMassDecay": 4,
+				"massVariance": 0.5,
+				"mass": 0.1,
+				"bodyType": "soft"
+			}
+		}
+	}
+}

@@ -1,0 +1,102 @@
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Testbed</title>
+</head>
+<body>
+	<canvas id="canvas"></canvas>
+	<script src="../build/svjellymaker.js"></script>
+	<script>
+		var loadEventHandler = function ()
+		{
+			var canvas = document.getElementById('canvas');
+			canvas.width = document.body.clientWidth;
+			var maker = window.svjellymaker.createFromConfig(canvas, '../examples/assets/jellyfish.json');
+			maker.promise.then(function ()
+			{
+				maker.addBasicMouseControls(10);
+				//if (true) { return; }
+				var world = maker.svjellyWorld;
+				// var p2 = world.physicsManager.p2;
+				var p2World = world.physicsManager.p2World;
+				var jellyfish = world.getGroupByID('jellyfishHead');
+				var forceAmp = 5;
+				var angForce = 20;
+				var randomAngForce = 0;
+				var angle;
+
+				var musclesArray = [];
+				for (var i = 0, length = jellyfish.joints.length; i < length; i += 1)
+				{
+					var currJoint = jellyfish.joints[i];
+					if (currJoint.type === 'muscle')
+					{
+						var constraint = currJoint.physicsManager.constraints[0];
+						var dist = constraint.distance;
+						musclesArray.push({ joint: currJoint, constraint: constraint, distance: dist });
+					}
+				}
+
+				//var constraints = muscle.physicsManager.constraints;
+
+				//WIND
+				var windForce = world.conf.wind;
+				if (windForce !== undefined)
+				{
+					var bodiesLength = p2World.bodies.length;
+					var coeff = 0;
+					var muscleCoeff = 0;
+					var lastWindTime;
+					var lastMuscleTime;
+					var twoPIs = Math.PI * 2;
+					var windInterval = 10000;
+					var muscleInterval = 3000;
+					maker.updateCallback = function ($time)
+					{
+						//wind
+						if (!lastWindTime || coeff > twoPIs)
+						{
+							lastWindTime = $time;
+							coeff = 0;
+						}
+						coeff = ($time - lastWindTime) / windInterval * twoPIs;
+						for (var i = 0, length = bodiesLength; i < length; i += 1)
+						{
+							var curr = p2World.bodies[i];
+							curr.applyForce([Math.sin(coeff) * windForce, 0], curr.position);
+						}
+
+						//movement
+						if (!lastMuscleTime || muscleCoeff > twoPIs)
+						{
+							lastMuscleTime = $time;
+							muscleCoeff = 0;
+							randomAngForce = - angForce + Math.random() * angForce * 2;
+						}
+						var musclesLength = musclesArray.length;
+						muscleCoeff = ($time - lastMuscleTime) / muscleInterval * twoPIs;
+						for (i = 0; i < musclesLength; i += 1)
+						{
+							var muscle = musclesArray[i];
+							muscle.constraint.distance = muscle.distance + Math.sin(muscleCoeff) * (muscle.distance * 0.5);
+						}
+
+						angle = jellyfish.physicsManager.getAngle() + Math.PI * 0.5;
+						jellyfish.physicsManager.applyAngularForce((1 + -Math.sin(muscleCoeff)) * randomAngForce);
+						jellyfish.physicsManager.applyForce([
+							Math.cos(angle) * (forceAmp * (1 + -Math.sin(muscleCoeff))),
+							Math.sin(angle) * (forceAmp * (1 + -Math.sin(muscleCoeff)))
+						]);
+					};
+				}
+
+			});
+		};
+
+		window.addEventListener('load', loadEventHandler);
+	</script>
+</body>
+</html>

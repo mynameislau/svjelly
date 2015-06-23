@@ -16,6 +16,7 @@ var Polygon =
 		{
 			var currPoint = this.points[i];
 			var next = i === length - 1 ? this.points[0] : this.points[i + 1];
+
 			sumA += currPoint[0] * next[1];
 			sumB += currPoint[1] * next[0];
 		}

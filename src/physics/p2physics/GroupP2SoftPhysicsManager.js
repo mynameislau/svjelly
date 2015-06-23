@@ -4,13 +4,15 @@
 var p2 = require('../../../libs/p2');
 var NodeP2SoftPhysicsManager = require('./NodeP2SoftPhysicsManager');
 var AnchorP2SoftPhysicsManager = require('./AnchorP2SoftPhysicsManager');
+var JointP2PhysicsManager = require('./JointP2PhysicsManager');
 
-var GroupP2SoftPhysicsManager = function ($world, $worldHeight, $group, $conf)
+var GroupP2SoftPhysicsManager = function ($group, $world, $worldHeight)
 {
 	this.group = $group;
 	this.world = $world;
 	this.worldHeight = $worldHeight;
-	this.conf = $conf;
+	this.conf = $group.conf.physics;
+	// this.constraints = [];
 	//this.nodesDiameter = this.conf.nodesDiameter;
 };
 
@@ -48,39 +50,7 @@ GroupP2SoftPhysicsManager.prototype.addJointsToWorld = function ()
 	for (var i = 0, length = this.group.joints.length; i < length; i += 1)
 	{
 		var joint = this.group.joints[i];
-		var lock = this.conf.lockConstraint;
-		var distance = this.conf.distanceConstraint;
-		var linearSpring = this.conf.linearSpring;
-		var rotationalSpring = this.conf.rotationalSpring;
-
-		if (lock)
-		{
-			var constraint1 = new p2.LockConstraint(joint.node1.physicsManager.body, joint.node2.physicsManager.body);
-			if (lock.stiffness) { constraint1.setStiffness(lock.stiffness); } //default 20
-			if (lock.relaxation) { constraint1.setRelaxation(lock.relaxation); }
-			this.world.addConstraint(constraint1);
-		}
-		if (distance)
-		{
-			var constraint2 = new p2.DistanceConstraint(joint.node1.physicsManager.body, joint.node2.physicsManager.body);
-			if (distance.stiffness) { constraint2.setStiffness(distance.stiffness); } // default 500
-			if (distance.relaxation) { constraint2.setRelaxation(distance.relaxation); }// default 0.1
-			this.world.addConstraint(constraint2);
-		}
-		if (linearSpring)
-		{
-			var constraint3 = new p2.LinearSpring(joint.node1.physicsManager.body, joint.node2.physicsManager.body);
-			if (linearSpring.stiffness) { constraint3.stiffness = linearSpring.stiffness; }
-			if (linearSpring.damping) { constraint3.damping = linearSpring.damping; }
-			this.world.addSpring(constraint3);
-		}
-		if (rotationalSpring)
-		{
-			var constraint4 = new p2.RotationalSpring(joint.node1.physicsManager.body, joint.node2.physicsManager.body);
-			if (rotationalSpring.stiffness) { constraint4.stiffness = rotationalSpring.stiffness; }
-			if (rotationalSpring.damping) { constraint4.damping = rotationalSpring.damping; }
-			//this.world.addSpring(constraint4);
-		}
+		joint.physicsManager = new JointP2PhysicsManager(joint, this.world, this.conf);
 	}
 };
 
@@ -95,7 +65,7 @@ GroupP2SoftPhysicsManager.prototype.setNodesMassFromJoints = function ()
 	for (i = 0; i < jointsLength; i += 1)
 	{
 		var currJoint = this.group.joints[i];
-		nodeGraph.connect(currJoint.node1, currJoint.node2);
+		nodeGraph.connect(currJoint.nodeA, currJoint.nodeB);
 	}
 	for (i = 0; i < nodesLength; i += 1)
 	{
@@ -134,10 +104,41 @@ GroupP2SoftPhysicsManager.prototype.setNodesMassFromJoints = function ()
 	}
 };
 
+GroupP2SoftPhysicsManager.prototype.applyAngularForce = function ($value)
+{
+	//this.group.nodes[0].physicsManager.body.angularForce += $value;
+	for (var i = 0, length = this.group.nodes.length; i < length; i += 1)
+	{
+		var currPhys = this.group.nodes[i].physicsManager;
+		currPhys.body.angularForce += $value;
+	}
+};
+
+GroupP2SoftPhysicsManager.prototype.applyForce = function ($vector)
+{
+	for (var i = 0, length = this.group.nodes.length; i < length; i += 1)
+	{
+		var currPhys = this.group.nodes[i].physicsManager;
+		currPhys.body.force = [
+			currPhys.body.force[0] + $vector[0],
+			currPhys.body.force[1] + $vector[1]
+		];
+	}
+};
+
+GroupP2SoftPhysicsManager.prototype.getAngle = function ()
+{
+	return this.group.nodes[0].physicsManager.body.interpolatedAngle;
+};
+
+
 GroupP2SoftPhysicsManager.prototype.addNodesToWorld = function ()
 {
 	for (var i = 0, length = this.group.nodes.length; i < length; i += 1)
 	{
+		// this.baseBody = new p2.Body({
+		// 	mass: 1
+		// });
 		var node = this.group.nodes[i];
 		//var fractionMass = this.conf.mass / this.group.nodes.length;
 		var area = this.group.structure.area;
@@ -154,34 +155,24 @@ GroupP2SoftPhysicsManager.prototype.addNodesToWorld = function ()
 		//if (node.fixed) { body.type = p2.Body.STATIC; }
 		//console.log(node.oX, node.oY);
 		//this.body.fixedRotation = true;
-		body.gravityScale = this.conf.gravityScale || 1;//0;// -1;
 
 		// var radius = this.conf.nodeRadius;
 		// var circleShape = new p2.Circle(radius);
 		// body.addShape(circleShape);
-		if (this.group.structure.innerRadius)
-		{
-			var radius = this.group.structure.innerRadius;
-			var circleShape = new p2.Circle(radius);
-			body.addShape(circleShape);
-		}
-		else
-		{
-			// var particleShape = new p2.Particle();
-			// body.addShape(particleShape);
-			var circledShape = new p2.Circle(this.group.conf.nodeRadius);
-			body.addShape(circledShape);
-			// body.mass = nodeMass;
-			// body.updateMassProperties();
-		}
+
+		var radius = this.group.structure.innerRadius || this.group.conf.nodeRadius || 0.1;
+		var circledShape = new p2.Circle(radius);
+		body.addShape(circledShape);
 
 		//console.log(this.body.getArea());
 
 		//this.body.setDensity(node.type === 'line' ? 1 : 5000);
 
+
 		//body.damping = 1;
 		//body.mass = mass;
 		node.physicsManager = new NodeP2SoftPhysicsManager(p2, body, this.worldHeight);
+		node.physicsManager.radius = radius;
 		//node.physicsManager.setFixed(node.fixed);
 		//body.setDensity(0.1);
 		this.world.addBody(body);
@@ -200,12 +191,72 @@ GroupP2SoftPhysicsManager.prototype.addNodesToWorld = function ()
 		body.invMass = 1 / body.mass;
 		body.inertia = body.mass * 0.5;
 		body.invInertia = 1 / body.inertia;
-		
+		body.collisionResponse = !this.conf.noCollide;
+
 		body.angularDamping = this.conf.angularDamping || body.angularDamping;
 		body.damping = this.conf.damping || body.damping;
+
+		body.gravityScale = this.conf.gravityScale !== undefined ? this.conf.gravityScale : 1;
 	}
 
+	var Polygon = require('../../core/Polygon');
+	var points = [];
+	var envelope = this.group.drawing.nodes;
+	var envelopeLength = this.group.drawing.nodes.length;
+	for (i = 0; i < envelopeLength; i += 1)
+	{
+		points.push(envelope[i].physicsManager.body.interpolatedPosition);
+	}
+	this.polygon = Polygon.init(points);
+	console.log(this.polygon);
+	//debugger;
+
 	if (this.conf.structuralMassDecay) { this.setNodesMassFromJoints(); }
+};
+
+GroupP2SoftPhysicsManager.prototype.hitTest = function ($point, $precision)
+{
+	var dx;
+	var dy;
+	var nodesLength = this.group.nodes.length;
+
+	for (var m = 0; m < nodesLength; m += 1)
+	{
+		var body = this.group.nodes[m].physicsManager.body;
+		dx = Math.abs(body.interpolatedPosition[0] - $point[0]);
+		dy = Math.abs(body.interpolatedPosition[1] - $point[1]);
+		if (dx < $precision && dy < $precision)
+		{
+			return body;
+		}
+	}
+	if (this.polygon.isInside($point))
+	{
+		var closest;
+		var closestHyp;
+		for (var i = 0, length = this.polygon.points.length; i < length; i += 1)
+		{
+			var currPoint = this.polygon.points[i];
+			dx = Math.abs($point[0] - currPoint[0]);
+			dy = Math.abs($point[1] - currPoint[1]);
+			var hyp = Math.sqrt(dx * dx + dy * dy);
+			if (closestHyp === undefined || hyp < closestHyp)
+			{
+				closest = currPoint;
+				closestHyp = hyp;
+			}
+		}
+		for (var k = 0; k < nodesLength; k += 1)
+		{
+			var currNode = this.group.nodes[k];
+			if (currNode.physicsManager.body.interpolatedPosition[0] === closest[0] &&
+				currNode.physicsManager.body.interpolatedPosition[1] === closest[1])
+			{
+				return currNode.physicsManager.body;
+			}
+		}
+		return closest;
+	}
 };
 
 module.exports = GroupP2SoftPhysicsManager;

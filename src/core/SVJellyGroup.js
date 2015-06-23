@@ -148,19 +148,19 @@ SVJellyGroup.prototype.hitTest = function ($point)
 	return false;
 };
 
-SVJellyGroup.prototype.createJoint = function ($node1, $node2)
+SVJellyGroup.prototype.createJoint = function ($nodeA, $nodeB, $type)
 {
-	for (var i = 0, jointsLength = this.joints.length; i < jointsLength; i += 1)
+	for (var i = 0; i < this.joints.length; i += 1)
 	{
 		var currJoint = this.joints[i];
-		if ((currJoint.node1 === $node1 && currJoint.node2 === $node2) || (currJoint.node2 === $node1 && currJoint.node1 === $node2))
+		if ((currJoint.nodeA === $nodeA && currJoint.nodeB === $nodeB) || (currJoint.nodeB === $nodeA && currJoint.nodeA === $nodeB))
 		{
-			return;
+			//return;
+			this.joints.splice(i, 1);
+			i = i - 1;
 		}
 	}
-
-	var joint = new SVJellyJoint($node1, $node2);
-
+	var joint = new SVJellyJoint($nodeA, $nodeB, $type);
 	this.joints.push(joint);
 
 	//this.physicsManager.addJointToWorld(joint);

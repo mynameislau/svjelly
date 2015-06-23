@@ -18,7 +18,7 @@
 			maker.promise.then(function ()
 			{
 				var world = maker.svjellyWorld;
-				var p2 = world.physicsManager.p2;
+				// var p2 = world.physicsManager.p2;
 				var p2World = world.physicsManager.p2World;
 
 				//WIND
@@ -43,9 +43,7 @@
 						for (var i = 0, length = bodiesLength; i < length; i += 1)
 						{
 							var curr = p2World.bodies[i];
-							var loc = [];
-							curr.toWorldFrame(loc, [0, 0]);
-							curr.applyForce([Math.sin(coeff) * windForce, 0], loc);
+							curr.applyForce([Math.sin(coeff) * windForce, 0], curr.position);
 						}
 					};
 				}

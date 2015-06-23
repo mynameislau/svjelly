@@ -1,10 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!-- Generator: Adobe Illustrator 16.0.0, SVG Export Plug-In . SVG Version: 6.00 Build 0)  -->
 <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
-<svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" width="1200px"
-	 height="800px" viewBox="0 0 1200 800" enable-background="new 0 0 1200 800" xml:space="preserve">
-<g id="Layer_1">
-	<radialGradient id="ghost_1_" cx="602" cy="415" r="534.5111" gradientUnits="userSpaceOnUse">
+<svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+	 width="1200px" height="800px" viewBox="0 0 1200 800" enable-background="new 0 0 1200 800" xml:space="preserve">
+<g id="Layer_1_1_">
+	
+		<radialGradient id="ghost_1_" cx="65" cy="694.5" r="534.5111" gradientTransform="matrix(1 0 0 -1 537 1109.5)" gradientUnits="userSpaceOnUse">
 		<stop  offset="0" style="stop-color:#7FFFF9"/>
 		<stop  offset="1" style="stop-color:#6ABBFF"/>
 	</radialGradient>
@@ -15,8 +16,8 @@
 			875.847,284.542 989.5,284.542 1031.23,509.615 1106.615,517.308 1183.538,317.307 1229.692,200.384 1223.538,815.769 
 			-25.692,825 		"/>
 	</g>
-	<g id="hard">
-		<rect x="1049.691" y="303.462" fill="#6A1800" width="104.615" height="13.846"/>
+	<g id="wood_1_">
+		<rect x="1046.691" y="304.167" fill="#6A1800" width="104.612" height="6.294"/>
 		
 			<line id="constraint-ball2" fill="none" stroke="#543800" stroke-miterlimit="10" x1="1053" y1="306.333" x2="1048.333" y2="232.333"/>
 		
@@ -62,7 +63,7 @@
 	</g>
 	<rect id="metal" x="425.667" y="23.666" fill="#92BF00" width="58.541" height="202.333"/>
 </g>
-<g id="hard_2_">
+<g id="wood_2_">
 	<rect x="888.75" y="277.5" fill="#3F3F3F" stroke="#2D2F33" stroke-miterlimit="10" width="14.25" height="7.042"/>
 	<rect x="881.625" y="277.5" fill="#3F3F3F" stroke="#2D2F33" stroke-miterlimit="10" width="7.125" height="7.042"/>
 	<rect x="903" y="277.5" fill="#3F3F3F" stroke="#2D2F33" stroke-miterlimit="10" width="14.25" height="7.042"/>

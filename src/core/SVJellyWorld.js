@@ -40,7 +40,7 @@ SVJellyWorld.prototype.createGroup = function ($type, $ID)
 	return group;
 };
 
-SVJellyWorld.prototype.constrainGroups = function ($groupA, $groupB, $points)
+SVJellyWorld.prototype.constrainGroups = function ($groupA, $groupB, $points, $type)
 {
 	var points = $points;
 	var groupA = $groupA;
@@ -51,11 +51,12 @@ SVJellyWorld.prototype.constrainGroups = function ($groupA, $groupB, $points)
 		var anchorA = groupA.physicsManager.createAnchorFromLine(points);
 		points.splice(points.indexOf(anchorA.point), 1);
 		var anchorB = groupB ? groupB.physicsManager.createAnchorFromPoint(points[0]) : this.physicsManager.createGhostAnchorFromPoint(points[0]);
-		this.groupConstraints.push({ anchorA: anchorA, anchorB: anchorB });
+		this.groupConstraints.push({ anchorA: anchorA, anchorB: anchorB, type: $type });
 	}
 	else
 	{
 		var anchorsA = groupA.physicsManager.createAnchors(points);
+		var anchorsB = groupB ? groupB.physicsManager.createAnchors(points) : [];
 		//console.log('A', groupA.ID, anchorsA.length, 'B', groupB ? groupB.ID : groupB);
 		for (var i = 0, nodesLength = anchorsA.length; i < nodesLength; i += 1)
 		{
@@ -66,11 +67,10 @@ SVJellyWorld.prototype.constrainGroups = function ($groupA, $groupB, $points)
 			}
 			else
 			{
-				var anchorsB = groupB.physicsManager.createAnchors(points);
 				for (var k = 0, anchorsBLength = anchorsB.length; k < anchorsBLength; k += 1)
 				{
 					var currAnchorB = anchorsB[k];
-					this.groupConstraints.push({ anchorA: currAnchorA, anchorB: currAnchorB });
+					this.groupConstraints.push({ anchorA: currAnchorA, anchorB: currAnchorB, type: $type });
 				}
 			}
 		}
@@ -91,7 +91,7 @@ SVJellyWorld.prototype.addGroupsToWorld = function ()
 	for (i = 0; i < toConstrainLength; i += 1)
 	{
 		var currToConstrain = this.groupConstraints[i];
-		this.physicsManager.constrainGroups(currToConstrain.anchorA, currToConstrain.anchorB);
+		this.physicsManager.constrainGroups(currToConstrain.anchorA, currToConstrain.anchorB, currToConstrain.type);
 	}
 };
 

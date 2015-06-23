@@ -1,7 +1,8 @@
-var SVJellyJoint = function ($node1, $node2)
+var SVJellyJoint = function ($nodeA, $nodeB, $type)
 {
-	this.node1 = $node1;
-	this.node2 = $node2;
+	this.nodeA = $nodeA;
+	this.nodeB = $nodeB;
+	this.type = $type || 'default';
 };
 
 module.exports = SVJellyJoint;
