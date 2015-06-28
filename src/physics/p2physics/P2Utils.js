@@ -26,7 +26,16 @@ P2Utils.createConstraints = function ($world, $bodyA, $bodyB, $config, $options)
 		{
 			worldPivot: $bodyA.interpolatedPosition
 		});
-		constraint.setLimits(0, 0);
+		if (!revolute.motor)
+		{
+			constraint.setLimits(0, 0);
+		}
+		else
+		{
+			constraint.enableMotor();
+			constraint.setMotorSpeed(0.5);
+			constraint.collideConnected = false;
+		}
 		if (revolute.stiffness) { constraint.setStiffness(revolute.stiffness); } //default 20
 		if (revolute.relaxation) { constraint.setRelaxation(revolute.relaxation); }
 		$world.addConstraint(constraint);

@@ -1,0 +1,25 @@
+{
+	"source": "assets/airhockey.svg",
+	"wind": 5,
+	"groups":
+	{
+		"puck":
+		{
+			"physics":
+			{
+				"gravityScale": 0,
+				"mass": 1,
+				"bodyType": "hard"
+			}
+		},
+		"pallet":
+		{
+			"physics":
+			{
+				"gravityScale": 0,
+				"mass": 1000,
+				"bodyType": "hard"
+			}
+		}
+	}
+}

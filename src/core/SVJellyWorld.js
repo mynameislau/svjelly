@@ -40,6 +40,7 @@ SVJellyWorld.prototype.createGroup = function ($type, $ID)
 	return group;
 };
 
+//maybe split this into two different features, stuff for making bodies fixed, and constraints
 SVJellyWorld.prototype.constrainGroups = function ($groupA, $groupB, $points, $type)
 {
 	var points = $points;
@@ -63,7 +64,16 @@ SVJellyWorld.prototype.constrainGroups = function ($groupA, $groupB, $points, $t
 			var currAnchorA = anchorsA[i];
 			if (!groupB)
 			{
-				currAnchorA.setFixed(true);
+				if ($type === 'default')
+				{
+					currAnchorA.setFixed(true);
+				}
+				else
+				{
+					var ghostAnchor = this.physicsManager.createGhostAnchorFromPoints(points);
+					this.groupConstraints.push({ anchorA: currAnchorA, anchorB: ghostAnchor, type: $type });
+				}
+				console.log('constraining');
 			}
 			else
 			{

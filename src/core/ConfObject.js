@@ -4,7 +4,7 @@ module.exports = {
 	worldWidth: 150,
 	multiCanvas: true,
 	wind: 5,
-	debug: false,
+	debug: true,
 	gravity: [0, -9.8],
 	groups:
 	{
@@ -181,6 +181,19 @@ module.exports = {
 			}
 		}
 	},
+	materials:
+	{
+		default:
+		{
+			bounciness: 1,
+			friction: 0.5
+		},
+		rubber:
+		{
+			bounciness: 10,
+			friction: 1
+		}
+	},
 	constraints:
 	{
 		default:
@@ -193,6 +206,23 @@ module.exports = {
 			{
 				stiffness: 1000,
 				relaxation: 1
+			}
+		},
+		spring:
+		{
+			distanceConstraint:
+			{
+				stiffness: 100000,
+				relaxation: 0
+			}
+		},
+		continuousMotor:
+		{
+			revoluteConstraint:
+			{
+				motor: true,
+				continuousMotor: true,
+				motorPower: 4
 			}
 		}
 	}

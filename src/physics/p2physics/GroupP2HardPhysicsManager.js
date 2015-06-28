@@ -5,9 +5,10 @@ var p2 = require('../../../libs/p2');
 var NodeP2HardPhysicsManager = require('./NodeP2HardPhysicsManager');
 var AnchorP2HardPhysicsManager = require('./AnchorP2HardPhysicsManager');
 
-var GroupP2HardPhysicsManager = function ($group, $P2World, $worldHeight)
+var GroupP2HardPhysicsManager = function ($group, $P2World, $worldHeight, $materialsList)
 {
 	this.group = $group;
+	this.materialsList = $materialsList;
 	this.worldHeight = $worldHeight;
 	this.P2World = $P2World;
 	this.conf = $group.conf.physics;
@@ -101,6 +102,13 @@ GroupP2HardPhysicsManager.prototype.addNodesToWorld = function ()
 	//this.body.mass = this.conf.mass;
 	//if (this.group.conf.fixed) { node.physicsManager.setFixed(this.group.conf.fixed); }
 	//this.body.updateMassProperties();
+	var shapesLength = this.body.shapes.length;
+	for (i = 0; i < shapesLength; i += 1)
+	{
+		var currShape = this.body.shapes[i];
+		currShape.material = this.conf.material ? this.materialsList[this.conf.material].material : this.materialsList.default.material;
+		console.log(currShape.material);
+	}
 	this.P2World.addBody(this.body);
 	this.body.mass = this.body.getArea() * this.conf.mass;
 	this.body.updateMassProperties();

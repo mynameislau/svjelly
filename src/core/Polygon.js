@@ -46,6 +46,14 @@ var Polygon =
 		return this._boundingBox;
 	},
 
+	getCenter: function ()
+	{
+		var bounding = this.getBoundingBox();
+		var x = bounding[0][0] + (bounding[1][0] - bounding[0][0]) / 2;
+		var y = bounding[0][1] + (bounding[1][1] - bounding[0][1]) / 2;
+		return [x, y];
+	},
+
 	getSegments: function ()
 	{
 		var segments = [];

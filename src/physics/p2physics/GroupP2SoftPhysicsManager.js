@@ -208,7 +208,6 @@ GroupP2SoftPhysicsManager.prototype.addNodesToWorld = function ()
 		points.push(envelope[i].physicsManager.body.interpolatedPosition);
 	}
 	this.polygon = Polygon.init(points);
-	console.log(this.polygon);
 	//debugger;
 
 	if (this.conf.structuralMassDecay) { this.setNodesMassFromJoints(); }

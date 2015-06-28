@@ -12,7 +12,11 @@
 		var loadEventHandler = function ()
 		{
 			var container = document.getElementById('container');
-			window.svjellymaker.createFromURL(container, 'assets/rocks.svg');
+			var maker = window.svjellymaker.createFromURL(container, 'assets/motorTest.svg');
+			maker.promise.then(function ()
+			{
+				maker.addBasicMouseControls();
+			});
 		};
 
 		window.addEventListener('load', loadEventHandler);

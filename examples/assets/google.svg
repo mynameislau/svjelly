@@ -48,8 +48,8 @@
   <ellipse ry="25.33333" rx="45.33333" id="svg_36" cy="134.66667" cx="586.66667" stroke-opacity="0.41" stroke-linecap="null" stroke-linejoin="null" stroke-dasharray="null" stroke-width="3" stroke="#ffffff" fill="#ffffff"/>
  </g>
  <g>
-  <title>hard</title>
-  <ellipse ry="19" rx="19" id="hard_2" cy="127.88889" cx="228.88889" stroke-linecap="null" stroke-linejoin="null" stroke-dasharray="null" stroke-width="3" fill="#FF0000" stroke="#ffaaaa"/>
+  <title>stone</title>
+  <ellipse ry="19" rx="19" id="stone_2" cy="127.88889" cx="228.88889" stroke-linecap="null" stroke-linejoin="null" stroke-dasharray="null" stroke-width="3" fill="#FF0000" stroke="#ffaaaa"/>
   <rect stroke="#b2b2b2" transform="rotate(24.279464721679688 313.725341796875,224.89021301269534) " id="static_EOO" height="22.37394" width="235.51758" y="213.70324" x="195.96653" stroke-linecap="null" stroke-linejoin="null" stroke-dasharray="null" stroke-width="5" fill="#7f7f7f"/>
   <rect id="static" height="12" width="660" y="408" x="-11" stroke-linecap="null" stroke-linejoin="null" stroke-dasharray="null" stroke-width="0" stroke="#492300" fill="#7fff00"/>
  </g>

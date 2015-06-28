@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Generator: Adobe Illustrator 16.0.0, SVG Export Plug-In . SVG Version: 6.00 Build 0)  -->
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+	 width="1200px" height="800px" viewBox="0 0 1200 800" enable-background="new 0 0 1200 800" xml:space="preserve">
+<g>
+	<line id="constraint-chassis-spring_3_" fill="none" x1="877.023" y1="747.202" x2="974.229" y2="708.051"/>
+	<line id="constraint-chassis-spring_2_" fill="none" x1="877.023" y1="747.202" x2="878.019" y2="708.051"/>
+	<circle id="wood" fill="#FF00FF" cx="877.023" cy="747.202" r="15.241"/>
+</g>
+<g>
+	<rect id="wood-motor" x="961.06" y="736.182" fill="#FF0000" width="23.902" height="23.902"/>
+	<line id="constraint-chassis-spring_1_" fill="none" x1="984.962" y1="736.182" x2="974.229" y2="708.051"/>
+	<line id="constraint-chassis-spring" fill="none" x1="973.011" y1="748.133" x2="878.019" y2="708.051"/>
+	<line id="constraint-chassis-spring_4_" fill="none" x1="961.06" y1="736.182" x2="974.229" y2="708.051"/>
+</g>
+<rect id="wood-chassis" x="878.019" y="687.848" fill="#FF0000" width="96.21" height="20.203"/>
+<g>
+	<circle id="wood_1_" fill="#FF00FF" cx="973.011" cy="748.133" r="18.989"/>
+	<rect id="constraint-motor-continuousMotor" x="968.271" y="743.394" fill="#FF00FF" width="9.479" height="9.479"/>
+</g>
+<rect id="static" y="800" fill="#FF00FF" width="1200" height="220.882"/>
+<rect id="static_2_" x="-216.262" fill="#FF00FF" width="216.262" height="1020.882"/>
+<rect id="static_1_" x="1200" fill="#FF00FF" width="257.905" height="1020.882"/>
+<rect id="static_3_" x="-74.385" y="723.885" transform="matrix(0.865 0.5017 -0.5017 0.865 397.8493 41.3171)" fill="#FF00FF" width="393.04" height="72.397"/>
+</svg>

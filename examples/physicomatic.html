@@ -3,11 +3,11 @@
 <head>
 	<meta charset="UTF-8">
 	<title>Physic-o-matic</title>
-	<link rel="stylesheet" href="assets/styles.css">
+	<link rel="stylesheet" href="assets/physicomatic-styles.css">
 </head>
 <body>
-	<div id="canvas-holder">
-		<canvas id="canvas"></canvas>
+	<div id="container-holder">
+		<div id="container"></div>
 	</div>
 	<div id="textarea-holder">
 		<textarea id="svg-paste" cols="30" rows="10"></textarea>
@@ -19,11 +19,12 @@
 		{
 			var button = document.getElementById('load-svg');
 			var textarea = document.getElementById('svg-paste');
-			var canvas = document.getElementById('canvas');
-			canvas.width = canvas.parentNode.clientWidth;
+			var container = document.getElementById('container');
+			container.style.width = container.parentNode.clientWidth + 'px';
+			container.style.height = container.parentNode.clientHeight + 'px';
 
 			var maker;
-			//maker = window.svjellymaker.createFromURL(canvas, 'assets/google.svg');
+			//maker = window.svjellymaker.createFromURL(container, 'assets/google.svg');
 			button.addEventListener('click', function ()
 			{
 				if (maker)
@@ -31,7 +32,7 @@
 					maker.remove();
 					maker.removeBasicMouseControls();
 				}
-				maker = window.svjellymaker.createFromString(canvas, textarea.value);
+				maker = window.svjellymaker.createFromString(container, textarea.value);
 				maker.promise.then(function ()
 				{
 					maker.addBasicMouseControls();

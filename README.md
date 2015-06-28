@@ -2,7 +2,7 @@
 A library for turning a SVG file into a physically simulated scene.
 
 ###Work in progress
-SVJelly is a work in progress and can be rough on the edges. The api is subject to break.
+SVJelly is a work in progress and can be rough around the edges. The api is subject to break.
 It is physics engine-agnostic but has a built-in 'physics renderer' working with P2js.
 There is a built-in graphics renderer too, but interfacing the lib with your renderer should be easy.
 
@@ -57,6 +57,8 @@ For non-moving shapes, you are quite free to draw curves, gradients, strokes, ci
 Moving shapes are more restrictive at the moment though.
 They can only be simple paths with simple strokes. Curves are not supported apart from circles. Gradients on moving shapes are not supported yet apart from lines with gradients.
 
+Opacity on groups is currently not supported
+
 ##Config file reference
 
 - **worldWidth** : Specifies the physical width of your scene.
@@ -72,7 +74,7 @@ They can only be simple paths with simple strokes. Curves are not supported apar
 - **stone** : Hard body
 - **wood** : Hard body
 - **balloon** : Hard body, can lift other objects
-- **tree** : Soft body, the mass of the nodes decrease the farer you go from the fixed points. The linking of the nodes composing the shape will be created from triangulation.
+- **tree** : Soft body, the mass of the nodes decrease the farer you go from the fixed points. The linking of the nodes composing the shape will be created by triangulation.
 - **flora** : Basically the same as the tree object but for line drawings.
 - **rubber** : A somewhat stiff soft body.
 - **jelly** : A soft body whose structure is an hexagonal grid.

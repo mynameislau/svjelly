@@ -2,6 +2,7 @@ var SVJellyWorld = require('./core/SVJellyWorld');
 var SVJellyRenderer = require('./renderer/svjelly/SVJellyRenderer');
 var SVGParser = require('./core/SVGParser');
 var P2PhysicsManager = require('./physics/p2physics/P2PhysicsManager');
+var P2MouseControls = require('./physics/p2physics/P2MouseControls');
 var SVJellyUtils = require('./core/SVJellyUtils');
 var confObject = require('./core/ConfObject');
 
@@ -16,28 +17,24 @@ var cancelAnimFrame = window.cancelAnimationFrame ||
 //TODO promise polyfill
 var SVJellyMaker =
 {
-	createFromURL: function ($canvas, $URL, $physicsManager, $Renderer)
+	createFromURL: function ($container, $URL, $width, $height, $scaleMode)
 	{
 		var svjellyMaker = Object.create(SVJellyMaker);
-		svjellyMaker.canvas = $canvas;
-		svjellyMaker.Renderer = $Renderer;
-		svjellyMaker.physicsManager = $physicsManager;
+		svjellyMaker.container = $container;
 		svjellyMaker.promise = new window.Promise(function (resolve)
 		{
 			svjellyMaker.loadFile($URL, function ($SVG)
 			{
-				svjellyMaker.create($canvas, $SVG);
+				svjellyMaker.create($container, $SVG, $width, $height, $scaleMode);
 				resolve();
 			}, true);
 		});
 		return svjellyMaker;
 	},
-	createFromConfig: function ($canvas, $configURL, $physicsManager, $Renderer)
+	createFromConfig: function ($container, $configURL, $width, $height, $scaleMode)
 	{
 		var svjellyMaker = Object.create(SVJellyMaker);
-		svjellyMaker.canvas = $canvas;
-		svjellyMaker.Renderer = $Renderer;
-		svjellyMaker.physicsManager = $physicsManager;
+		svjellyMaker.container = $container;
 
 		svjellyMaker.promise = new window.Promise(function (resolve)
 		{
@@ -48,7 +45,7 @@ var SVJellyMaker =
 
 				SVJellyMaker.loadFile(svjellyMaker.conf.source, function ($SVG)
 				{
-					svjellyMaker.create($canvas, $SVG);
+					svjellyMaker.create($container, $SVG, $width, $height, $scaleMode);
 					resolve();
 				}, true);
 			};
@@ -57,19 +54,19 @@ var SVJellyMaker =
 
 		return svjellyMaker;
 	},
-	createFromString: function ($canvas, $string)
+	createFromString: function ($container, $string, $width, $height, $scaleMode)
 	{
 		var parser = new DOMParser();
 		var doc = parser.parseFromString($string, 'image/svg+xml');
 		var svjellyMaker = Object.create(SVJellyMaker);
 		svjellyMaker.promise = new window.Promise(function (resolve)
 		{
-			svjellyMaker.create($canvas, doc);
+			svjellyMaker.create($container, doc, $width, $height, $scaleMode);
 			resolve();
 		});
 		return svjellyMaker;
 	},
-	createFromPageSVG: function ($physicsManager, $Renderer)
+	createFromPageSVG: function ()
 	{
 		var svjellies = document.querySelectorAll('[data-svjelly]');
 
@@ -80,17 +77,26 @@ var SVJellyMaker =
 			var appendCanvas = function ($config)
 			{
 				svjellyMaker.conf = $config;
-				var canvas = document.createElement('canvas');
-				canvas.width = currSVG.clientWidth;
-				canvas.height = currSVG.clientHeight;
-				currSVG.parentElement.insertBefore(canvas, currSVG);
+				var container;
+				if (svjellyMaker.conf.multiCanvas)
+				{
+					container = document.createElement('div');
+					container.style.width = currSVG.clientWidth + 'px';
+					container.style.height = currSVG.clientHeight + 'px';
+				}
+				else
+				{
+					container = document.createElement('canvas');
+					container.width = currSVG.clientWidth;
+					container.height = currSVG.clientHeight;
+				}
+
+				currSVG.parentElement.insertBefore(container, currSVG);
 				currSVG.remove();
-				svjellyMaker.canvas = canvas;
-				svjellyMaker.Renderer = $Renderer;
-				svjellyMaker.physicsManager = $physicsManager;
+				svjellyMaker.container = container;
 				var wrapper = document.createElement('div');
 				wrapper.appendChild(currSVG);
-				svjellyMaker.create(canvas, wrapper);
+				svjellyMaker.create(container, wrapper, container.clientWidth, container.clientHeight);
 			};
 			var configURL = currSVG.getAttribute('data-svjelly');
 			if (configURL)
@@ -114,27 +120,49 @@ var SVJellyMaker =
 		}
 	},
 
-	create: function ($canvas, $SVG)
+	create: function ($container, $SVG, $width, $height, $scaleMode)
 	{
 		var conf = this.conf || confObject;
-		this.canvas = $canvas;
+		this.container = $container;
 
-		this.physicsManager = this.physicsManager || new P2PhysicsManager(conf);
+		this.physicsManager = new P2PhysicsManager(conf);
 		var svjellyWorld = this.svjellyWorld = new SVJellyWorld(this.physicsManager, conf);
 
-		var canvasDefinition = conf.definition;
+		var canvasDefinition = conf.definition || 1;
 		var svgDef = $SVG.querySelector('svg');
 		var parser = new SVGParser();
 		parser.parse(svjellyWorld, svgDef);
-		var canvasWidth = this.canvas.clientWidth * canvasDefinition;
-		var canvasHeight = this.canvas.clientWidth * (parser.viewBoxHeight / parser.viewBoxWidth) * canvasDefinition;
 
-		this.canvas.width = canvasWidth;
-		this.canvas.height = canvasHeight;
-		this.renderer = this.Renderer ? this.Renderer.create(svjellyWorld, this.canvas) : SVJellyRenderer.create(svjellyWorld, this.canvas);
+		var width = $width || this.container.clientWidth;
+		var height = $height || this.container.clientHeight;
 
-		this.renderer.container.style.transformOrigin = '0 0';
-		this.renderer.container.style.transform = 'scale(' + 1 / canvasDefinition + ')';
+		var ratioCanvas = height / width;
+		var ratioSVG = parser.viewBoxHeight / parser.viewBoxWidth;
+		var canvasWidth;
+		var canvasHeight;
+
+		if ((ratioSVG < ratioCanvas && $scaleMode !== 'max') || (ratioSVG > ratioCanvas && $scaleMode === 'max'))
+		{
+			canvasWidth = width * canvasDefinition;
+			canvasHeight = canvasWidth * ratioSVG;
+		}
+		else
+		{
+			canvasHeight = height * canvasDefinition;
+			canvasWidth = canvasHeight / ratioSVG;
+		}
+
+		// this.container.width = canvasWidth;
+		// this.container.height = canvasHeight;
+
+		this.renderer = SVJellyRenderer.create(svjellyWorld, this.container);
+		this.renderer.setSize(canvasWidth, canvasHeight);
+
+		if (canvasDefinition !== 1)
+		{
+			this.container.style.transformOrigin = '0 0';
+			this.container.style.transform = 'scale(' + 1 / canvasDefinition + ')';
+		}
 
 		var requestID = '';
 		var lastRender = window.performance.now();
@@ -198,110 +226,18 @@ var SVJellyMaker =
 		request.send();
 	},
 
-	addBasicMouseControls: function ($stiffness)
+	addBasicMouseControls: function ($stiffness, $relaxation)
 	{
 		var world = this.svjellyWorld;
-		var p2 = world.physicsManager.p2;
 		var p2World = world.physicsManager.p2World;
-		var container = this.renderer.container;
+		if (this.mouseControls) { this.mouseControls.removeBasicMouseControls(); }
+		this.mouseControls = new P2MouseControls(world, p2World, this.renderer);
+		this.mouseControls.addBasicMouseControls($stiffness, $relaxation);
+	},
 
-		//MOUSE
-		var mouseBody = new p2.Body();
-		p2World.addBody(mouseBody);
-
-		var mouseConstraint;
-		var worldWidth = world.worldWidth;
-		//var bodies = p2World.bodies.concat();
-		var groups = world.groups;
-		var body;
-		var scale = this.renderer.scaleX;
-		var renderer = this.renderer;
-
-		var getPhysicsCoord = function (mouseEvent)
-		{
-			var x = mouseEvent.clientX - container.offsetLeft;
-			var y = mouseEvent.clientY - container.offsetTop;
-
-			x = x / scale;
-			// console.log(container.offsetLeft, container.offsetTop, mouseEvent.clientX, mouseEvent.clientY, scale);
-			y = (renderer.height - y) / scale;
-			return [x, y];
-		};
-
-		var lastPos;
-		// var acceleration;
-		var mouseMove = function (event)
-		{
-			var position = getPhysicsCoord(event);
-			mouseBody.position[0] = position[0];
-			mouseBody.position[1] = position[1];
-			lastPos = lastPos || position;
-			// acceleration = [position[0] - lastPos[0], position[1] - lastPos[1]];
-			lastPos = position;
-		};
-
-		var mouseDown = function (event)
-		{
-			var position = getPhysicsCoord(event);
-			for (var i = 0, length = groups.length; i < length; i += 1)
-			{
-				var currGroup = groups[i];
-				if (currGroup.physicsManager.hitTest)
-				{
-					body = currGroup.physicsManager.hitTest(position, worldWidth / 50);
-					if (body) { break; }
-				}
-			}
-
-			// Check if the cursor is inside the box
-			//var hitBodies = p2World.hitTest(position, bodies, 100);
-
-			if (body)//hitBodies.length)
-			{
-				//body = hitBodies[0];
-				// Move the mouse body to the cursor position
-
-				mouseBody.position[0] = position[0];
-				mouseBody.position[1] = position[1];
-
-				// Create a RevoluteConstraint.
-				// This constraint lets the bodies rotate around a common point
-				mouseConstraint = new p2.DistanceConstraint(mouseBody, body,
-				{
-					//worldPivot: position,
-					collideConnected: false
-				});
-
-				mouseConstraint.setStiffness($stiffness || 200);
-				mouseConstraint.setRelaxation(1);
-
-				p2World.addConstraint(mouseConstraint);
-				container.addEventListener('mousemove', mouseMove);
-			}
-		};
-
-		var mouseUp = function ()
-		{
-			// acceleration[0] *= 100;
-			// acceleration[1] *= 100;
-
-			// console.log(acceleration);
-			//body.toWorldFrame(bodyWorldPosition, [0, 0]);
-			p2World.removeConstraint(mouseConstraint);
-			//body.applyForce(acceleration, body.position);
-			mouseConstraint = null;
-			container.removeEventListener('mousemove', mouseMove);
-		};
-
-		container.addEventListener('mousedown', mouseDown);
-		container.addEventListener('mouseup', mouseUp);
-
-		this.removeBasicMouseControls = function ()
-		{
-			container.removeEventListener('mousemove', mouseMove);
-			container.removeEventListener('mousedown', mouseDown);
-			container.removeEventListener('mouseup', mouseUp);
-		};
+	removeBasicMouseControls: function ()
+	{
+		this.mouseControls.removeBasicMouseControls();
 	}
 };
 
