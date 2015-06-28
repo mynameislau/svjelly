@@ -3,7 +3,7 @@
 <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
 <svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
 	 width="1200px" height="800px" viewBox="0 0 1200 800" enable-background="new 0 0 1200 800" xml:space="preserve">
-<radialGradient id="SVGID_1_" cx="887.9863" cy="235.0078" r="1053.1478" fx="881.8385" fy="-140.7383" gradientUnits="userSpaceOnUse">
+<radialGradient id="SVGID_1_" cx="708.9863" cy="668.4922" r="1053.1478" fx="702.8385" fy="292.7461" gradientTransform="matrix(1 0 0 -1 179 903.5)" gradientUnits="userSpaceOnUse">
 	<stop  offset="0" style="stop-color:#1D2E2C"/>
 	<stop  offset="1" style="stop-color:#000000"/>
 </radialGradient>
@@ -16,7 +16,7 @@
 </g>
 <g id="tentacles">
 	
-		<linearGradient id="SVGID_2_" gradientUnits="userSpaceOnUse" x1="125.46" y1="492.0908" x2="125.46" y2="317.1035" gradientTransform="matrix(1 0 0 1 358 206)">
+		<linearGradient id="SVGID_2_" gradientUnits="userSpaceOnUse" x1="-53.5405" y1="411.4092" x2="-53.5405" y2="586.3965" gradientTransform="matrix(1 0 0 -1 537 1109.5)">
 		<stop  offset="0" style="stop-color:#B2F3FF;stop-opacity:0.3"/>
 		<stop  offset="1" style="stop-color:#C2F6FF"/>
 	</linearGradient>
@@ -25,7 +25,7 @@
 		483.46,524.604 483.46,546.104 483.46,567.601 483.46,589.1 483.46,610.599 483.46,632.096 483.46,653.594 483.46,675.093 
 		483.46,696.591 	"/>
 	
-		<linearGradient id="SVGID_3_" gradientUnits="userSpaceOnUse" x1="135.4966" y1="406.8447" x2="135.4966" y2="317.0986" gradientTransform="matrix(1 0 0 1 358 206)">
+		<linearGradient id="SVGID_3_" gradientUnits="userSpaceOnUse" x1="-43.5039" y1="496.6553" x2="-43.5039" y2="586.4014" gradientTransform="matrix(1 0 0 -1 537 1109.5)">
 		<stop  offset="0" style="stop-color:#B2F3FF;stop-opacity:0.3"/>
 		<stop  offset="1" style="stop-color:#C2F6FF"/>
 	</linearGradient>
@@ -33,7 +33,7 @@
 		<polyline opacity="0.8" fill="none" stroke="url(#SVGID_3_)" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" stroke-miterlimit="10" enable-background="new    " points="
 		494.017,525.099 493.757,546.535 493.496,567.972 493.236,589.408 492.977,610.845 	"/>
 	
-		<linearGradient id="SVGID_4_" gradientUnits="userSpaceOnUse" x1="144.1958" y1="449.6338" x2="144.1958" y2="317.7148" gradientTransform="matrix(1 0 0 1 358 206)">
+		<linearGradient id="SVGID_4_" gradientUnits="userSpaceOnUse" x1="-34.8047" y1="453.8662" x2="-34.8047" y2="585.7852" gradientTransform="matrix(1 0 0 -1 537 1109.5)">
 		<stop  offset="0" style="stop-color:#B2F3FF;stop-opacity:0.3"/>
 		<stop  offset="1" style="stop-color:#C2F6FF"/>
 	</linearGradient>
@@ -44,7 +44,7 @@
 		<polyline opacity="0.8" fill="none" stroke="#FFFFFF" stroke-width="3.6195" stroke-linecap="round" stroke-linejoin="round" stroke-miterlimit="10" enable-background="new    " points="
 		515.63,526.11 515.363,547.421 515.095,568.73 514.827,590.041 	"/>
 	
-		<linearGradient id="SVGID_5_" gradientUnits="userSpaceOnUse" x1="164.5596" y1="471.1406" x2="164.5596" y2="318.7012" gradientTransform="matrix(1 0 0 1 358 206)">
+		<linearGradient id="SVGID_5_" gradientUnits="userSpaceOnUse" x1="-14.4409" y1="432.3594" x2="-14.4409" y2="584.7988" gradientTransform="matrix(1 0 0 -1 537 1109.5)">
 		<stop  offset="0" style="stop-color:#B2F3FF;stop-opacity:0.3"/>
 		<stop  offset="1" style="stop-color:#C2F6FF"/>
 	</linearGradient>
@@ -53,7 +53,7 @@
 		524.185,526.511 523.721,547.771 523.257,569.031 522.792,590.292 522.328,611.552 521.864,632.812 521.399,654.071 
 		520.935,675.331 	"/>
 	
-		<linearGradient id="SVGID_6_" gradientUnits="userSpaceOnUse" x1="177.8394" y1="407.3438" x2="177.8394" y2="319.5957" gradientTransform="matrix(1 0 0 1 358 206)">
+		<linearGradient id="SVGID_6_" gradientUnits="userSpaceOnUse" x1="-1.1611" y1="496.1562" x2="-1.1611" y2="583.9043" gradientTransform="matrix(1 0 0 -1 537 1109.5)">
 		<stop  offset="0" style="stop-color:#B2F3FF;stop-opacity:0.3"/>
 		<stop  offset="1" style="stop-color:#C2F6FF"/>
 	</linearGradient>
@@ -61,7 +61,7 @@
 		<polyline opacity="0.8" fill="none" stroke="url(#SVGID_6_)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" stroke-miterlimit="10" enable-background="new    " points="
 		536.676,527.096 536.258,548.283 535.84,569.47 535.421,590.657 535.003,611.844 	"/>
 	
-		<linearGradient id="SVGID_7_" gradientUnits="userSpaceOnUse" x1="188.3872" y1="449.3477" x2="188.3872" y2="320.6172" gradientTransform="matrix(1 0 0 1 358 206)">
+		<linearGradient id="SVGID_7_" gradientUnits="userSpaceOnUse" x1="9.3867" y1="454.1523" x2="9.3867" y2="582.8828" gradientTransform="matrix(1 0 0 -1 537 1109.5)">
 		<stop  offset="0" style="stop-color:#B2F3FF;stop-opacity:0.3"/>
 		<stop  offset="1" style="stop-color:#C2F6FF"/>
 	</linearGradient>

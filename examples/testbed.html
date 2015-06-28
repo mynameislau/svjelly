@@ -1,22 +1,24 @@
-
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
 	<meta charset="UTF-8">
 	<title>Testbed</title>
+	<link rel="stylesheet" href="assets/example_main_styles.css">
 </head>
-<body>
-	<canvas id="canvas"></canvas>
+<body class="fullscreen">
+	<div id="container"></div>
 	<script src="../build/svjellymaker.js"></script>
 	<script>
 		var loadEventHandler = function ()
 		{
-			var canvas = document.getElementById('canvas');
-			canvas.width = document.body.clientWidth;
-			var maker = window.svjellymaker.createFromURL(canvas, '../examples/assets/testbed.svg');
+			var container = document.getElementById('container');
+			container.width = document.body.clientWidth;
+			var maker = window.svjellymaker.createFromURL(container, '../examples/assets/testbed.svg', window.innerWidth, window.innerHeight, 'min');
 			maker.promise.then(function ()
 			{
+				container.style.width = maker.renderer.width + 'px';
+				container.style.height = maker.renderer.height + 'px';
+
 				var world = maker.svjellyWorld;
 				// var p2 = world.physicsManager.p2;
 				var p2World = world.physicsManager.p2World;

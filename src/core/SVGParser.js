@@ -206,7 +206,7 @@ SVGParser.prototype.setGraphicInstructions = function ($group, $raw, $nodesToDra
 	props.stroke = rawStroke && props.lineWidth !== 0 ? rawStroke : 'none';
 	props.lineCap = rawLinecap && rawLinecap !== 'null' ? rawLinecap : 'butt';
 	props.lineJoin = rawLinejoin && rawLinejoin !== 'null' ? rawLinejoin : 'miter';
-	props.opacity = rawOpacity || 1;
+	props.opacity = rawOpacity !== null ? Number(rawOpacity) : 1;
 
 	props.closePath = $drawingCommands.closePath;
 
@@ -274,18 +274,18 @@ SVGParser.prototype.getGradient = function ($value)
 			var currStop = stops[k];
 			var offset = Number(currStop.getAttribute('offset'));
 			var colorRegexResult = /stop-color:(.+?)(;|$)/g.exec(currStop.getAttribute('style'));
-			var color = currStop.getAttribute('stop-color') || colorRegexResult ? colorRegexResult[1] : undefined;
+			var color = currStop.getAttribute('stop-color') || (colorRegexResult ? colorRegexResult[1] : undefined);
 			var opacityRegexResult = /stop-opacity:([\d.-]+)/g.exec(currStop.getAttribute('style'));
-			var opacity = currStop.getAttribute('stop-opacity') || opacityRegexResult ? opacityRegexResult[1] : 1;
-			if (color.startsWith('#'))
+			var opacity = currStop.getAttribute('stop-opacity') || (opacityRegexResult ? opacityRegexResult[1] : 1);
+			if (color.indexOf('#') > -1)
 			{
 				var R = parseInt(color.substr(1, 2), 16);
 				var G = parseInt(color.substr(3, 2), 16);
 				var B = parseInt(color.substr(5, 2), 16);
 				color = 'rgba(' + R + ',' + G + ',' + B + ',' + opacity + ')';
 			}
-			if (color.startsWith('rgb(')) { color = 'rgba' + color.substring(4, -1) + ',' + opacity + ')'; }
-			if (color.startsWith('hsl(')) { color = 'hsla' + color.substring(4, -1) + ',' + opacity + ')'; }
+			if (color.indexOf('rgb(') > -1) { color = 'rgba' + color.substring(4, -1) + ',' + opacity + ')'; }
+			if (color.indexOf('hsl(') > -1) { color = 'hsla' + color.substring(4, -1) + ',' + opacity + ')'; }
 			gradient.stops.push({ offset: offset, color: color, opacity: opacity });
 		}
 

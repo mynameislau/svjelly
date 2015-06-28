@@ -5,38 +5,54 @@ var MOVE_TO = Commands.MOVE_TO;
 var BEZIER_TO = Commands.BEZIER_TO;
 var QUADRA_TO = Commands.QUADRA_TO;
 var ELLIPSE = Commands.ELLIPSE;
+var SVJellyUtils = require('../../core/SVJellyUtils');
 
 var SVJellyRenderer =//function ($world, $canvas)
 {
-	create: function ($world, $canvas)
+	create: function ($world, $container)
 	{
 		var inst = Object.create(SVJellyRenderer);
 
-		inst.mainContainer = inst.mainCanvas = $canvas;
+		inst.container = inst.mainCanvas = $container;
 		inst.world = $world;
 		inst.multiCanvas = $world.conf.multiCanvas;
-		inst.mainContext = inst.mainCanvas.getContext('2d');
+		if (inst.multicanvas) { inst.mainContext = inst.mainCanvas.getContext('2d'); }
 		inst.debug = $world.conf.debug;
-		inst.staticCanvas = [];
-		inst.dynamicCanvas = [];
-		inst.cachedHard = [];
-		inst.dynamicGroups = [];
-		inst.dynamicGroupsLength = undefined;
 
-		inst.width = inst.mainCanvas.width;
-		inst.height = inst.mainCanvas.height;
+		//inst.setSize($width, $height);
 
-		inst.scaleX = inst.scaleY = inst.mainCanvas.width / inst.world.getWidth();
+		if (!inst.multiCanvas) { inst.container = inst.mainCanvas; }
 
-		inst.drawingGroups = [];
+		return inst;
+	},
+
+	setSize: function ($width, $height)
+	{
+		while (this.container.firstChild)
+		{
+			this.container.removeChild(this.container.firstChild);
+		}
+
+		this.staticCanvas = [];
+		this.dynamicCanvas = [];
+		this.cachedHard = [];
+		this.dynamicGroups = [];
+		this.dynamicGroupsLength = undefined;
+
+		this.width = $width;
+		this.height = $height;
+
+		this.scaleX = this.scaleY = this.width / this.world.getWidth();
+
+		this.drawingGroups = [];
 		var k = 0;
 		var i;
-		for (var groupsLength = inst.world.groups.length; k < groupsLength; k += 1)
+		for (var groupsLength = this.world.groups.length; k < groupsLength; k += 1)
 		{
-			var currGroup = inst.world.groups[k];
-			inst.createDrawingGroup(currGroup);
+			var currGroup = this.world.groups[k];
+			this.createDrawingGroup(currGroup);
 		}
-		inst.drawingGroupsLength = inst.drawingGroups.length;
+		this.drawingGroupsLength = this.drawingGroups.length;
 
 		var drawingGroup;
 
@@ -44,38 +60,38 @@ var SVJellyRenderer =//function ($world, $canvas)
 		i = 0;
 		var canvas;
 		var context;
-		for (i; i < inst.drawingGroupsLength; i += 1)
+		for (i; i < this.drawingGroupsLength; i += 1)
 		{
-			drawingGroup = inst.drawingGroups[i];
+			drawingGroup = this.drawingGroups[i];
 			if (drawingGroup.isStatic)
 			{
 				//if some static layers are on top of each other, no need to create
 				//a new canvas, you can just draw the layers on the same one
-				canvas = inst.staticCanvas[i - 1] || inst.createCanvas();
+				canvas = this.staticCanvas[i - 1] || this.createCanvas();
 				context = canvas.getContext('2d');
-				inst.staticCanvas[i] = canvas;
+				this.staticCanvas[i] = canvas;
 			}
 			else
 			{
-				canvas = inst.dynamicCanvas[i - 1] || inst.createCanvas();
+				canvas = this.dynamicCanvas[i - 1] || this.createCanvas();
 				context = canvas.getContext('2d');
-				inst.dynamicCanvas[i] = canvas;
-				inst.dynamicGroups.push(drawingGroup);
+				this.dynamicCanvas[i] = canvas;
+				this.dynamicGroups.push(drawingGroup);
 			}
 			drawingGroup.canvas = canvas;
 			drawingGroup.context = context;
 		}
-		inst.dynamicGroupsLength = inst.dynamicGroups.length;
+		this.dynamicGroupsLength = this.dynamicGroups.length;
 		//
 
 		//caching gradients and precalculating
-		for (i = 0; i < inst.drawingGroupsLength; i += 1)
+		for (i = 0; i < this.drawingGroupsLength; i += 1)
 		{
-			drawingGroup = inst.drawingGroups[i];
-			//precalculating some instructions
-			drawingGroup.properties.lineWidth = drawingGroup.properties.lineWidth * inst.scaleX;
-			drawingGroup.properties.radiusX = drawingGroup.properties.radiusX * inst.scaleX;
-			drawingGroup.properties.radiusY = drawingGroup.properties.radiusY * inst.scaleY;
+			drawingGroup = this.drawingGroups[i];
+			//precalculating some thisructions
+			drawingGroup.properties.lineWidth = drawingGroup.properties.lineWidth * this.scaleX;
+			drawingGroup.properties.radiusX = drawingGroup.properties.radiusX * this.scaleX;
+			drawingGroup.properties.radiusY = drawingGroup.properties.radiusY * this.scaleY;
 			var nodesLength = drawingGroup.nodes.length;
 			for (k = 0; k < nodesLength; k += 1)
 			{
@@ -96,73 +112,71 @@ var SVJellyRenderer =//function ($world, $canvas)
 					for (var m = 0, length = options.length; m < length; m += 1)
 					{
 						var currOption = options[m];
-						currOption[0] = currOption[0] * inst.scaleX;
-						currOption[1] = currOption[1] * inst.scaleY;
+						currOption[0] = currOption[0] * this.scaleX;
+						currOption[1] = currOption[1] * this.scaleY;
 					}
 				}
 				else if (command === ELLIPSE || command === ARC)
 				{
-					options[0] = options[0] * inst.scaleX;
-					options[1] = options[1] * inst.scaleX;
+					options[0] = options[0] * this.scaleX;
+					options[1] = options[1] * this.scaleX;
 				}
 			}
 			drawingGroup.nodesLength = drawingGroup.nodes.length;
 			//
 			if (drawingGroup.properties.strokeGradient)
 			{
-				drawingGroup.properties.stroke = inst.createGradient(drawingGroup.context, drawingGroup.properties.strokeGradient);
+				drawingGroup.properties.stroke = this.createGradient(drawingGroup.context, drawingGroup.properties.strokeGradient);
 			}
 			if (drawingGroup.properties.fillGradient)
 			{
-				drawingGroup.properties.fill = inst.createGradient(drawingGroup.context, drawingGroup.properties.fillGradient);
+				drawingGroup.properties.fill = this.createGradient(drawingGroup.context, drawingGroup.properties.fillGradient);
 			}
 		}
 
 		// multi canvas
-		if (inst.multiCanvas)
+		if (this.multiCanvas)
 		{
-			inst.container = document.createElement('div');
-			inst.mainContainer = inst.container;
-			inst.container.style.position = 'relative';
-			inst.container.className = inst.mainCanvas.className;
-			inst.mainCanvas.parentNode.replaceChild(inst.container, inst.mainCanvas);
+			//this.container = document.createElement('div');
+			//this.container = this.container;
+			//this.container.id = this.mainCanvas.id;
+			this.container.style.position = 'relative';
+			//this.container.className = this.mainCanvas.className;
+			//this.mainCanvas.parentNode.replaceChild(this.container, this.mainCanvas);
 
-			for (i = 0; i < inst.drawingGroupsLength; i += 1)
+			for (i = 0; i < this.drawingGroupsLength; i += 1)
 			{
-				drawingGroup = inst.drawingGroups[i];
-				inst.addLayer(inst.container, drawingGroup.canvas, !drawingGroup.isStatic);
+				drawingGroup = this.drawingGroups[i];
+				this.addLayer(this.container, drawingGroup.canvas, !drawingGroup.isStatic);
 				// if (!container.contains(drawingGroup.canvas)) { container.appendChild(drawingGroup.canvas); }
 			}
 		}
-		inst.draw = inst.multiCanvas ? inst.drawMultiCanvas : inst.drawSingleCanvas;
+		this.draw = this.multiCanvas ? this.drawMultiCanvas : this.drawSingleCanvas;
 		//
 
 		//drawingGroups once
-		for (i = 0; i < inst.drawingGroupsLength; i += 1)
+		for (i = 0; i < this.drawingGroupsLength; i += 1)
 		{
-			drawingGroup = inst.drawingGroups[i];
-			inst.drawGroup(drawingGroup, drawingGroup.context);
+			drawingGroup = this.drawingGroups[i];
+			this.drawGroup(drawingGroup, drawingGroup.context);
 		}
 
-		if (inst.debug)
+		if (this.debug)
 		{
-			inst.debugCanvas = inst.createCanvas();
-			inst.debugContext = inst.debugCanvas.getContext('2d');
-			inst.addLayer(inst.multiCanvas ? inst.container : inst.mainCanvas.parentNode, inst.debugCanvas, false);
+			this.debugCanvas = this.createCanvas();
+			this.debugContext = this.debugCanvas.getContext('2d');
+			this.addLayer(this.multiCanvas ? this.container : this.mainCanvas.parentNode, this.debugCanvas, false);
 		}
 
-		if (!inst.multiCanvas) { inst.container = inst.mainCanvas; }
-
-		return inst;
 		//caching hard stuff - not interesting performance-wise yet
-		// for (i = 0; i < inst.drawingGroupsLength; i += 1)
+		// for (i = 0; i < this.drawingGroupsLength; i += 1)
 		// {
-		// 	drawingGroup = inst.drawingGroups[i];
+		// 	drawingGroup = this.drawingGroups[i];
 		// 	if (drawingGroup.bodyType === 'hard' && !drawingGroup.fixed)
 		// 	{
-		// 		canvas = inst.createCanvas();
-		// 		inst.drawGroup(drawingGroup, canvas.getContext('2d'));
-		// 		inst.cachedHard[i] = canvas;
+		// 		canvas = this.createCanvas();
+		// 		this.drawGroup(drawingGroup, canvas.getContext('2d'));
+		// 		this.cachedHard[i] = canvas;
 		// 	}
 		// }
 	},
@@ -172,8 +186,8 @@ var SVJellyRenderer =//function ($world, $canvas)
 		if ($parent.contains($canvas)) { return; }
 		$parent.appendChild($canvas);
 		$canvas.style.position = 'absolute';
-		$canvas.style.top = this.mainCanvas.offsetTop + 'px';
-		$canvas.style.left = this.mainCanvas.offsetLeft + 'px';
+		// $canvas.style.top = this.mainCanvas.offsetTop + 'px';
+		// $canvas.style.left = this.mainCanvas.offsetLeft + 'px';
 		$canvas.style.pointerEvents = $pointerEvents ? 'auto' : 'none';
 	},
 	createCanvas: function ()
@@ -181,7 +195,6 @@ var SVJellyRenderer =//function ($world, $canvas)
 		var canvas = window.document.createElement('canvas');
 		canvas.width = this.width;
 		canvas.height = this.height;
-		canvas.id = Math.random() * 10000000;
 		return canvas;
 	},
 
@@ -230,7 +243,7 @@ var SVJellyRenderer =//function ($world, $canvas)
 		{
 			drawingGroup =
 			{
-				properties: $group.drawing.properties,
+				properties: SVJellyUtils.extend({}, $group.drawing.properties),
 				isStatic: this.isStatic($group),
 				isSimpleDrawing: this.isSimpleDrawing($group),
 				nodes: []

@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, minimal-ui">
+	<title>Air hockey</title>
+	<link rel="stylesheet" href="assets/example_main_styles.css">
+</head>
+<body class="fullscreen">
+	<div id="container" style="background:white"></div>
+	<script src="../build/svjellymaker.js"></script>
+	<script>
+		var loadEventHandler = function ()
+		{
+			var container = document.getElementById('container');
+			container.width = document.body.clientWidth;
+			var maker = window.svjellymaker.createFromConfig(container, '../examples/assets/airhockey.json', window.innerWidth, window.innerHeight, 'min');
+			maker.promise.then(function ()
+			{
+				container.style.width = maker.renderer.width + 'px';
+				container.style.height = maker.renderer.height + 'px';
+				maker.addBasicMouseControls(Infinity, 0);
+
+				// var palletABody = maker.svjellyWorld.getGroupByID('palletA').physicsManager.body;
+				// var palletAShape = palletABody.shapes[0];
+				// var palletBBody = maker.svjellyWorld.getGroupByID('palletB').physicsManager.body;
+				// var palletBShape = palletBBody.shapes[0];
+				// var puckBody = maker.svjellyWorld.getGroupByID('puck').physicsManager.body;
+				// var puckShape = puckBody.shapes[0];
+				// var wallABody = maker.svjellyWorld.getGroupByID('wallA').physicsManager.body;
+				// var wallAShape = wallABody.shapes[0];
+				// var wallBBody = maker.svjellyWorld.getGroupByID('wallB').physicsManager.body;
+				// var wallBShape = wallBBody.shapes[0];
+
+
+				
+				// var palletsGroup = Math.pow(2, 1);
+				// var puckGroup = Math.pow(2, 2);
+				// var wallsGroup = Math.pow(2, 3);
+
+				// palletAShape.collisionGroup = palletsGroup;
+				// palletBShape.collisionGroup = palletsGroup;
+				// puckShape.collisionGroup = puckGroup;
+				// wallAShape.collisionGroup = wallsGroup;
+				// wallBShape.collisionGroup = wallsGroup;
+
+				// palletAShape.collisionMask = puckGroup;
+				// palletBShape.collisionMask = puckGroup;
+
+				// puckShape.collisionMask = palletsGroup | wallsGroup;
+
+				// wallAShape.collisionMask = puckGroup;
+				// wallBShape.collisionMask = puckGroup;
+
+				console.log(palletAShape, palletBShape, puckShape, wallAShape, wallBShape);
+			});
+		};
+
+		window.addEventListener('load', loadEventHandler);
+	</script>
+</body>
+</html>

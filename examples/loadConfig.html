@@ -3,16 +3,17 @@
 <head>
 	<meta charset="UTF-8">
 	<title>SVJelly from config file</title>
+	<link rel="stylesheet" href="assets/example_main_styles.css">
 </head>
 <body>
-	<canvas id="canvas"></canvas>
+	<div id="container"></div>
 	<script src="../build/svjellymaker.js"></script>
 	<script>
 		var loadEventHandler = function ()
 		{
-			var canvas = document.getElementById('canvas');
-			canvas.width = document.body.clientWidth;
-			var maker = window.svjellymaker.createFromConfig(canvas, '../examples/assets/underwaterConfig.json');
+			var container = document.getElementById('container');
+			container.width = document.body.clientWidth;
+			var maker = window.svjellymaker.createFromConfig(container, '../examples/assets/underwaterConfig.json', window.innerWidth, window.innerHeight, 'max');
 			maker.promise.then(function ()
 			{
 				var world = maker.svjellyWorld;
