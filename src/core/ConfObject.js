@@ -4,7 +4,7 @@ module.exports = {
 	worldWidth: 150,
 	multiCanvas: true,
 	wind: 5,
-	debug: true,
+	debug: false,
 	gravity: [0, -9.8],
 	groups:
 	{
