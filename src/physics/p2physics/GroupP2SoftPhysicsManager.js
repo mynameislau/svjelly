@@ -6,14 +6,44 @@ var NodeP2SoftPhysicsManager = require('./NodeP2SoftPhysicsManager');
 var AnchorP2SoftPhysicsManager = require('./AnchorP2SoftPhysicsManager');
 var JointP2PhysicsManager = require('./JointP2PhysicsManager');
 
-var GroupP2SoftPhysicsManager = function ($group, $world, $worldHeight)
+var GroupP2SoftPhysicsManager = function ($group, $world, $worldHeight, $materialsList)
 {
 	this.group = $group;
+	this._boundingBox = [[0, 0], [0, 0]];
+	this.materialsList = $materialsList;
 	this.world = $world;
 	this.worldHeight = $worldHeight;
 	this.conf = $group.conf.physics;
 	// this.constraints = [];
 	//this.nodesDiameter = this.conf.nodesDiameter;
+};
+
+GroupP2SoftPhysicsManager.prototype.getNodePhysicsManager = function ()
+{
+	return new NodeP2SoftPhysicsManager();
+};
+
+GroupP2SoftPhysicsManager.prototype.getBoundingBox = function ()
+{
+	var minX = Infinity;
+	var minY = Infinity;
+	var maxX = -Infinity;
+	var maxY = -Infinity;
+	for (var i = 0, length = this.group.nodesLength; i < length; i += 1)
+	{
+		var currNode = this.group.nodes[i];
+		minX = Math.min(currNode.physicsManager.getX(), minX);
+		minY = Math.min(currNode.physicsManager.getY(), minY);
+		maxX = Math.max(currNode.physicsManager.getX(), maxX);
+		maxY = Math.max(currNode.physicsManager.getY(), maxY);
+	}
+
+	this._boundingBox[0][0] = minX;
+	this._boundingBox[0][1] = minY;
+	this._boundingBox[1][0] = maxX;
+	this._boundingBox[1][1] = maxY;
+
+	return this._boundingBox;
 };
 
 GroupP2SoftPhysicsManager.prototype.createAnchorFromPoint = function ($point)
@@ -131,7 +161,6 @@ GroupP2SoftPhysicsManager.prototype.getAngle = function ()
 	return this.group.nodes[0].physicsManager.body.interpolatedAngle;
 };
 
-
 GroupP2SoftPhysicsManager.prototype.addNodesToWorld = function ()
 {
 	for (var i = 0, length = this.group.nodes.length; i < length; i += 1)
@@ -163,15 +192,15 @@ GroupP2SoftPhysicsManager.prototype.addNodesToWorld = function ()
 		var radius = this.group.structure.innerRadius || this.group.conf.nodeRadius || 0.1;
 		var circledShape = new p2.Circle(radius);
 		body.addShape(circledShape);
+		circledShape.material = this.conf.material ? this.materialsList[this.conf.material].material : this.materialsList.default.material;
 
 		//console.log(this.body.getArea());
 
 		//this.body.setDensity(node.type === 'line' ? 1 : 5000);
 
-
 		//body.damping = 1;
 		//body.mass = mass;
-		node.physicsManager = new NodeP2SoftPhysicsManager(p2, body, this.worldHeight);
+		node.physicsManager.addToWorld(p2, body, this.worldHeight);
 		node.physicsManager.radius = radius;
 		//node.physicsManager.setFixed(node.fixed);
 		//body.setDensity(0.1);
@@ -201,8 +230,8 @@ GroupP2SoftPhysicsManager.prototype.addNodesToWorld = function ()
 
 	var Polygon = require('../../core/Polygon');
 	var points = [];
-	var envelope = this.group.drawing.nodes;
-	var envelopeLength = this.group.drawing.nodes.length;
+	var envelope = this.group.structure.envelope;
+	var envelopeLength = this.group.structure.envelope.length;
 	for (i = 0; i < envelopeLength; i += 1)
 	{
 		points.push(envelope[i].physicsManager.body.interpolatedPosition);

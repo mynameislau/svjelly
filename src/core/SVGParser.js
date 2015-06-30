@@ -38,8 +38,8 @@ SVGParser.prototype.parse = function ($world, $SVG)
 		currGroup.rawSVGElement = rawElement;
 
 		var drawingCommands = this.parseElement(rawElement);
-		var nodesToDraw = currGroup.structure.create(drawingCommands);
-		this.setGraphicInstructions(currGroup, rawElement, nodesToDraw, drawingCommands);
+		currGroup.structure.create(drawingCommands);
+		this.setGraphicInstructions(currGroup, rawElement, drawingCommands);
 
 		rawGroupPairings.push({ group: currGroup, raw: rawElement.parentNode });
 	}
@@ -175,25 +175,25 @@ SVGParser.prototype.parseElement = function ($rawElement)
 	}
 };
 
-SVGParser.prototype.setGraphicInstructions = function ($group, $raw, $nodesToDraw, $drawingCommands)
+SVGParser.prototype.setGraphicInstructions = function ($group, $raw, $drawingCommands)
 {
-	var drawing = $group.drawing = {};
-	drawing.nodes = $nodesToDraw;
-	var props = drawing.properties = {};
+	var drawing = $group.drawing;
+	//drawing.commands = $nodesToDraw;
+	var props = drawing.properties;
 	//sorting nodesToDraw so the path is drawn correctly
-	var start;
-	for (var i = 0, length = $nodesToDraw.length; i < length; i += 1)
-	{
-		var currNode = $nodesToDraw[i];
-		if (currNode.drawing.command === MOVE_TO || i === length - 1)
-		{
-			if (start) { start.drawing.endNode = currNode; }
-			start = currNode;
-		}
+	// var start;
+	// for (var i = 0, length = $nodesToDraw.length; i < length; i += 1)
+	// {
+	// 	var currNode = $nodesToDraw[i];
+	// 	if (currNode.drawing.command === MOVE_TO || i === length - 1)
+	// 	{
+	// 		if (start) { start.drawing.endNode = currNode; }
+	// 		start = currNode;
+	// 	}
 
-		$group.nodes.splice($group.nodes.indexOf(currNode), 1);
-		$group.nodes.splice(i, 0, currNode);
-	}
+	// 	$group.nodes.splice($group.nodes.indexOf(currNode), 1);
+	// 	$group.nodes.splice(i, 0, currNode);
+	// }
 
 	var rawFill = $raw.getAttribute('fill');
 	var rawStroke = $raw.getAttribute('stroke');
@@ -302,7 +302,7 @@ SVGParser.prototype.parseCircle = function ($rawCircle)
 	var radiusX = this.getCoord(radiusAttrX);
 	var radiusY = this.getCoord(radiusAttrY) || radiusX;
 	var rotation = this.getRotation($rawCircle.getAttribute('transform'));
-	var pointCommands = [{ command: radiusY !== radiusX ? ELLIPSE : ARC, point: [xPos, yPos], options: [radiusX, radiusY, rotation] }];
+	var pointCommands = [{ name: radiusY !== radiusX ? ELLIPSE : ARC, point: [xPos, yPos], options: [radiusX, radiusY, rotation] }];
 	return { type: 'ellipse', pointCommands: pointCommands, radiusX: radiusX, radiusY: radiusY, closePath: false, thickness: this.getThickness($rawCircle) };
 };
 
@@ -313,8 +313,8 @@ SVGParser.prototype.parseLine = function ($rawLine)
 	var y1 = this.getCoord($rawLine.getAttribute('y1'));
 	var y2 = this.getCoord($rawLine.getAttribute('y2'));
 	var pointCommands = [];
-	pointCommands.push({ command: MOVE_TO, point: [x1, y1], options: [] });
-	pointCommands.push({ command: LINE_TO, point: [x2, y2], options: [] });
+	pointCommands.push({ name: MOVE_TO, point: [x1, y1], options: [] });
+	pointCommands.push({ name: LINE_TO, point: [x2, y2], options: [] });
 	return { type: 'line', pointCommands: pointCommands, closePath: false, thickness: this.getThickness($rawLine) };
 };
 
@@ -346,10 +346,10 @@ SVGParser.prototype.parseRect = function ($rawRect)
 	}
 
 	var pointCommands = [];
-	pointCommands.push({ command: MOVE_TO, point: points[0], options: [] });
-	pointCommands.push({ command: LINE_TO, point: points[1], options: [] });
-	pointCommands.push({ command: LINE_TO, point: points[2], options: [] });
-	pointCommands.push({ command: LINE_TO, point: points[3], options: [] });
+	pointCommands.push({ name: MOVE_TO, point: points[0], options: [] });
+	pointCommands.push({ name: LINE_TO, point: points[1], options: [] });
+	pointCommands.push({ name: LINE_TO, point: points[2], options: [] });
+	pointCommands.push({ name: LINE_TO, point: points[3], options: [] });
 
 	return { type: 'polygon', pointCommands: pointCommands, closePath: true, thickness: this.getThickness($rawRect) };
 };
@@ -362,9 +362,9 @@ SVGParser.prototype.parsePoly = function ($rawPoly)
 
 	while (result)
 	{
-		var command = pointCommands.length === 0 ? MOVE_TO : LINE_TO;
+		var name = pointCommands.length === 0 ? MOVE_TO : LINE_TO;
 		var point = [this.getCoord(result[1]), this.getCoord(result[2])];
-		pointCommands.push({ command: command, point: point, options: [] });
+		pointCommands.push({ name: name, point: point, options: [] });
 		result = regex.exec($rawPoly.getAttribute('points'));
 	}
 	return { type: $rawPoly.tagName, pointCommands: pointCommands, closePath: $rawPoly.tagName !== 'polyline', thickness: this.getThickness($rawPoly) };
@@ -408,9 +408,9 @@ SVGParser.prototype.parsePath = function ($rawPath)
 		return [x, y];
 	};
 
-	var createPoint = function ($command, $point, $options)
+	var createPoint = function ($commandName, $point, $options)
 	{
-		var info = { command: $command, point: $point, options: $options || [] };
+		var info = { name: $commandName, point: $point, options: $options || [] };
 		lastX = info.point[0];
 		lastY = info.point[1];
 		pointCommands.push(info);

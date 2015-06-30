@@ -14,11 +14,13 @@
 			var container = document.getElementById('container');
 			container.width = document.body.clientWidth;
 			var maker = window.svjellymaker.createFromURL(container, '../examples/assets/testbed.svg', window.innerWidth, window.innerHeight, 'min');
+
 			maker.promise.then(function ()
 			{
 				container.style.width = maker.renderer.width + 'px';
 				container.style.height = maker.renderer.height + 'px';
 
+				var decal = [[0, 0], [maker.renderer.width * 0.5, maker.renderer.height * 0.5]];
 				var world = maker.svjellyWorld;
 				// var p2 = world.physicsManager.p2;
 				var p2World = world.physicsManager.p2World;
@@ -34,6 +36,11 @@
 					var windInterval = 4000;
 					maker.updateCallback = function ($time)
 					{
+						// decal[0][0] += 0.1;
+						// decal[0][1] += 0.1;
+						// decal[1][0] += 0.1;
+						// decal[1][1] += 0.1;
+						// maker.renderer.setViewport(decal);
 						if (!lastTime || coeff > Math.PI * 2)
 						{
 							lastTime = $time;

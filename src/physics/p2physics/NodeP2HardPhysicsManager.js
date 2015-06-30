@@ -2,14 +2,18 @@
 /*jshint camelcase:false*/
 var p2 = require('../../../libs/p2');
 
-var NodeP2HardPhysicsManager = function ($body, $position, $worldHeight)
+var NodeP2HardPhysicsManager = function ()
+{
+	this.getX = this.getXSimple;
+	this.getY = this.getYSimple;
+};
+
+NodeP2HardPhysicsManager.prototype.addToWorld = function ($body, $position, $worldHeight)
 {
 	this.body = $body;
 	this.position = $position;
 	this.worldHeight = $worldHeight;
 	this.offset = [0, 0];
-	this.getX = this.getXSimple;
-	this.getY = this.getYSimple;
 };
 
 NodeP2HardPhysicsManager.prototype.setFixed = function ($fixed)

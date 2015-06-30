@@ -1,7 +1,11 @@
 // jscs:disable requireCamelCaseOrUpperCaseIdentifiers
 /*jshint camelcase:false*/
 
-var NodeP2SoftPhysicsManager = function ($p2, $body, $worldHeight)
+var NodeP2SoftPhysicsManager = function ()
+{
+};
+
+NodeP2SoftPhysicsManager.prototype.addToWorld = function ($p2, $body, $worldHeight)
 {
 	this.p2 = $p2;
 	this.body = $body;

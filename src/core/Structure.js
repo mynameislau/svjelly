@@ -2,6 +2,7 @@ var Triangulator = require('./Triangulator');
 var Polygon = require('./Polygon');
 var Grid = require('./Grid');
 var Commands = require('./Commands');
+var DrawingCommand = require('./DrawingCommand');
 
 var Structure = function ($group, $world)
 {
@@ -12,8 +13,6 @@ var Structure = function ($group, $world)
 
 Structure.prototype.create = function ($drawingCommands)
 {
-	var nodesToDraw;
-
 	this.points = this.getPoints($drawingCommands);
 	this.drawingCommands = $drawingCommands;
 
@@ -28,35 +27,33 @@ Structure.prototype.create = function ($drawingCommands)
 		case 'triangulate':
 			this.removeDuplicates(this.drawingCommands);
 			var triPoints = this.getPoints(this.drawingCommands);
-			nodesToDraw = this.createNodesFromPoints(triPoints);
-			this.setNodeDrawingCommands(nodesToDraw);
+			this.envelope = this.createNodesFromPoints(triPoints);
+			this.setNodeDrawingCommands(this.envelope);
 			this.createJointsFromTriangles(triPoints);
 			break;
 		case 'line':
-			nodesToDraw = this.createNodesFromPoints(this.points);
-			this.setNodeDrawingCommands(nodesToDraw);
+			this.envelope = this.createNodesFromPoints(this.points);
+			this.setNodeDrawingCommands(this.envelope);
 			this.createJointsFromPoints(this.points, true);
-			//nodesToDraw[0].fixed = true;//to remove later maybe ?
+			//envelope[0].fixed = true;//to remove later maybe ?
 			break;
 		case 'preciseHexaFill':
-			nodesToDraw = this.createPreciseHexaFillStructure(this.points);
+			this.envelope = this.createPreciseHexaFillStructure(this.points);
 			// structureNodes.forEach(function ($element) { $element.drawing = { notToDraw: true }; });
 			break;
 		case 'hexaFill':
-			nodesToDraw = this.createHexaFillStructure(this.points);
+			this.envelope = this.createHexaFillStructure(this.points);
 			break;
 		case 'simple':
-			nodesToDraw = this.createNodesFromPoints(this.points);
+			this.envelope = this.createNodesFromPoints(this.points);
 			this.createJointsFromPoints(this.points);
-			this.setNodeDrawingCommands(nodesToDraw);
-		break;
+			this.setNodeDrawingCommands(this.envelope);
+			break;
 		default:
-			nodesToDraw = this.createNodesFromPoints(this.points);
-			this.setNodeDrawingCommands(nodesToDraw);
+			this.envelope = this.createNodesFromPoints(this.points);
+			this.setNodeDrawingCommands(this.envelope);
 			break;
 	}
-
-	return nodesToDraw;
 };
 
 Structure.prototype.calculateArea = function ($points, $drawingCommands)
@@ -90,17 +87,18 @@ Structure.prototype.createHexaFillStructure = function ($points)
 {
 	this.createInnerStructure($points);
 	var path = this.innerStructure.getShapePath();
-	var nodesToDraw = [];
+	var envelope = [];
 	for (var i = 0, length = path.length; i < length; i += 1)
 	{
 		var node = this.group.getNodeAtPoint(path[i][0], path[i][1]);
-		nodesToDraw.push(node);
-		node.drawing = {};
-		node.drawing.command = i === 0 ? Commands.MOVE_TO : Commands.LINE_TO;
-		node.drawing.point = [path[i][0], path[i][1]];
-		node.drawing.options = [];
+		envelope.push(node);
+		var commandName = i === 0 ? Commands.MOVE_TO : Commands.LINE_TO;
+		this.group.drawing.addCommand(new DrawingCommand(commandName, node, {
+			point: [path[i][0], path[i][1]],
+			options: []
+		}));
 	}
-	return nodesToDraw;
+	return envelope;
 };
 
 Structure.prototype.setNodeDrawingCommands = function ($nodes)
@@ -108,14 +106,15 @@ Structure.prototype.setNodeDrawingCommands = function ($nodes)
 	for (var i = 0, length = $nodes.length; i < length; i += 1)
 	{
 		var node = $nodes[i];
-		node.drawing = this.drawingCommands.pointCommands[i];
+		var commandObject = this.drawingCommands.pointCommands[i];
+		this.group.drawing.addCommand(new DrawingCommand(commandObject.name, node, commandObject));
 	}
 };
 
 Structure.prototype.createPreciseHexaFillStructure = function ($points)
 {
-	var nodesToDraw = this.createNodesFromPoints($points);
-	this.setNodeDrawingCommands(nodesToDraw);
+	var envelope = this.createNodesFromPoints($points);
+	this.setNodeDrawingCommands(envelope);
 	this.createInnerStructure($points);
 
 	this.createJointsFromPoints($points, false);
@@ -133,7 +132,7 @@ Structure.prototype.createPreciseHexaFillStructure = function ($points)
 			this.group.createJoint(n1, n2);
 		}
 	}
-	return nodesToDraw;
+	return envelope;
 };
 
 Structure.prototype.createJointsFromTriangles = function ($points)

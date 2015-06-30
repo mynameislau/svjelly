@@ -4,8 +4,10 @@ var SVJellyJoint = require('./SVJellyJoint');
 var SVJellyGroup = function ($type, $conf, $ID)
 {
 	this.physicsManager = undefined;
-	this.drawing = undefined;
+	var GroupDrawing = require('./ObjectDrawing');
+	this.drawing = new GroupDrawing(this);
 	this.structure = undefined;
+	this.nodesLength = undefined;
 	this.conf = $conf;
 	this.fixed = this.conf.fixed;
 	this.type = $type;
@@ -40,7 +42,10 @@ SVJellyGroup.prototype.createNode = function ($px, $py, $options, $overwrite)
 		this.nodes.push(node);
 	}
 
+	node.physicsManager = this.physicsManager.getNodePhysicsManager(node);
 	//this.physicsManager.addNodeToWorld(node);
+
+	this.nodesLength = this.nodes.length;
 
 	return node;
 };
@@ -115,37 +120,6 @@ SVJellyGroup.prototype.getNodesInside = function ($points)
 		}
 	}
 	return toReturn;
-};
-
-SVJellyGroup.prototype.getBoundingBox = function ()
-{
-	var minX;
-	var maxX;
-	var minY;
-	var maxY;
-	for (var i = 0, length = this.nodes.length; i < length; i += 1)
-	{
-		var node = this.nodes[i];
-		minX = minX > node.oX || minX === undefined ? node.oX : minX;
-		maxX = maxX < node.oX || maxX === undefined ? node.oX : maxX;
-		minY = minY > node.oY || minY === undefined ? node.oY : minY;
-		maxY = maxY < node.oY || maxY === undefined ? node.oY : maxY;
-	}
-	return [[minX, minY], [maxX, maxY]];
-};
-
-//TODO : to remove
-SVJellyGroup.prototype.hitTest = function ($point)
-{
-	var currX = $point[0];
-	var currY = $point[1];
-	var bounding = this.getBoundingBox();
-	if (currX >= bounding[0][0] && currX <= bounding[1][0] &&
-		currY >= bounding[0][1] && currY <= bounding[1][1])
-	{
-		return true;
-	}
-	return false;
 };
 
 SVJellyGroup.prototype.createJoint = function ($nodeA, $nodeB, $type)

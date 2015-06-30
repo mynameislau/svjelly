@@ -73,7 +73,6 @@ SVJellyWorld.prototype.constrainGroups = function ($groupA, $groupB, $points, $t
 					var ghostAnchor = this.physicsManager.createGhostAnchorFromPoints(points);
 					this.groupConstraints.push({ anchorA: currAnchorA, anchorB: ghostAnchor, type: $type });
 				}
-				console.log('constraining');
 			}
 			else
 			{

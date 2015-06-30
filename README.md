@@ -88,7 +88,7 @@ Opacity on groups is currently not supported
 - **wire** : Your object will be attached to the world or other object with wires and will be able to rotate around its constraint.
 
 ##Future plans
-- Motors, springs, built-in muscles etc. 
+- Motors, springs, built-in muscles etc.
 - an option to have moving shapes with gradients
 - "Decorations" for moving objects, stuff that is drawn but isn't involved into collisions.
 -Advanced collision groups.

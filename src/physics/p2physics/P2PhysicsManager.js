@@ -62,7 +62,7 @@ P2PhysicsManager.prototype.getGroupPhysicsManager = function ($group)
 	{
 		case 'ghost': return new GroupGhostPhysicsManager($group);
 		case 'hard': return new GroupP2HardPhysicsManager($group, this.p2World, this.worldHeight, this.materialsList);
-		case 'soft': return new GroupP2SoftPhysicsManager($group, this.p2World, this.worldHeight);
+		case 'soft': return new GroupP2SoftPhysicsManager($group, this.p2World, this.worldHeight, this.materialsList);
 	}
 };
 
@@ -81,7 +81,6 @@ P2PhysicsManager.prototype.setMaterials = function ()
 				friction: curr.materialConfig.friction + (other.materialConfig.friction - curr.materialConfig.friction) / 2,
 				relaxation: curr.materialConfig.bounciness + (other.materialConfig.bounciness - curr.materialConfig.bounciness) / 2
 			});
-			console.log(contactMaterial);
 			this.p2World.addContactMaterial(contactMaterial);
 		}
 	}

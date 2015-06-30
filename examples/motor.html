@@ -16,6 +16,18 @@
 			maker.promise.then(function ()
 			{
 				maker.addBasicMouseControls();
+				var viewport = [[maker.renderer.width * 0.5, maker.renderer.height * 0.5], [maker.renderer.width, maker.renderer.height]];
+				var chassis = maker.svjellyWorld.getGroupByID('chassis');
+				maker.updateCallback = function ($time)
+				{
+					var box = chassis.drawing.getBoundingBox();
+					viewport[0][0] = box[0][0] * maker.renderer.scaleX;
+					viewport[1][0] = box[0][0] * maker.renderer.scaleX + maker.renderer.width * 0.2;
+					viewport[0][1] = box[0][1] * maker.renderer.scaleX;
+					viewport[1][1] = box[0][1] * maker.renderer.scaleX  + maker.renderer.height * 0.2;
+
+					//maker.renderer.setViewport(viewport);
+				};
 			});
 		};
 

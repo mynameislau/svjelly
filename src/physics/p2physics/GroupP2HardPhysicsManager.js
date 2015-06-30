@@ -12,6 +12,22 @@ var GroupP2HardPhysicsManager = function ($group, $P2World, $worldHeight, $mater
 	this.worldHeight = $worldHeight;
 	this.P2World = $P2World;
 	this.conf = $group.conf.physics;
+	this._boundingBox = [[0, 0], [0, 0]];
+};
+
+GroupP2HardPhysicsManager.prototype.getNodePhysicsManager = function ()
+{
+	return new NodeP2HardPhysicsManager();
+};
+
+GroupP2HardPhysicsManager.prototype.getBoundingBox = function ()
+{
+	var AABB = this.body.getAABB();
+	this._boundingBox[0][0] = AABB.lowerBound[0];
+	this._boundingBox[0][1] = this.worldHeight - AABB.upperBound[1];
+	this._boundingBox[1][0] = AABB.upperBound[0];
+	this._boundingBox[1][1] = this.worldHeight - AABB.lowerBound[1];
+	return this._boundingBox;
 };
 
 GroupP2HardPhysicsManager.prototype.createAnchorFromPoint = function ($point)
@@ -55,14 +71,9 @@ GroupP2HardPhysicsManager.prototype.addJointsToWorld = function () { return; };
 GroupP2HardPhysicsManager.prototype.addNodesToWorld = function ()
 {
 	var path = [];
-	var boundingBox = this.group.getBoundingBox();
-	var width = boundingBox[1][0] - boundingBox[0][0];
-	var height = boundingBox[1][1] - boundingBox[0][1];
-	var startX = boundingBox[0][0] + width * 0.5;
-	var startY = boundingBox[0][1] + height * 0.5;
 
-	//startX = this.group.nodes[0].oX;
-	//startY = this.group.nodes[0].oY;
+	var startX = this.group.nodes[0].oX;
+	var startY = this.group.nodes[0].oY;
 	var initX = startX;
 	var initY = this.worldHeight - startY;
 
@@ -75,7 +86,7 @@ GroupP2HardPhysicsManager.prototype.addNodesToWorld = function ()
 	{
 		node = this.group.nodes[i];
 		var pos = [node.oX - startX, -(node.oY - startY)];
-		node.physicsManager = new NodeP2HardPhysicsManager(this.body, pos, this.worldHeight);
+		node.physicsManager.addToWorld(this.body, pos, this.worldHeight);
 		path.push(pos);
 	}
 
@@ -107,7 +118,6 @@ GroupP2HardPhysicsManager.prototype.addNodesToWorld = function ()
 	{
 		var currShape = this.body.shapes[i];
 		currShape.material = this.conf.material ? this.materialsList[this.conf.material].material : this.materialsList.default.material;
-		console.log(currShape.material);
 	}
 	this.P2World.addBody(this.body);
 	this.body.mass = this.body.getArea() * this.conf.mass;
