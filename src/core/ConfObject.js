@@ -131,6 +131,22 @@ module.exports = {
 				bodyType: 'soft'
 			}
 		},
+		liquid:
+		{
+			structure: 'hexaFill',
+			innerStructureDef: 0.02,
+			nodeRadius: 0.8,
+			drawNodesSeparately: true,
+			physics:
+			{
+				joints:
+				{
+				},
+				mass: 0.1,
+				material: 'liquid',
+				bodyType: 'soft'
+			}
+		},
 		rope:
 		{
 			structure: 'line',
@@ -190,15 +206,35 @@ module.exports = {
 		},
 		rubber:
 		{
-			bounciness: 10,
-			friction: 1
+			bounciness: 0,
+			friction: 100
+		},
+		liquid:
+		{
+			bounciness: 1000,
+			friction: 0
 		}
 	},
 	constraints:
 	{
 		default:
 		{
-			lockConstraint: {}
+			lockConstraint:
+			{
+				stiffness: 10000000000000,
+				relaxation: 0,
+				collideConnected: false
+			}
+		},
+		axis:
+		{
+			revoluteConstraint:
+			{
+				stiffness: Infinity,
+				relaxation: 0,
+				motor: false,
+				collideConnected: false
+			}
 		},
 		wire:
 		{

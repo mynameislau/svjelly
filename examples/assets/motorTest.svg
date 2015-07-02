@@ -4,23 +4,36 @@
 <svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
 	 width="1200px" height="800px" viewBox="0 0 1200 800" enable-background="new 0 0 1200 800" xml:space="preserve">
 <g>
-	<line id="constraint-chassis-spring_3_" fill="none" x1="877.023" y1="747.202" x2="974.229" y2="708.051"/>
-	<line id="constraint-chassis-spring_2_" fill="none" x1="877.023" y1="747.202" x2="878.019" y2="708.051"/>
-	<circle id="wood" fill="#FF00FF" cx="877.023" cy="747.202" r="15.241"/>
+	<rect fill="#BFE0FF" width="1200" height="805.857"/>
+	<polygon fill="#5D6E91" points="0,748.853 179.277,631.953 257.285,709.849 377.296,631.953 506.31,748.853 600,712.849 
+		638.322,748.853 830.342,562.834 872.346,631.953 926.352,592.837 1010.359,748.853 1088.367,715.849 1140.991,784.855 
+		1200,805.857 0,805.857 	"/>
+</g>
+<g id="car">
+	<g>
+		<line id="constraint-chassis-spring_3_" fill="none" x1="1114.897" y1="777.601" x2="1165.908" y2="766.169"/>
+		<line id="constraint-chassis-spring_2_" fill="none" x1="1114.897" y1="777.601" x2="1114.779" y2="766.169"/>
+		<circle id="wood-wheelA" fill="#13003F" cx="1114.897" cy="777.601" r="8.1"/>
+	</g>
+	<g>
+		<rect id="wood-motor" x="1159.558" y="771.743" fill="#FF0000" width="12.702" height="12.703"/>
+		<line id="constraint-chassis-spring_1_" fill="none" x1="1172.26" y1="771.743" x2="1165.908" y2="766.169"/>
+		<line id="constraint-chassis-spring" fill="none" x1="1165.908" y1="778.095" x2="1114.779" y2="766.169"/>
+		<line id="constraint-chassis-spring_4_" fill="none" x1="1159.558" y1="771.743" x2="1165.908" y2="766.169"/>
+	</g>
+	<polygon id="wood-chassis" fill="#13003F" points="1116.875,762.375 1121.843,759.745 1142.625,753 1155.816,753.875 
+		1163.39,760.801 1165.908,766.169 1114.779,766.169 	"/>
+	<g>
+		<circle id="wood_1_" fill="#13003F" cx="1165.908" cy="778.095" r="10.092"/>
+		<rect id="constraint-motor-continuousMotor" x="1163.39" y="775.576" fill="#FF00FF" width="5.037" height="5.038"/>
+	</g>
 </g>
 <g>
-	<rect id="wood-motor" x="961.06" y="736.182" fill="#FF0000" width="23.902" height="23.902"/>
-	<line id="constraint-chassis-spring_1_" fill="none" x1="984.962" y1="736.182" x2="974.229" y2="708.051"/>
-	<line id="constraint-chassis-spring" fill="none" x1="973.011" y1="748.133" x2="878.019" y2="708.051"/>
-	<line id="constraint-chassis-spring_4_" fill="none" x1="961.06" y1="736.182" x2="974.229" y2="708.051"/>
+	<polygon id="static_3_" fill="#697768" points="-0.38,801 67.117,778.501 128.614,778.501 241.108,789.75 343.103,778.501 
+		413.6,760.502 454.098,760.502 520.094,772.502 600,769.502 646.716,743.151 727.084,735.003 874.076,759.224 925.074,771.931 
+		973.071,780.524 1037.568,783.044 1081.065,790.616 1200,801 	"/>
+	<rect id="static" y="800" fill="#FF00FF" width="1200" height="220.882"/>
+	<rect id="static_2_" x="-216.262" fill="#FF00FF" width="216.262" height="1020.882"/>
+	<rect id="static_1_" x="1200" fill="#FF00FF" width="257.905" height="1020.882"/>
 </g>
-<rect id="wood-chassis" x="878.019" y="687.848" fill="#FF0000" width="96.21" height="20.203"/>
-<g>
-	<circle id="wood_1_" fill="#FF00FF" cx="973.011" cy="748.133" r="18.989"/>
-	<rect id="constraint-motor-continuousMotor" x="968.271" y="743.394" fill="#FF00FF" width="9.479" height="9.479"/>
-</g>
-<rect id="static" y="800" fill="#FF00FF" width="1200" height="220.882"/>
-<rect id="static_2_" x="-216.262" fill="#FF00FF" width="216.262" height="1020.882"/>
-<rect id="static_1_" x="1200" fill="#FF00FF" width="257.905" height="1020.882"/>
-<rect id="static_3_" x="-74.385" y="723.885" transform="matrix(0.865 0.5017 -0.5017 0.865 397.8493 41.3171)" fill="#FF00FF" width="393.04" height="72.397"/>
 </svg>

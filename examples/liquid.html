@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>SVJelly From URL</title>
+	<link rel="stylesheet" href="assets/example_main_styles.css">
+</head>
+<body class="fit">
+	<div id="container"></div>
+	<script src="../build/svjellymaker.js"></script>
+	<script>
+		var loadEventHandler = function ()
+		{
+			var container = document.getElementById('container');
+			window.svjellymaker.createFromURL(container, 'assets/liquid.svg');
+		};
+		window.addEventListener('load', loadEventHandler);
+	</script>
+</body>
+</html>

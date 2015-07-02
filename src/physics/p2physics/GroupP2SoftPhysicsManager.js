@@ -190,9 +190,9 @@ GroupP2SoftPhysicsManager.prototype.addNodesToWorld = function ()
 		// body.addShape(circleShape);
 
 		var radius = this.group.structure.innerRadius || this.group.conf.nodeRadius || 0.1;
-		var circledShape = new p2.Circle(radius);
-		body.addShape(circledShape);
-		circledShape.material = this.conf.material ? this.materialsList[this.conf.material].material : this.materialsList.default.material;
+		var shape = new p2.Circle(radius);
+		body.addShape(shape);
+		shape.material = this.conf.material ? this.materialsList[this.conf.material].material : this.materialsList.default.material;
 
 		//console.log(this.body.getArea());
 

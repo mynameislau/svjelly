@@ -1,0 +1,47 @@
+{
+	"source": "assets/motorTest2.svg",
+	"debug": true,
+	"worldWidth": 500,
+	"gravity": [0, -10],
+	"wind": 10,
+	"groups":
+	{
+		"tire":
+		{
+			"physics":
+			{
+				"mass": 1,
+				"bodyType": "hard",
+				"material": "rubber"
+			}
+		}
+	},
+	"constraints":
+	{
+		"spring":
+		{
+			"distanceConstraint":
+			{
+				"stiffness": 10000000000,
+				"relaxation": 0
+			}
+		},
+		"blank":
+		{
+		},
+		"shockAbsorber":
+		{
+			"prismaticConstraint":
+			{
+				"stiffness": 1000000000000000,
+				"relaxation": 0,
+				"canRotate": false
+			},
+			"linearSpring":
+			{
+				"stiffness": 10000,
+				"damping": 1
+			}
+		}
+	}
+}

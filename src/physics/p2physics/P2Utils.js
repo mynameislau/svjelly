@@ -3,10 +3,13 @@ var P2Utils = {};
 
 P2Utils.createConstraints = function ($world, $bodyA, $bodyB, $config, $options)
 {
+	if (!$config) { return; }
+
 	var lock = $config.lockConstraint;
 	var distance = $config.distanceConstraint;
 	var revolute = $config.revoluteConstraint;
 	var linearSpring = $config.linearSpring;
+	var prismaticConstraint = $config.prismaticConstraint;
 	var rotationalSpring = $config.rotationalSpring;
 	var constraints = [];
 	var constraint;
@@ -22,18 +25,26 @@ P2Utils.createConstraints = function ($world, $bodyA, $bodyB, $config, $options)
 		$bodyA.toLocalFrame(vecLocA, $bodyB.position);
 		$bodyB.toLocalFrame(vecLocB, $bodyA.position);
 
+		// console.log(revolute.autoPivot);
+		if (!$options || !$options[0] || !$options[1]) { revolute.autoPivot = true; }
+		var localPivotA = revolute.autoPivot ? undefined : $options[0];
+		var localPivotB = revolute.autoPivot ? undefined : $options[1];
+		var worldPivot = revolute.autoPivot ? $bodyA.interpolatedPosition : undefined;
 		constraint = new p2.RevoluteConstraint($bodyA, $bodyB,
 		{
-			worldPivot: $bodyA.interpolatedPosition
+			worldPivot: worldPivot,
+			localPivotA: localPivotA,
+			localPivotB: localPivotB
 		});
 		if (!revolute.motor)
 		{
-			constraint.setLimits(0, 0);
+			//constraint.setLimits(0, 0);
+			if (revolute.collideConnected !== undefined) { constraint.collideConnected = revolute.collideConnected; }
 		}
 		else
 		{
 			constraint.enableMotor();
-			constraint.setMotorSpeed(0.5);
+			constraint.setMotorSpeed(-1);
 			constraint.collideConnected = false;
 		}
 		if (revolute.stiffness) { constraint.setStiffness(revolute.stiffness); } //default 20
@@ -41,10 +52,35 @@ P2Utils.createConstraints = function ($world, $bodyA, $bodyB, $config, $options)
 		$world.addConstraint(constraint);
 		constraints.push(constraint);
 	}
+	if (prismaticConstraint)
+	{
+		var axisVec = p2.vec2.create();
+		var worldOffsetB = p2.vec2.create();
+		$bodyB.toWorldFrame(worldOffsetB, $options[1]);
+		$bodyA.toLocalFrame(axisVec, worldOffsetB);//[$bodyB.interpolatedPosition[0] + $options[1][0] - ($bodyA.interpolatedPosition[0] + $options[0][0]), $bodyB.interpolatedPosition[1] - $bodyA.interpolatedPosition[1]];
+		var sx = axisVec[0] - $options[0][0];
+		var sy = axisVec[1] - $options[0][1];
+		// var cx = Math.abs(sx);
+		// var cy = Math.abs(sy);
+		// var dist = Math.sqrt(cx * cx + cy * cy);
+		//console.log(axisVec, $options[0]);
+		//debugger;
+		constraint = new p2.PrismaticConstraint($bodyA, $bodyB, {
+			localAnchorA: $options[0],
+			localAnchorB: $options[1],
+			localAxisA: [sx, sy],
+			upperLimit: 1,
+			lowerLimit: 0,
+			disableRotationalLock: prismaticConstraint.canRotate === true ? true : false
+		});
+		$world.addConstraint(constraint);
+		constraints.push(constraint);
+	}
 	if (lock)
 	{
 		constraint = new p2.LockConstraint($bodyA, $bodyB);
 		//if ($options && $options[0]) { constraint.localOffsetB = $options[0]; }
+		if (lock.collideConnected !== undefined) { constraint.collideConnected = lock.collideConnected; }
 		if (lock.stiffness) { constraint.setStiffness(lock.stiffness); } //default 20
 		if (lock.relaxation) { constraint.setRelaxation(lock.relaxation); }
 		$world.addConstraint(constraint);
@@ -52,7 +88,10 @@ P2Utils.createConstraints = function ($world, $bodyA, $bodyB, $config, $options)
 	}
 	if (linearSpring)
 	{
-		constraint = new p2.LinearSpring($bodyA, $bodyB);
+		constraint = new p2.LinearSpring($bodyA, $bodyB, {
+			localAnchorA: $options[0],
+			localAnchorB: $options[1]
+		});
 		if (linearSpring.stiffness) { constraint.stiffness = linearSpring.stiffness; }
 		if (linearSpring.damping) { constraint.damping = linearSpring.damping; }
 		$world.addSpring(constraint);

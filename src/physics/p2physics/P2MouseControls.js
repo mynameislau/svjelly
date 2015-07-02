@@ -32,8 +32,8 @@ P2MouseControls.prototype.addBasicMouseControls = function ($stiffness, $relaxat
 
 		var x = ($contact.clientX - pos.left) / (pos.right - pos.left);
 		var y = ($contact.clientY - pos.top) / (pos.bottom - pos.top);
-		x = renderer.viewport[0][0] + x * (renderer.viewport[1][0] - renderer.viewport[0][0]);
-		y = renderer.viewport[0][1] + y * (renderer.viewport[1][1] - renderer.viewport[0][1]);
+		x = renderer.viewCenter[0] + (x - 0.5) * renderer.viewWidth;
+		y = renderer.viewCenter[1] + (y - 0.5) * renderer.viewHeight;
 		x = x / scale;
 		y = (renderer.height - y) / scale;
 		return [x, y];

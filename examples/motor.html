@@ -12,22 +12,76 @@
 		var loadEventHandler = function ()
 		{
 			var container = document.getElementById('container');
-			var maker = window.svjellymaker.createFromURL(container, 'assets/motorTest.svg');
+			var maker = window.svjellymaker.createFromConfig(container, 'assets/motor.json');
 			maker.promise.then(function ()
 			{
-				maker.addBasicMouseControls();
-				var viewport = [[maker.renderer.width * 0.5, maker.renderer.height * 0.5], [maker.renderer.width, maker.renderer.height]];
-				var chassis = maker.svjellyWorld.getGroupByID('chassis');
-				maker.updateCallback = function ($time)
-				{
-					var box = chassis.drawing.getBoundingBox();
-					viewport[0][0] = box[0][0] * maker.renderer.scaleX;
-					viewport[1][0] = box[0][0] * maker.renderer.scaleX + maker.renderer.width * 0.2;
-					viewport[0][1] = box[0][1] * maker.renderer.scaleX;
-					viewport[1][1] = box[0][1] * maker.renderer.scaleX  + maker.renderer.height * 0.2;
+				maker.addBasicMouseControls(1000, 1);
+				var frontWheel = maker.svjellyWorld.getGroupByID('frontWheel');
+				var rearWheel = maker.svjellyWorld.getGroupByID('rearWheel');
 
-					//maker.renderer.setViewport(viewport);
-				};
+				var swingArmBody = maker.svjellyWorld.getGroupByID('swingArm').physicsManager.body;
+				var swingArmShape = swingArmBody.shapes[0];
+				swingArmShape.collisionGroup = Math.pow(2, 1);
+				swingArmShape.collisionMask = 0;
+
+				var keyDown;
+				document.addEventListener('keydown', function () { keyDown = true; });
+				document.addEventListener('keyup', function () { keyDown = false; });
+				// var palletAShape = palletABody.shapes[0];
+				// var palletBBody = maker.svjellyWorld.getGroupByID('palletB').physicsManager.body;
+				// var palletBShape = palletBBody.shapes[0];
+				// var puckBody = maker.svjellyWorld.getGroupByID('puck').physicsManager.body;
+				// var puckShape = puckBody.shapes[0];
+				// var wallABody = maker.svjellyWorld.getGroupByID('wallA').physicsManager.body;
+				// var wallAShape = wallABody.shapes[0];
+				// var wallBBody = maker.svjellyWorld.getGroupByID('wallB').physicsManager.body;
+				// var wallBShape = wallBBody.shapes[0];
+
+				//WIND
+				var world = maker.svjellyWorld;
+				var p2World = world.physicsManager.p2World;
+				var windForce = 10;//world.conf.wind;
+				var maxPower = 100;
+				var accel = 10000000;//maxPower * 0.1;
+				if (windForce)
+				{
+					var bodiesLength = p2World.bodies.length;
+					var coeff = 0;
+					var lastTime;
+					var twoPIs = Math.PI * 2;
+					var windInterval = 4000;
+					maker.updateCallback = function ($time)
+					{
+						if (!lastTime || coeff > Math.PI * 2)
+						{
+							lastTime = $time;
+							windInterval = 1000 + Math.random() * 7000;
+							coeff = 0;
+						}
+						coeff = ($time - lastTime) / windInterval * twoPIs;
+						//console.log(Math.sin(coeff));
+						for (var i = 0, length = bodiesLength; i < length; i += 1)
+						{
+							var curr = p2World.bodies[i];
+							//console.log('applying', Math.sin(coeff) * windForce);
+							curr.applyForce([Math.sin(coeff) * windForce, 0], curr.position);
+						}
+
+						//motor
+						if (keyDown)
+						{
+							console.log('vroooooom');
+							rearWheel.physicsManager.body.angularForce += accel;
+							// rearWheel.angularForce = rearWheel.physicsManager.body.angularForce, maxPower);
+						}
+						rearWheel.physicsManager.body.angularForce *= 0.01;
+						var box = frontWheel.drawing.getBoundingBox();
+						var center = [];
+						center[0] = (box[0][0] + ((box[1][0] - box[0][0]) * 0.5)) * maker.renderer.scaleX;
+						center[1] = (box[0][1] + ((box[1][1] - box[0][1]) * 0.5)) * maker.renderer.scaleY;
+						maker.renderer.setViewCenter(center, 1 / (100 / world.worldWidth));
+					};
+				}
 			});
 		};
 

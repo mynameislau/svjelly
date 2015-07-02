@@ -2,8 +2,11 @@ var DrawingCommand = function ($name, $node, $instructions)
 {
 	this.node = $node;
 	this.name = $name;
-	this.point = $instructions.point;
-	this.options = $instructions.options;
+	if ($instructions)
+	{
+		this.point = $instructions.point;
+		this.options = $instructions.options;
+	}
 	this.properties = {};
 };
 

@@ -48,9 +48,10 @@ var SVJellyRenderer =//function ($world, $canvas)
 
 		this.ratio = this.width / this.world.getWidth();
 
-		this.previousViewport = [[null, null], [null, null]];
-		this.viewport = [[0, 0], [0, 0]];
-		this.viewportScale = undefined;
+		this.previousViewCenter = [null, null];
+		this.viewCenter = [0, 0];
+		this.viewportScale = 1;
+		this.previousViewportScale = undefined;
 
 		this.scaleX = this.scaleY = this.ratio;
 
@@ -152,7 +153,8 @@ var SVJellyRenderer =//function ($world, $canvas)
 		//this.updateStaticLayers();
 
 		//this.setViewport(this.width * 0.5, this.height * 0.5, this.width, this.height);
-		this.setViewport([[0, 0], [this.width, this.height]]);
+		//this.setViewport([[0, 0], [this.width, this.height]]);
+		this.setViewCenter([this.width * 0.5, this.height * 0.5], 1);
 		// this.setViewport(0, 0, this.width * 0.5, this.height * 0.5);
 		// this.setViewport(0, this.height * 0.5, this.width * 0.5, this.height);
 		// this.setViewport(0, this.height * 0.5, this.width * 0.5, this.height);
@@ -186,6 +188,13 @@ var SVJellyRenderer =//function ($world, $canvas)
 		// }
 	},
 
+	setViewCenter: function ($vc, $scale)
+	{
+		this.viewCenter[0] = Math.round($vc[0] * 10) / 10;
+		this.viewCenter[1] = Math.round($vc[1] * 10) / 10;
+		this.viewportScale = $scale || this.viewportScale;
+	},
+
 	setViewport: function ($vp)
 	{
 		this.viewport[0][0] = Math.round($vp[0][0] * 10) / 10;
@@ -197,7 +206,6 @@ var SVJellyRenderer =//function ($world, $canvas)
 	setScale: function ()
 	{
 		var previousStatic;
-		console.log('setting scale');
 		for (var i = 0; i < this.staticGroupsLength; i += 1)
 		{
 			var staticGroup = this.staticGroups[i];
@@ -205,7 +213,9 @@ var SVJellyRenderer =//function ($world, $canvas)
 			{
 				staticGroup.canvas.width = this.width * this.viewportScale;
 				staticGroup.canvas.height = this.height * this.viewportScale;
-				staticGroup.context.setTransform(this.viewportScale, 0, 0, this.viewportScale, 0, 0);//this.contextScale, this.contextScale);
+				staticGroup.context.scale(this.viewportScale, this.viewportScale);//this.contextScale, this.contextScale);
+				//staticGroup.canvas.width = this.width;
+				//staticGroup.canvas.height = this.height;
 				previousStatic = staticGroup.canvas;
 			}
 			this.drawGroup(staticGroup, staticGroup.context, true);
@@ -232,9 +242,10 @@ var SVJellyRenderer =//function ($world, $canvas)
 
 			context = layer.getContext('2d');
 			context.clearRect(0, 0, this.width, this.height);
-			var sX = this.viewport[0][0] * this.viewportScale;
-			var sY = this.viewport[0][1] * this.viewportScale;
-			context.drawImage(drawingGroup.canvas, sX, sY, this.width, this.height, 0, 0, this.width, this.height);//, 100, 0, this.width, this.height, this.viewport[0][0], this.viewport[0][1], 200, 200);//this.viewport[0][0], this.viewport[0][1], width, height);
+			var sx = this.viewCenter[0] * this.viewportScale - this.width * 0.5;
+			var sy = this.viewCenter[1] * this.viewportScale - this.height * 0.5;
+			context.drawImage(drawingGroup.canvas, sx, sy, this.width, this.height, 0, 0, this.width, this.height);
+			//context.drawImage(drawingGroup.canvas, 0, 0, this.width, this.height, 0, 0, this.width, this.height);
 			previous = layer;
 		}
 	},
@@ -246,34 +257,56 @@ var SVJellyRenderer =//function ($world, $canvas)
 		{
 			var dynamicGroup = this.dynamicGroups[i];
 			if (dynamicGroup.canvas === previousDynamic) { continue; }
-			dynamicGroup.context.setTransform(this.viewportScale, 0, 0, this.viewportScale, -this.viewport[0][0] * this.viewportScale, -this.viewport[0][1] * this.viewportScale);
+			//dynamicGroup.context.setTransform(this.viewportScale, 0, 0, this.viewportScale, -this.viewCenter[0] * this.viewportScale, -this.viewY * this.viewportScale);
+			dynamicGroup.context.setTransform(this.viewportScale, 0, 0, this.viewportScale, -this.viewCenter[0] * this.viewportScale + this.width * 0.5, -this.viewCenter[1] * this.viewportScale + this.height * 0.5);
 			previousDynamic = dynamicGroup.canvas;
 		}
 	},
 
 	checkViewport: function ()
 	{
-		if (this.viewport[0][0] !== this.previousViewport[0][0] ||
-			this.viewport[0][1] !== this.previousViewport[0][1] ||
-			this.viewport[1][0] !== this.previousViewport[1][0] ||
-			this.viewport[1][1] !== this.previousViewport[1][1])
+		if (this.viewCenter[0] !== this.previousViewCenter[0] ||
+			this.viewCenter[1] !== this.previousViewCenter[1] ||
+			this.viewportScale !== this.previousViewportScale)
 		{
-			var lastScale = this.viewportScale;
-			this.viewportScale = (this.width / (this.viewport[1][0] - this.viewport[0][0]));
+			this.viewWidth = this.width / this.viewportScale;
+			this.viewHeight = this.height / this.viewportScale;
+			this.viewX = this.viewCenter[0] - this.width * 0.5;
+			this.viewY = this.viewCenter[1] - this.height * 0.5;
 
-			if (lastScale === this.viewportScale)
-			{
-				this.setTranslate();
-			}
-			else
+			if (this.viewportScale !== this.previousViewportScale)
 			{
 				this.setScale();
 			}
-			this.previousViewport[0][0] = this.viewport[0][0];
-			this.previousViewport[0][1] = this.viewport[0][1];
-			this.previousViewport[1][0] = this.viewport[1][0];
-			this.previousViewport[1][1] = this.viewport[1][1];
+			else
+			{
+				this.setTranslate();
+			}
+			this.previousViewCenter[0] = this.viewCenter[0];
+			this.previousViewCenter[1] = this.viewCenter[1];
+			this.previousViewportScale = this.viewportScale;
 		}
+		// if (this.viewport[0][0] !== this.previousViewport[0][0] ||
+		// 	this.viewport[0][1] !== this.previousViewport[0][1] ||
+		// 	this.viewport[1][0] !== this.previousViewport[1][0] ||
+		// 	this.viewport[1][1] !== this.previousViewport[1][1])
+		// {
+		// 	var lastScale = this.viewportScale;
+		// 	this.viewportScale = (this.width / (this.viewport[1][0] - this.viewport[0][0]));
+
+		// 	if (lastScale === this.viewportScale)
+		// 	{
+		// 		this.setTranslate();
+		// 	}
+		// 	else
+		// 	{
+		// 		this.setScale();
+		// 	}
+		// 	this.previousViewport[0][0] = this.viewport[0][0];
+		// 	this.previousViewport[0][1] = this.viewport[0][1];
+		// 	this.previousViewport[1][0] = this.viewport[1][0];
+		// 	this.previousViewport[1][1] = this.viewport[1][1];
+		// }
 	},
 
 	drawMultiCanvas: function ()
@@ -343,11 +376,13 @@ var SVJellyRenderer =//function ($world, $canvas)
 	{
 		if (!force)
 		{
-			var boundingBox = objectDrawing.getBoundingBox();
-			if (boundingBox[1][0] * this.scaleX < this.viewport[0][0]) { return; }
-			if (boundingBox[1][1] * this.scaleY < this.viewport[0][1]) { return; }
-			if (boundingBox[0][0] * this.scaleX > this.viewport[1][0]) { return; }
-			if (boundingBox[0][1] * this.scaleY > this.viewport[1][1]) { return; }
+			var toto = 'tut';
+			toto += 1;
+			// var boundingBox = objectDrawing.getBoundingBox();
+			// if (boundingBox[1][0] * this.scaleX < this.viewX) { return; }
+			// if (boundingBox[1][1] * this.scaleY < this.viewY) { return; }
+			// if (boundingBox[0][0] * this.scaleX > this.viewX + this.viewWidth) { return; }
+			// if (boundingBox[0][1] * this.scaleY > this.viewY + this.viewHeight) { return; }
 		}
 
 		for (var k = 0; k < objectDrawing.commandsLength; k += 1)
@@ -363,6 +398,7 @@ var SVJellyRenderer =//function ($world, $canvas)
 				{
 					var x1 = currCommand.getX() * this.scaleX;
 					var y1 = currCommand.getY() * this.scaleY;
+					//console.log(currCommand.endCommand, currCommand.endCommand.getX(), currCommand.endCommand.getY());
 					var x2 = currCommand.endCommand.getX() * this.scaleX;
 					var y2 = currCommand.endCommand.getY() * this.scaleY;
 					var gradient = context.createLinearGradient(x1, y1, x2, y2);
@@ -511,7 +547,7 @@ var SVJellyRenderer =//function ($world, $canvas)
 			var currDrawingGroup = this.drawingGroups[i];
 			if (this.compareProperties(currDrawingGroup.properties, $objectDrawing.properties) &&
 				(currDrawingGroup.willNotIntersect || $objectDrawing.willNotIntersect()) &&
-				$objectDrawing.isStatic() === false &&
+				($objectDrawing.isStatic() === false && currDrawingGroup.isStatic === false) &&
 				currDrawingGroup.isSimpleDrawing === $objectDrawing.isSimpleDrawing() &&
 				$objectDrawing.properties.opacity === 1)
 			{
@@ -549,10 +585,12 @@ var SVJellyRenderer =//function ($world, $canvas)
 	{
 		if ($clear !== undefined) { this.debugContext.clearRect(0, 0, this.width, this.height); }
 
+		this.debugContext.setTransform(this.viewportScale, 0, 0, this.viewportScale, -this.viewCenter[0] * this.viewportScale + this.width * 0.5, -this.viewCenter[1] * this.viewportScale + this.height * 0.5);
+
 		this.debugContext.strokeStyle = 'yellow';
 		this.debugContext.lineCap = 'butt';
 		this.debugContext.lineJoin = 'miter';
-		this.debugContext.lineWidth = 1;
+		this.debugContext.lineWidth = 1 / this.viewportScale;
 		this.debugContext.beginPath();
 		var currGroup;
 		var i;
@@ -580,7 +618,7 @@ var SVJellyRenderer =//function ($world, $canvas)
 				if (currNode.physicsManager.body)
 				{
 					this.debugContext.moveTo(xPos, yPos);
-					var angle = currNode.physicsManager.body.angle;
+					var angle = Math.PI * 2 - currNode.physicsManager.body.angle;
 					this.debugContext.lineTo(xPos + Math.cos(angle) * radius, yPos + Math.sin(angle) * radius);
 				}
 			}

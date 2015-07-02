@@ -1,11 +1,11 @@
 var SVJellyNode = require('./SVJellyNode');
 var SVJellyJoint = require('./SVJellyJoint');
+var ObjectDrawing = require('./ObjectDrawing');
 
 var SVJellyGroup = function ($type, $conf, $ID)
 {
 	this.physicsManager = undefined;
-	var GroupDrawing = require('./ObjectDrawing');
-	this.drawing = new GroupDrawing(this);
+	this.drawing = new ObjectDrawing(this);
 	this.structure = undefined;
 	this.nodesLength = undefined;
 	this.conf = $conf;

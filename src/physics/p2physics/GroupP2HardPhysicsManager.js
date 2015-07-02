@@ -52,8 +52,11 @@ GroupP2HardPhysicsManager.prototype.createAnchors = function ($points)
 	if (!nodes.length)
 	{
 		var defaultAnchor = new AnchorP2HardPhysicsManager(this.group);
-		var closest = this.group.getClosestPoint($points);
-		defaultAnchor.setFromPoint(closest);
+		var Polygon = require('../../core/Polygon');
+		var polygon = Polygon.init($points);
+		var center = polygon.getCenter();
+		//var closest = this.group.getClosestPoint($points);
+		defaultAnchor.setFromPoint(center);
 		return [defaultAnchor];
 	}
 	for (var i = 0, length = nodes.length; i < length; i += 1)
@@ -124,9 +127,9 @@ GroupP2HardPhysicsManager.prototype.addNodesToWorld = function ()
 	this.body.updateMassProperties();
 	this.body.collisionResponse = !this.conf.noCollide;
 
-	if (this.group.ID === 'ground')
+	if (this.group.ID === 'rearWheel')
 	{
-		console.log(this.body);
+		console.log(this.body.mass);
 	}
 
 	this.body.interpolatedPosition[0] = this.body.position[0];

@@ -3,10 +3,8 @@ var SVJellyNode = function ($oX, $oY, $options)
 	this.jointsArray = [];
 	this.oX = $oX;
 	this.oY = $oY;
-	this.drawing = undefined;
 	this.fixed = false;
-	this.isStart = false;
-	this.endNode = undefined;
+	this.drawing = undefined;
 	this.setOptions($options);
 };
 

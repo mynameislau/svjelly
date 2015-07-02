@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Generator: Adobe Illustrator 16.0.0, SVG Export Plug-In . SVG Version: 6.00 Build 0)  -->
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+	 width="1000px" height="500px" viewBox="0 0 1000 500" enable-background="new 0 0 1000 500" xml:space="preserve">
+<rect id="static_2_" y="500" width="1000" height="68.5"/>
+<rect id="static_1_" x="-141.5" y="402.5" width="141.5" height="166"/>
+<rect id="static" x="1000" y="402.5" width="142.5" height="166"/>
+<g>
+	<polygon id="wood" points="500,494 537.5,449.5 557.5,398.5 551.5,315.5 528.75,253.5 515.5,231.5 514.5,183.5 489.5,183.5 
+		489.5,236.5 510.5,261.5 532.5,321.5 538.5,390.5 523.5,440.5 495,488 454,494 	"/>
+	<rect id="constraint-world-continuousMotor" x="495.5" y="190.5" width="17" height="17"/>
+</g>
+<rect id="liquid" x="142.92" y="-10.866" fill="#A4FF23" width="773.648" height="140.887"/>
+</svg>

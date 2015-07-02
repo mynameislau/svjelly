@@ -1,8 +1,6 @@
 var Triangulator = require('./Triangulator');
 var Polygon = require('./Polygon');
 var Grid = require('./Grid');
-var Commands = require('./Commands');
-var DrawingCommand = require('./DrawingCommand');
 
 var Structure = function ($group, $world)
 {
@@ -15,6 +13,9 @@ Structure.prototype.create = function ($drawingCommands)
 {
 	this.points = this.getPoints($drawingCommands);
 	this.drawingCommands = $drawingCommands;
+
+	this.envelope = undefined;
+	this.fillNodes = undefined;
 
 	// console.log('points', points.length, this.group.conf.structure);
 
@@ -50,7 +51,7 @@ Structure.prototype.create = function ($drawingCommands)
 			this.setNodeDrawingCommands(this.envelope);
 			break;
 		default:
-			this.envelope = this.createNodesFromPoints(this.points);
+			this.envelope = this.createNodesFromPoints(this.points, true);
 			this.setNodeDrawingCommands(this.envelope);
 			break;
 	}
@@ -85,18 +86,14 @@ Structure.prototype.calculateArea = function ($points, $drawingCommands)
 
 Structure.prototype.createHexaFillStructure = function ($points)
 {
-	this.createInnerStructure($points);
+	this.fillNodes = this.createInnerStructure($points);
 	var path = this.innerStructure.getShapePath();
 	var envelope = [];
 	for (var i = 0, length = path.length; i < length; i += 1)
 	{
 		var node = this.group.getNodeAtPoint(path[i][0], path[i][1]);
 		envelope.push(node);
-		var commandName = i === 0 ? Commands.MOVE_TO : Commands.LINE_TO;
-		this.group.drawing.addCommand(new DrawingCommand(commandName, node, {
-			point: [path[i][0], path[i][1]],
-			options: []
-		}));
+		this.group.drawing.addCommand(node, undefined, true);
 	}
 	return envelope;
 };
@@ -107,7 +104,7 @@ Structure.prototype.setNodeDrawingCommands = function ($nodes)
 	{
 		var node = $nodes[i];
 		var commandObject = this.drawingCommands.pointCommands[i];
-		this.group.drawing.addCommand(new DrawingCommand(commandObject.name, node, commandObject));
+		this.group.drawing.addCommand(node, commandObject, true);
 	}
 };
 
@@ -115,7 +112,7 @@ Structure.prototype.createPreciseHexaFillStructure = function ($points)
 {
 	var envelope = this.createNodesFromPoints($points);
 	this.setNodeDrawingCommands(envelope);
-	this.createInnerStructure($points);
+	this.fillNodes = this.createInnerStructure($points);
 
 	this.createJointsFromPoints($points, false);
 	var i = 0;
@@ -164,14 +161,14 @@ Structure.prototype.getPoints = function ($drawingCommands)
 	return points;
 };
 
-Structure.prototype.createNodesFromPoints = function ($points)
+Structure.prototype.createNodesFromPoints = function ($points, $overwrite)
 {
 	var pointsLength = $points.length;
 	var toReturn = [];
 	for (var i = 0; i < pointsLength; i += 1)
 	{
 		var currPoint = $points[i];
-		var node = this.group.createNode(currPoint[0], currPoint[1], undefined, false);
+		var node = this.group.createNode(currPoint[0], currPoint[1], undefined, $overwrite);
 		toReturn.push(node);
 	}
 	return toReturn;
@@ -216,6 +213,13 @@ Structure.prototype.createInnerStructure = function ($points)
 		var n2 = this.group.getNodeAtPoint(currLink[1][0], currLink[1][1]);
 		this.group.createJoint(n1, n2);
 	}
+	length = this.structureNodes.length;
+	for (i = 0; i < length; i += 1)
+	{
+		var node = this.structureNodes[i];
+		this.group.drawing.addCommand(node, undefined, false);
+	}
+
 	return this.structureNodes;
 };
 

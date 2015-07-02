@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Generator: Adobe Illustrator 16.0.0, SVG Export Plug-In . SVG Version: 6.00 Build 0)  -->
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+	 width="1200px" height="800px" viewBox="0 0 1200 800" enable-background="new 0 0 1200 800" xml:space="preserve">
+<g id="Layer_1_1_">
+	<g>
+		<rect fill="#BFE0FF" width="1200" height="805.857"/>
+		<polygon fill="#5D6E91" points="0,748.854 179.277,631.953 257.285,709.849 377.296,631.953 506.31,748.854 600,712.849 
+			638.322,748.854 830.342,562.834 872.346,631.953 926.352,592.837 1010.359,748.854 1088.367,715.849 1140.991,784.855 
+			1200,805.857 0,805.857 		"/>
+	</g>
+	<g>
+		<polygon id="static_3_" fill="#697768" points="-0.38,801 67.117,778.501 128.614,778.501 241.108,789.75 343.103,778.501 
+			413.6,760.502 454.098,760.502 520.094,772.502 651.5,774.836 646.716,743.151 727.084,735.003 743.854,744.242 764.165,735.827 
+			785.18,745.161 808.159,736.807 821.833,746.171 839.5,739.837 855.5,747.504 869.5,738.171 925.074,771.931 973.071,780.524 
+			1037.568,783.044 1081.064,790.616 1200,801 		"/>
+		<rect id="static" y="800" fill="#FF00FF" width="1200" height="220.882"/>
+		<rect id="static_2_" x="-216.262" fill="#FF00FF" width="216.262" height="1020.882"/>
+		<rect id="static_1_" x="1200" fill="#FF00FF" width="257.905" height="1020.882"/>
+	</g>
+	<g id="bike">
+		<g>
+			<circle id="tire-frontWheel" fill="#13003F" cx="1058.504" cy="697.192" r="8.1"/>
+		</g>
+		<g>
+			<polygon id="wood-engineBlock" points="1070.108,684.696 1083.229,682.005 1084.038,690.726 1074.118,691.47 			"/>
+			
+				<rect id="constraint-bikeBody" x="1069.008" y="682.259" transform="matrix(0.9843 -0.1766 0.1766 0.9843 -103.7 200.7751)" opacity="0.1" enable-background="new    " width="14.813" height="1.75"/>
+		</g>
+		<g>
+			<polygon id="tire-rearWheel" fill="#13003F" stroke="#92FF28" stroke-miterlimit="10" points="1102.73,680.856 1106.739,680.944 
+				1110.278,682.506 1112.974,685.281 1114.448,689.009 1114.36,693.015 1112.798,696.554 1110.021,699.249 1106.296,700.724 
+				1102.29,700.637 1098.751,699.073 1096.056,696.298 1094.581,692.571 1094.667,688.565 1096.229,685.026 1099.007,682.331 			"/>
+		</g>
+		<g>
+			<polygon id="wood-bikeBody" fill="#8C260E" points="1065.722,685.015 1062.411,680.273 1059.724,675.644 1066.954,672.412 
+				1075.345,674.589 1095.938,672.867 1107.327,669.808 1091.716,680.481 1070.108,684.696 			"/>
+			
+				<line id="constraint-fork-shockAbsorber" fill="none" stroke="#00E8AC" stroke-miterlimit="10" x1="1059.304" y1="687.232" x2="1059.729" y2="675.672"/>
+			<line id="constraint-swingArm-shockAbsorber" fill="none" x1="1104.515" y1="690.79" x2="1096.759" y2="677.034"/>
+		</g>
+		<g>
+			
+				<rect id="metal-swingArm" x="1082.965" y="689.375" transform="matrix(-0.9998 -0.0218 0.0218 -0.9998 2173.0149 1405.0555)" fill="#999999" width="22.418" height="2.59"/>
+			
+				<rect id="constraint-rearWheel-axis" x="1103.9" y="690.183" transform="matrix(-0.9844 0.1759 -0.1759 -0.9844 2313.2988 1176.5192)" fill="#999999" width="1.21" height="1.209"/>
+			
+				<rect id="constraint-engineBlock-axis" x="1083.374" y="690.016" transform="matrix(-0.9843 0.1767 -0.1767 -0.9843 2273.1968 1179.1132)" fill="#999999" width="1.47" height="1.469"/>
+		</g>
+		<g>
+			
+				<rect id="constraint-frontWheel-axis" x="1058.051" y="696.659" transform="matrix(-0.9842 0.177 -0.177 -0.9842 2223.687 1195.9453)" width="0.933" height="0.933"/>
+			
+				<rect id="wood-fork" x="1057.975" y="686.888" transform="matrix(-0.998 -0.0636 0.0636 -0.998 2071.5869 1450.9188)" width="1.812" height="11.214"/>
+		</g>
+	</g>
+</g>
+<g id="Layer_2">
+</g>
+</svg>
