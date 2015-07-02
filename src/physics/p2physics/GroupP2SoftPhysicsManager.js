@@ -2,20 +2,31 @@
 /*jshint camelcase:false*/
 
 var p2 = require('../../../libs/p2');
+// var Dispatcher = require('../../event/Dispatcher');
 var NodeP2SoftPhysicsManager = require('./NodeP2SoftPhysicsManager');
 var AnchorP2SoftPhysicsManager = require('./AnchorP2SoftPhysicsManager');
 var JointP2PhysicsManager = require('./JointP2PhysicsManager');
+var SoftDecorationDrawing = require('./SoftDecorationDrawing');
 
 var GroupP2SoftPhysicsManager = function ($group, $world, $worldHeight, $materialsList)
 {
 	this.group = $group;
 	this._boundingBox = [[0, 0], [0, 0]];
 	this.materialsList = $materialsList;
+	var self = this;
+	this._position = [];
+	this.nodesAddedPromise = new window.Promise(function (resolve) { self.resolveNodesAdded = resolve; });
 	this.world = $world;
 	this.worldHeight = $worldHeight;
 	this.conf = $group.conf.physics;
 	// this.constraints = [];
 	//this.nodesDiameter = this.conf.nodesDiameter;
+};
+
+GroupP2SoftPhysicsManager.prototype.getDecorationDrawing = function ()
+{
+	console.log(SoftDecorationDrawing);
+	return new SoftDecorationDrawing(this.group);
 };
 
 GroupP2SoftPhysicsManager.prototype.getNodePhysicsManager = function ()
@@ -156,6 +167,9 @@ GroupP2SoftPhysicsManager.prototype.applyForce = function ($vector)
 	}
 };
 
+GroupP2SoftPhysicsManager.prototype.getX = function () { return this.group.nodes[0].physicsManager.body.interpolatedPosition[0]; };
+GroupP2SoftPhysicsManager.prototype.getY = function () { return this.worldHeight - this.group.nodes[0].physicsManager.body.interpolatedPosition[1]; };
+
 GroupP2SoftPhysicsManager.prototype.getAngle = function ()
 {
 	return this.group.nodes[0].physicsManager.body.interpolatedAngle;
@@ -240,6 +254,8 @@ GroupP2SoftPhysicsManager.prototype.addNodesToWorld = function ()
 	//debugger;
 
 	if (this.conf.structuralMassDecay) { this.setNodesMassFromJoints(); }
+
+	this.resolveNodesAdded();
 };
 
 GroupP2SoftPhysicsManager.prototype.hitTest = function ($point, $precision)

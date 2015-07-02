@@ -5,10 +5,16 @@ var SVJellyWorld = function ($physicsManager, $conf)
 {
 	this.physicsManager = $physicsManager;
 	this.groups = [];
+	this.drawings = [];
 	this.conf = $conf;
 	this.worldNodes = [];
 	this.groupConstraints = [];
 	this.worldWidth = this.physicsManager.worldWidth = $conf.worldWidth;
+};
+
+SVJellyWorld.prototype.addDrawing = function ($drawing)
+{
+	this.drawings.push($drawing);
 };
 
 SVJellyWorld.prototype.setHeight = function ($height)

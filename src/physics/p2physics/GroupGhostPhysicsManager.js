@@ -2,6 +2,9 @@ var GroupGhostPhysicsManager = function ($group)
 {
 	this.group = $group;
 	this._boundingBox = undefined;
+	this._position = [];
+	var self = this;
+	this.nodesAddedPromise = new window.Promise(function (resolve) { self.resolveNodesAdded = resolve; });
 };
 
 GroupGhostPhysicsManager.prototype.getNodePhysicsManager = function ($node)
@@ -43,6 +46,9 @@ GroupGhostPhysicsManager.prototype.addJointsToWorld = function ()
 	return null;
 };
 
+GroupGhostPhysicsManager.prototype.getX = function () { return 0; };
+GroupGhostPhysicsManager.prototype.getY = function () { return 0; };
+
 GroupGhostPhysicsManager.prototype.getBoundingBox = function ()
 {
 	if (!this._boundingBox)
@@ -67,6 +73,7 @@ GroupGhostPhysicsManager.prototype.getBoundingBox = function ()
 
 GroupGhostPhysicsManager.prototype.addNodesToWorld = function ()
 {
+	this.resolveNodesAdded();
 };
 
 module.exports = GroupGhostPhysicsManager;

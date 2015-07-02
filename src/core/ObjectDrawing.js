@@ -1,4 +1,4 @@
-var DrawingCommand = require('./DrawingCommand');
+var NodeDrawingCommand = require('./NodeDrawingCommand');
 var Commands = require('./Commands');
 
 var ObjectDrawing = function ($group)
@@ -6,7 +6,22 @@ var ObjectDrawing = function ($group)
 	this.group = $group;
 	this.commands = [];
 	this.commandsLength = 0;
-	this.properties = {};
+	this.properties = undefined;
+};
+
+ObjectDrawing.prototype.setProperties = function ($properties)
+{
+	this.properties = $properties;
+	this.useDynamicGradient = this.group.conf.structure === 'line' && this.properties.strokeGradient;
+};
+
+ObjectDrawing.prototype.setCommands = function ()
+{
+	for (var i = 0, length = this.group.structure.nodeProperties.length; i < length; i += 1)
+	{
+		var curr = this.group.structure.nodeProperties[i];
+		this.addCommand(curr.node, curr.commandProperties, curr.isEnvelope);
+	}
 };
 
 ObjectDrawing.prototype.addCommand = function ($node, $commandProperties, $envelope)
@@ -35,7 +50,7 @@ ObjectDrawing.prototype.addCommand = function ($node, $commandProperties, $envel
 	// commandName = Commands.ARC;
 	// $properties.options[0] = 5;
 	// $properties.options[1] = 5;
-	var command = new DrawingCommand(commandName, $node, properties);
+	var command = new NodeDrawingCommand(commandName, $node, properties);
 	this.commands.push(command);
 	this.commands[0].endCommand = command;
 	this.commandsLength += 1;

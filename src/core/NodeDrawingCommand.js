@@ -1,4 +1,4 @@
-var DrawingCommand = function ($name, $node, $instructions)
+var NodeDrawingCommand = function ($name, $node, $instructions)
 {
 	this.node = $node;
 	this.name = $name;
@@ -10,14 +10,14 @@ var DrawingCommand = function ($name, $node, $instructions)
 	this.properties = {};
 };
 
-DrawingCommand.prototype.getX = function ()
+NodeDrawingCommand.prototype.getX = function ()
 {
 	return this.node.physicsManager.getX();
 };
 
-DrawingCommand.prototype.getY = function ()
+NodeDrawingCommand.prototype.getY = function ()
 {
 	return this.node.physicsManager.getY();
 };
 
-module.exports = DrawingCommand;
+module.exports = NodeDrawingCommand;

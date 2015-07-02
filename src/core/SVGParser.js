@@ -1,10 +1,12 @@
 var Commands = require('./Commands');
+var ObjectDrawing = require('./ObjectDrawing');
 var ARC = Commands.ARC;
 var LINE_TO = Commands.LINE_TO;
 var MOVE_TO = Commands.MOVE_TO;
 var BEZIER_TO = Commands.BEZIER_TO;
 var QUADRA_TO = Commands.QUADRA_TO;
 var ELLIPSE = Commands.ELLIPSE;
+var onlyDrawingElements = ':not(g):not(title):not([id*="joint"]):not([id*="constraint"]):not(title):not(linearGradient):not(radialGradient):not(stop)';
 
 var SVGParser = function () {};
 //var isPolygon = /polygon|rect/ig;
@@ -22,7 +24,8 @@ SVGParser.prototype.parse = function ($world, $SVG)
 	this.world.setHeight(this.viewBoxHeight * this.ratio);
 
 	//temp
-	this.elementsQuery = '*:not(defs):not(g):not(title):not(linearGradient):not(radialGradient):not(stop):not([id*="joint"]):not([id*="constraint"])';
+	this.elementsQuery = 'g:not([id*="decoration"])>' + onlyDrawingElements + ',' + 'svg>' + onlyDrawingElements;
+	// this.elementsQuery = '*:not(defs):not(g):not(title):not(linearGradient):not(radialGradient):not(stop):not([id*="joint"]):not([id*="constraint"])';
 	var elemRaws = this.SVG.querySelectorAll(this.elementsQuery);
 
 	var i = 0;
@@ -39,8 +42,13 @@ SVGParser.prototype.parse = function ($world, $SVG)
 
 		var drawingCommands = this.parseElement(rawElement);
 		currGroup.structure.create(drawingCommands);
-		this.setGraphicInstructions(currGroup, rawElement, drawingCommands);
+		var objectDrawing = new ObjectDrawing(currGroup);
+		objectDrawing.setCommands();
+		currGroup.drawing = objectDrawing;
+		this.world.addDrawing(objectDrawing);
+		this.setGraphicInstructions(objectDrawing, rawElement, drawingCommands);
 
+		this.parseDecoration(currGroup, rawElement);
 		rawGroupPairings.push({ group: currGroup, raw: rawElement.parentNode });
 	}
 
@@ -48,6 +56,33 @@ SVGParser.prototype.parse = function ($world, $SVG)
 	this.parseCustomJoints();
 
 	this.world.addGroupsToWorld();
+};
+
+SVGParser.prototype.parseDecoration = function ($group, $rawElement)
+{
+	var rawChildren = $rawElement.parentNode.childNodes;//('[id="decoration"] :not(g)');
+	//if (!decorationRawElements) { return; }
+	for (var i = 0, length = rawChildren.length; i < length; i += 1)
+	{
+		var rawChild = rawChildren[i];
+		if (rawChild.nodeType === 3) { continue; }
+		if (/decoration/.test(rawChild.id))
+		{
+			var rawElements = rawChild.querySelectorAll(onlyDrawingElements);
+			if (!rawElements) { continue; }
+			for (var k = 0, rawElementsLength = rawElements.length; k < rawElementsLength; k += 1)
+			{
+				var rawElement = rawElements[k];
+				var drawingCommands = this.parseElement(rawElement);
+				console.log('creating !');
+				var decorationDrawing = $group.physicsManager.getDecorationDrawing($group);
+				decorationDrawing.setDrawingCommands(drawingCommands);
+				this.setGraphicInstructions(decorationDrawing, rawElement, drawingCommands);
+				this.world.addDrawing(decorationDrawing);
+			}
+		}
+	}
+	return false;
 };
 
 SVGParser.prototype.getGroupInfos = function ($rawGroup)
@@ -175,11 +210,10 @@ SVGParser.prototype.parseElement = function ($rawElement)
 	}
 };
 
-SVGParser.prototype.setGraphicInstructions = function ($group, $raw, $drawingCommands)
+SVGParser.prototype.setGraphicInstructions = function ($drawing, $raw, $drawingCommands)
 {
-	var drawing = $group.drawing;
 	//drawing.commands = $nodesToDraw;
-	var props = drawing.properties;
+	var props = {};
 	//sorting nodesToDraw so the path is drawn correctly
 	// var start;
 	// for (var i = 0, length = $nodesToDraw.length; i < length; i += 1)
@@ -214,8 +248,9 @@ SVGParser.prototype.setGraphicInstructions = function ($group, $raw, $drawingCom
 	props.radiusY = $drawingCommands.radiusY;
 
 	props.strokeGradient = this.getGradient(props.stroke);
-	props.dynamicGradient = $group.conf.structure === 'line' && props.strokeGradient;
 	props.fillGradient = this.getGradient(props.fill);
+
+	$drawing.setProperties(props);
 };
 
 SVGParser.prototype.getGradient = function ($value)
@@ -381,11 +416,11 @@ SVGParser.prototype.parsePath = function ($rawPath)
 	var lastX = this.getCoord(0);
 	var lastY = this.getCoord(0);
 
-	var that = this;
+	var self = this;
 	var getPoint = function ($x, $y, $relative)
 	{
-		var x = $x === undefined ? lastX : that.getCoord($x);
-		var y = $y === undefined ? lastY : that.getCoord($y);
+		var x = $x === undefined ? lastX : self.getCoord($x);
+		var y = $y === undefined ? lastY : self.getCoord($y);
 		if ($relative)
 		{
 			x = $x === undefined ? x : lastX + x;
@@ -396,8 +431,8 @@ SVGParser.prototype.parsePath = function ($rawPath)
 
 	var getRelativePoint = function ($point, $x, $y, $relative)
 	{
-		var x = that.getCoord($x);
-		var y = that.getCoord($y);
+		var x = self.getCoord($x);
+		var y = self.getCoord($y);
 		if ($relative)
 		{
 			x = lastX + x;

@@ -59,10 +59,10 @@ var SVJellyRenderer =//function ($world, $canvas)
 		this.drawingGroups = [];
 		var k = 0;
 		var i;
-		for (var groupsLength = this.world.groups.length; k < groupsLength; k += 1)
+		for (var groupsLength = this.world.drawings.length; k < groupsLength; k += 1)
 		{
-			var currGroup = this.world.groups[k];
-			this.createDrawingGroup(currGroup.drawing);
+			var currDrawing = this.world.drawings[k];
+			this.createDrawingGroup(currDrawing);
 		}
 		this.drawingGroupsLength = this.drawingGroups.length;
 
@@ -234,6 +234,7 @@ var SVJellyRenderer =//function ($world, $canvas)
 	{
 		var previous;
 		var context;
+
 		for (var i = 0; i < this.staticGroupsLength; i += 1)
 		{
 			var drawingGroup = this.staticGroups[i];
@@ -394,7 +395,7 @@ var SVJellyRenderer =//function ($world, $canvas)
 				context.moveTo(currCommand.getX() * this.scaleX, currCommand.getY() * this.scaleY);
 
 				//special case for lines with nice dynamic gradients
-				if (drawingGroup.properties.dynamicGradient)
+				if (drawingGroup.useDynamicGradient)
 				{
 					var x1 = currCommand.getX() * this.scaleX;
 					var y1 = currCommand.getY() * this.scaleY;

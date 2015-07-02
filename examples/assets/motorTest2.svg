@@ -39,6 +39,10 @@
 			
 				<line id="constraint-fork-shockAbsorber" fill="none" stroke="#00E8AC" stroke-miterlimit="10" x1="1059.304" y1="687.232" x2="1059.729" y2="675.672"/>
 			<line id="constraint-swingArm-shockAbsorber" fill="none" x1="1104.515" y1="690.79" x2="1096.759" y2="677.034"/>
+			<g id="decoration">
+				<polygon id="cool" points="1067.41,677.411 1068.615,679.089 1067.41,680.75 1065.792,678.042 1066.333,678.084 
+					1067.41,678.959 1066.149,677.125 1067.41,675.834 1069.027,678.084 1068.44,678.084 				"/>
+			</g>
 		</g>
 		<g>
 			

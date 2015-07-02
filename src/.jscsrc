@@ -128,7 +128,7 @@
 	"requireSpacesInsideParentheses": null,
 	"requireTrailingComma": null,
 	"requireYodaConditions": null,
-	"safeContextKeyword": ["that"],
+	"safeContextKeyword": ["self"],
 	"validateIndentation": "\t",
 	"validateLineBreaks": "LF",
 	"validateNewlineAfterArrayElements": null,

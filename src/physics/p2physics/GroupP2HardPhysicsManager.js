@@ -4,15 +4,24 @@
 var p2 = require('../../../libs/p2');
 var NodeP2HardPhysicsManager = require('./NodeP2HardPhysicsManager');
 var AnchorP2HardPhysicsManager = require('./AnchorP2HardPhysicsManager');
+var HardDecorationDrawing = require('./HardDecorationDrawing');
 
 var GroupP2HardPhysicsManager = function ($group, $P2World, $worldHeight, $materialsList)
 {
 	this.group = $group;
+	var self = this;
+	this._position = [];
+	this.nodesAddedPromise = new window.Promise(function (resolve) { self.resolveNodesAdded = resolve; });
 	this.materialsList = $materialsList;
 	this.worldHeight = $worldHeight;
 	this.P2World = $P2World;
 	this.conf = $group.conf.physics;
 	this._boundingBox = [[0, 0], [0, 0]];
+};
+
+GroupP2HardPhysicsManager.prototype.getDecorationDrawing = function ()
+{
+	return new HardDecorationDrawing(this.group);
 };
 
 GroupP2HardPhysicsManager.prototype.getNodePhysicsManager = function ()
@@ -28,6 +37,14 @@ GroupP2HardPhysicsManager.prototype.getBoundingBox = function ()
 	this._boundingBox[1][0] = AABB.upperBound[0];
 	this._boundingBox[1][1] = this.worldHeight - AABB.lowerBound[1];
 	return this._boundingBox;
+};
+
+GroupP2HardPhysicsManager.prototype.getX = function () { return this.body.interpolatedPosition[0]; };
+GroupP2HardPhysicsManager.prototype.getY = function () { return this.worldHeight - this.body.interpolatedPosition[1]; };
+
+GroupP2HardPhysicsManager.prototype.getAngle = function ()
+{
+	return this.body.interpolatedAngle;
 };
 
 GroupP2HardPhysicsManager.prototype.createAnchorFromPoint = function ($point)
@@ -127,16 +144,18 @@ GroupP2HardPhysicsManager.prototype.addNodesToWorld = function ()
 	this.body.updateMassProperties();
 	this.body.collisionResponse = !this.conf.noCollide;
 
-	if (this.group.ID === 'rearWheel')
-	{
-		console.log(this.body.mass);
-	}
+	// if (this.group.ID === 'rearWheel')
+	// {
+	// 	console.log(this.body.mass);
+	// }
 
 	this.body.interpolatedPosition[0] = this.body.position[0];
 	this.body.interpolatedPosition[1] = this.body.position[1];
 	//node.physicsManager.setFixed(this.group.conf.fixed);
 	// console.log(this.body.shapes);
 	// debugger;
+
+	this.resolveNodesAdded();
 };
 
 GroupP2HardPhysicsManager.prototype.hitTest = function ($point)

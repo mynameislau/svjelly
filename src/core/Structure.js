@@ -13,6 +13,7 @@ Structure.prototype.create = function ($drawingCommands)
 {
 	this.points = this.getPoints($drawingCommands);
 	this.drawingCommands = $drawingCommands;
+	this.nodeProperties = [];
 
 	this.envelope = undefined;
 	this.fillNodes = undefined;
@@ -93,7 +94,7 @@ Structure.prototype.createHexaFillStructure = function ($points)
 	{
 		var node = this.group.getNodeAtPoint(path[i][0], path[i][1]);
 		envelope.push(node);
-		this.group.drawing.addCommand(node, undefined, true);
+		this.nodeProperties.push({ node: node, commandProperties: undefined, isEnvelope: true });
 	}
 	return envelope;
 };
@@ -104,7 +105,7 @@ Structure.prototype.setNodeDrawingCommands = function ($nodes)
 	{
 		var node = $nodes[i];
 		var commandObject = this.drawingCommands.pointCommands[i];
-		this.group.drawing.addCommand(node, commandObject, true);
+		this.nodeProperties.push({ node: node, commandProperties: commandObject, isEnvelope: true });
 	}
 };
 
@@ -217,7 +218,7 @@ Structure.prototype.createInnerStructure = function ($points)
 	for (i = 0; i < length; i += 1)
 	{
 		var node = this.structureNodes[i];
-		this.group.drawing.addCommand(node, undefined, false);
+		this.nodeProperties.push({ node: node, commandProperties: undefined, isEnvelope: false });
 	}
 
 	return this.structureNodes;
