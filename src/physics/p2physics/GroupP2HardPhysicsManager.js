@@ -11,7 +11,7 @@ var GroupP2HardPhysicsManager = function ($group, $P2World, $worldHeight, $mater
 	this.group = $group;
 	var self = this;
 	this._position = [];
-	this.nodesAddedPromise = new window.Promise(function (resolve) { self.resolveNodesAdded = resolve; });
+	this.addedToWorld = new window.Promise(function (resolve) { self.resolveAddedToWorld = resolve; });
 	this.materialsList = $materialsList;
 	this.worldHeight = $worldHeight;
 	this.P2World = $P2World;
@@ -21,7 +21,7 @@ var GroupP2HardPhysicsManager = function ($group, $P2World, $worldHeight, $mater
 
 GroupP2HardPhysicsManager.prototype.getDecorationDrawing = function ()
 {
-	return new HardDecorationDrawing(this.group);
+	return HardDecorationDrawing.create(this.group);
 };
 
 GroupP2HardPhysicsManager.prototype.getNodePhysicsManager = function ()
@@ -155,12 +155,12 @@ GroupP2HardPhysicsManager.prototype.addNodesToWorld = function ()
 	// console.log(this.body.shapes);
 	// debugger;
 
-	this.resolveNodesAdded();
+	this.resolveAddedToWorld();
 };
 
 GroupP2HardPhysicsManager.prototype.hitTest = function ($point)
 {
-	var result = this.P2World.hitTest($point, [this.body]);
+	var result = this.P2World.hitTest([$point[0], this.worldHeight - $point[1]], [this.body]);
 	return result ? result[0] : undefined;
 };
 

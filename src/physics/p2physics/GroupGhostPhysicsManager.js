@@ -1,3 +1,5 @@
+var HardDecorationDrawing = require('./HardDecorationDrawing');
+
 var GroupGhostPhysicsManager = function ($group)
 {
 	this.group = $group;
@@ -18,6 +20,11 @@ GroupGhostPhysicsManager.prototype.getNodePhysicsManager = function ($node)
 		manager.getY = getY($node.oY);
 	}
 	return manager;
+};
+
+GroupGhostPhysicsManager.prototype.getDecorationDrawing = function ()
+{
+	return HardDecorationDrawing.create(this.group);
 };
 
 GroupGhostPhysicsManager.prototype.getBoundingBox = function ()
@@ -46,6 +53,7 @@ GroupGhostPhysicsManager.prototype.addJointsToWorld = function ()
 	return null;
 };
 
+GroupGhostPhysicsManager.prototype.getAngle = function () { return 0; };
 GroupGhostPhysicsManager.prototype.getX = function () { return 0; };
 GroupGhostPhysicsManager.prototype.getY = function () { return 0; };
 

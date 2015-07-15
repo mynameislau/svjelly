@@ -1,45 +1,50 @@
-var HardDecorationDrawingCommand = require('./HardDecorationDrawingCommand');
+var DecorationDrawingCommand = require('../../core/DecorationDrawingCommand');
+var DecorationDrawing = require('../../core/DecorationDrawing');
 
-var HardDecorationDrawing = function ($group)
+var HardDecorationDrawing = Object.create(DecorationDrawing);
+HardDecorationDrawing.create = function ($group)
 {
-	this.group = $group;
-	this.commands = [];
+	var inst = Object.create(HardDecorationDrawing);
+	inst.group = $group;
+	inst.commands = [];
 
-	this.properties = undefined;
+	inst.properties = undefined;
+
+	return inst;
 };
 
-HardDecorationDrawing.prototype.setDrawingCommands = function ($drawingCommands)
+HardDecorationDrawing.setDrawingCommands = function ($drawingCommands)
 {
 	for (var i = 0, length = $drawingCommands.pointCommands.length; i < length; i += 1)
 	{
 		var curr = $drawingCommands.pointCommands[i];
-		this.commands.push(new HardDecorationDrawingCommand(curr, this.group));
+		this.commands.push(new DecorationDrawingCommand(curr, this.group.physicsManager));
 	}
 	this.commandsLength = this.commands.length;
 };
 
-HardDecorationDrawing.prototype.setProperties = function ($properties)
+HardDecorationDrawing.setProperties = function ($properties)
 {
 	this.properties = $properties;
 	this.useDynamicGradient = false;
 };
 
-HardDecorationDrawing.prototype.getBoundingBox = function ()
+HardDecorationDrawing.getBoundingBox = function ()
 {
 	return this.group.physicsManager.getBoundingBox();
 };
 
-HardDecorationDrawing.prototype.isStatic = function ()
+HardDecorationDrawing.isStatic = function ()
 {
 	return this.group.conf.fixed === true;
 };
 
-HardDecorationDrawing.prototype.willNotIntersect = function ()
+HardDecorationDrawing.willNotIntersect = function ()
 {
 	return false;
 };
 
-HardDecorationDrawing.prototype.isSimpleDrawing = function ()
+HardDecorationDrawing.isSimpleDrawing = function ()
 {
 	return false;
 };

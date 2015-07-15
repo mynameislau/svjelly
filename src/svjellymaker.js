@@ -17,40 +17,36 @@ var cancelAnimFrame = window.cancelAnimationFrame ||
 //TODO promise polyfill
 var SVJellyMaker =
 {
-	createFromURL: function ($container, $URL, $width, $height, $scaleMode)
+	create: function ()
 	{
 		var svjellyMaker = Object.create(SVJellyMaker);
-		svjellyMaker.container = $container;
-		svjellyMaker.promise = new window.Promise(function (resolve)
+		svjellyMaker.initiated = new window.Promise(function (resolve) { svjellyMaker.initiatedResolve = resolve; });
+		return svjellyMaker;
+	},
+
+	createFromURL: function ($container, $URL, $width, $height, $scaleMode)
+	{
+		var svjellyMaker = SVJellyMaker.create();
+		svjellyMaker.loadFile($URL, function ($SVG)
 		{
-			svjellyMaker.loadFile($URL, function ($SVG)
-			{
-				svjellyMaker.create($container, $SVG, $width, $height, $scaleMode);
-				resolve();
-			}, true);
-		});
+			svjellyMaker.init($container, $SVG, $width, $height, $scaleMode);
+		}, true);
 		return svjellyMaker;
 	},
 	createFromConfig: function ($container, $configURL, $width, $height, $scaleMode)
 	{
-		var svjellyMaker = Object.create(SVJellyMaker);
-		svjellyMaker.container = $container;
-
-		svjellyMaker.promise = new window.Promise(function (resolve)
+		var svjellyMaker = SVJellyMaker.create();
+		var loadConfigComplete = function ($configData)
 		{
-			var loadConfigComplete = function ($configData)
-			{
-				var JSONConfig = JSON.parse($configData);
-				svjellyMaker.conf = SVJellyUtils.extend(confObject, JSONConfig);
+			var JSONConfig = JSON.parse($configData);
+			svjellyMaker.conf = SVJellyUtils.extend(confObject, JSONConfig);
 
-				SVJellyMaker.loadFile(svjellyMaker.conf.source, function ($SVG)
-				{
-					svjellyMaker.create($container, $SVG, $width, $height, $scaleMode);
-					resolve();
-				}, true);
-			};
-			SVJellyMaker.loadFile($configURL, loadConfigComplete);
-		});
+			SVJellyMaker.loadFile(svjellyMaker.conf.source, function ($SVG)
+			{
+				svjellyMaker.init($container, $SVG, $width, $height, $scaleMode);
+			}, true);
+		};
+		SVJellyMaker.loadFile($configURL, loadConfigComplete);
 
 		return svjellyMaker;
 	},
@@ -58,12 +54,8 @@ var SVJellyMaker =
 	{
 		var parser = new DOMParser();
 		var doc = parser.parseFromString($string, 'image/svg+xml');
-		var svjellyMaker = Object.create(SVJellyMaker);
-		svjellyMaker.promise = new window.Promise(function (resolve)
-		{
-			svjellyMaker.create($container, doc, $width, $height, $scaleMode);
-			resolve();
-		});
+		var svjellyMaker = SVJellyMaker.create();
+		svjellyMaker.init($container, doc, $width, $height, $scaleMode);
 		return svjellyMaker;
 	},
 	createFromPageSVG: function ()
@@ -72,7 +64,7 @@ var SVJellyMaker =
 
 		var createViewer = function ($element)
 		{
-			var svjellyMaker = Object.create(SVJellyMaker);
+			var svjellyMaker = SVJellyMaker.create();
 			var currSVG = $element;
 			var appendCanvas = function ($config)
 			{
@@ -96,7 +88,7 @@ var SVJellyMaker =
 				svjellyMaker.container = container;
 				var wrapper = document.createElement('div');
 				wrapper.appendChild(currSVG);
-				svjellyMaker.create(container, wrapper, container.clientWidth, container.clientHeight);
+				svjellyMaker.init(container, wrapper, container.clientWidth, container.clientHeight);
 			};
 			var configURL = currSVG.getAttribute('data-svjelly');
 			if (configURL)
@@ -120,12 +112,12 @@ var SVJellyMaker =
 		}
 	},
 
-	create: function ($container, $SVG, $width, $height, $scaleMode)
+	init: function ($container, $SVG, $width, $height, $scaleMode)
 	{
 		var conf = this.conf || confObject;
 		this.container = $container;
 
-		this.physicsManager = new P2PhysicsManager(conf);
+		this.physicsManager = this.physicsManager || new P2PhysicsManager(conf);
 		var svjellyWorld = this.svjellyWorld = new SVJellyWorld(this.physicsManager, conf);
 
 		var canvasDefinition = conf.definition || 1;
@@ -155,7 +147,8 @@ var SVJellyMaker =
 		// this.container.width = canvasWidth;
 		// this.container.height = canvasHeight;
 
-		this.renderer = SVJellyRenderer.create(svjellyWorld, this.container);
+		console.log(this.Renderer === true);
+		this.renderer = this.Renderer ? this.Renderer.create(svjellyWorld, this.container) : SVJellyRenderer.create(svjellyWorld, this.container);
 		this.renderer.setSize(canvasWidth, canvasHeight);
 
 		if (canvasDefinition !== 1)
@@ -168,18 +161,18 @@ var SVJellyMaker =
 		var lastRender = window.performance.now();
 		var diffRender;
 		var renderTargetFPS = 0;
-		var that = this;
+		var self = this;
 
 		var update = function ($now)
 		{
-			if (that.updateCallback) { that.updateCallback($now); }
+			if (self.updateCallback) { self.updateCallback($now); }
 
 			diffRender = $now - lastRender;
 
-			that.svjellyWorld.physicsManager.step($now);
+			self.svjellyWorld.physicsManager.step($now);
 			if (diffRender >= renderTargetFPS)
 			{
-				that.renderer.draw();
+				self.renderer.draw();
 				lastRender = $now;
 			}
 			requestID = requestAnimFrame(update);
@@ -205,6 +198,8 @@ var SVJellyMaker =
 			window.removeEventListener('focus', addAnimRequest);
 			window.removeEventListener('blur', cancelAnimRequest);
 		};
+
+		this.initiatedResolve();
 	},
 
 	loadFile: function ($URL, $successCallback, $XML)

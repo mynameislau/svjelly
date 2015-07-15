@@ -1,45 +1,52 @@
-var SoftDecorationDrawingCommand = require('./SoftDecorationDrawingCommand');
+var DecorationDrawingCommand = require('../../core/DecorationDrawingCommand');
+var DecorationDrawing = require('../../core/DecorationDrawing');
 
-var SoftDecorationDrawing = function ($group)
+var SoftDecorationDrawing = Object.create(DecorationDrawing);
+SoftDecorationDrawing.create = function ($group)
 {
-	this.group = $group;
-	this.commands = [];
+	var inst = Object.create(SoftDecorationDrawing);
+	inst.group = $group;
+	inst.commands = [];
 
-	this.properties = undefined;
+	inst.properties = undefined;
+
+	return inst;
 };
 
-SoftDecorationDrawing.prototype.setDrawingCommands = function ($drawingCommands)
+SoftDecorationDrawing.setDrawingCommands = function ($drawingCommands)
 {
 	for (var i = 0, length = $drawingCommands.pointCommands.length; i < length; i += 1)
 	{
 		var curr = $drawingCommands.pointCommands[i];
-		this.commands.push(new SoftDecorationDrawingCommand(curr, this.group));
+		var closestNode = this.group.getClosestNode(curr.point);
+		console.log(closestNode.ID);
+		this.commands.push(new DecorationDrawingCommand(curr, closestNode.physicsManager));
 	}
 	this.commandsLength = this.commands.length;
 };
 
-SoftDecorationDrawing.prototype.setProperties = function ($properties)
+SoftDecorationDrawing.setProperties = function ($properties)
 {
 	this.properties = $properties;
 	this.useDynamicGradient = false;
 };
 
-SoftDecorationDrawing.prototype.getBoundingBox = function ()
+SoftDecorationDrawing.getBoundingBox = function ()
 {
 	return this.group.physicsManager.getBoundingBox();
 };
 
-SoftDecorationDrawing.prototype.isStatic = function ()
+SoftDecorationDrawing.isStatic = function ()
 {
 	return this.group.conf.fixed === true;
 };
 
-SoftDecorationDrawing.prototype.willNotIntersect = function ()
+SoftDecorationDrawing.willNotIntersect = function ()
 {
 	return false;
 };
 
-SoftDecorationDrawing.prototype.isSimpleDrawing = function ()
+SoftDecorationDrawing.isSimpleDrawing = function ()
 {
 	return false;
 };

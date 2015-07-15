@@ -7,7 +7,7 @@ module.exports = {
 			{
 				if (typeof $extend[name] === 'object' && !Array.isArray($extend[name]) && $extend[name] !== null)
 				{
-					if ($object[name] === undefined) { $object[name] = {}; }
+					if ($object[name] === undefined || $object[name] === null) { $object[name] = {}; }
 					recur($object[name], $extend[name]);
 				}
 				else

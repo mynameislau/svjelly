@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Testbed</title>
+	<link rel="stylesheet" href="assets/example_main_styles.css">
+</head>
+<body class="fullscreen">
+	<div id="container" style="pointer-events:auto;"></div>
+	<script src="../libs/pixi.js"></script>
+	<script src="../build/svjellymaker.js"></script>
+	<script>
+		var loadEventHandler = function ()
+		{
+			var container = document.getElementById('container');
+			container.width = document.body.clientWidth;
+			var maker = window.svjellymaker.createFromURL(container, '../examples/assets/pixi.svg', window.innerWidth, window.innerHeight, 'min');
+
+			maker.promise.then(function ()
+			{
+				var target = maker.svjellyWorld.getGroupByID('target').physicsManager;
+				container.style.width = maker.renderer.width + 'px';
+				container.style.height = maker.renderer.height + 'px';
+				maker.addBasicMouseControls();
+				maker.updateCallback = function ()
+				{
+					maker.renderer.setViewCenter([target.getX(), target.getY()]);
+				};
+			});
+		};
+
+		window.addEventListener('load', loadEventHandler);
+	</script>
+</body>
+</html>

@@ -1,6 +1,6 @@
 var Commands = require('./Commands');
 var ObjectDrawing = require('./ObjectDrawing');
-var ARC = Commands.ARC;
+var CIRCLE = Commands.CIRCLE;
 var LINE_TO = Commands.LINE_TO;
 var MOVE_TO = Commands.MOVE_TO;
 var BEZIER_TO = Commands.BEZIER_TO;
@@ -42,7 +42,7 @@ SVGParser.prototype.parse = function ($world, $SVG)
 
 		var drawingCommands = this.parseElement(rawElement);
 		currGroup.structure.create(drawingCommands);
-		var objectDrawing = new ObjectDrawing(currGroup);
+		var objectDrawing = ObjectDrawing.create(currGroup);
 		objectDrawing.setCommands();
 		currGroup.drawing = objectDrawing;
 		this.world.addDrawing(objectDrawing);
@@ -74,7 +74,6 @@ SVGParser.prototype.parseDecoration = function ($group, $rawElement)
 			{
 				var rawElement = rawElements[k];
 				var drawingCommands = this.parseElement(rawElement);
-				console.log('creating !');
 				var decorationDrawing = $group.physicsManager.getDecorationDrawing($group);
 				decorationDrawing.setDrawingCommands(drawingCommands);
 				this.setGraphicInstructions(decorationDrawing, rawElement, drawingCommands);
@@ -141,7 +140,15 @@ SVGParser.prototype.parseConstraints = function ()
 			var currRawElement = rawElements[k];
 			var group = this.getGroupFromRawSVGElement(currRawElement);
 			//console.log(group);
-			this.world.constrainGroups(group, parentGroup, points, constraintType);
+			try
+			{
+				this.world.constrainGroups(group, parentGroup, points, constraintType);
+			}
+			catch (e)
+			{
+				console.warn('constraining problem', group.type, group.ID);
+				console.log(e);
+			}
 		}
 	}
 };
@@ -337,7 +344,7 @@ SVGParser.prototype.parseCircle = function ($rawCircle)
 	var radiusX = this.getCoord(radiusAttrX);
 	var radiusY = this.getCoord(radiusAttrY) || radiusX;
 	var rotation = this.getRotation($rawCircle.getAttribute('transform'));
-	var pointCommands = [{ name: radiusY !== radiusX ? ELLIPSE : ARC, point: [xPos, yPos], options: [radiusX, radiusY, rotation] }];
+	var pointCommands = [{ name: radiusY !== radiusX ? ELLIPSE : CIRCLE, point: [xPos, yPos], options: [radiusX, radiusY, rotation] }];
 	return { type: 'ellipse', pointCommands: pointCommands, radiusX: radiusX, radiusY: radiusY, closePath: false, thickness: this.getThickness($rawCircle) };
 };
 

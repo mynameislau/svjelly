@@ -1,22 +1,29 @@
 var Commands = require('../../core/Commands');
-var ARC = Commands.ARC;
+var CIRCLE = Commands.CIRCLE;
 var LINE_TO = Commands.LINE_TO;
 var MOVE_TO = Commands.MOVE_TO;
 var BEZIER_TO = Commands.BEZIER_TO;
 var QUADRA_TO = Commands.QUADRA_TO;
 var ELLIPSE = Commands.ELLIPSE;
 var SVJellyUtils = require('../../core/SVJellyUtils');
+var twoPIS = Math.PI * 2;
 
 var SVJellyRenderer =//function ($world, $canvas)
 {
 	create: function ($world, $container)
 	{
+		//crude polyfill
+		if (CanvasRenderingContext2D.prototype.ellipse === undefined) {
+			CanvasRenderingContext2D.prototype.ellipse = function (x, y, rx, ry, rotation, startAngle, endAngle)
+			{
+				this.arc(x, y, rx, startAngle, endAngle);
+			};
+		}
 		var inst = Object.create(SVJellyRenderer);
 
 		inst.container = inst.mainCanvas = $container;
 		inst.world = $world;
 		inst.multiCanvas = $world.conf.multiCanvas;
-		if (inst.multicanvas) { inst.mainContext = inst.mainCanvas.getContext('2d'); }
 		inst.debug = $world.conf.debug;
 
 		//inst.setSize($width, $height);
@@ -46,14 +53,14 @@ var SVJellyRenderer =//function ($world, $canvas)
 		this.width = $width;
 		this.height = $height;
 
-		this.ratio = this.width / this.world.getWidth();
+		this.ratio = this.width / this.world.physicsManager.worldWidth;
 
 		this.previousViewCenter = [null, null];
 		this.viewCenter = [0, 0];
 		this.viewportScale = 1;
 		this.previousViewportScale = undefined;
 
-		this.scaleX = this.scaleY = this.ratio;
+		this.scaleX = this.scaleY = 100;
 
 		//creating drawing groups
 		this.drawingGroups = [];
@@ -62,6 +69,7 @@ var SVJellyRenderer =//function ($world, $canvas)
 		for (var groupsLength = this.world.drawings.length; k < groupsLength; k += 1)
 		{
 			var currDrawing = this.world.drawings[k];
+			currDrawing.setScale(this.scaleX, this.scaleY);
 			this.createDrawingGroup(currDrawing);
 		}
 		this.drawingGroupsLength = this.drawingGroups.length;
@@ -72,7 +80,6 @@ var SVJellyRenderer =//function ($world, $canvas)
 		i = 0;
 		var canvas;
 		var layer;
-		var context;
 		for (i; i < this.drawingGroupsLength; i += 1)
 		{
 			drawingGroup = this.drawingGroups[i];
@@ -91,7 +98,6 @@ var SVJellyRenderer =//function ($world, $canvas)
 					layer = this.drawingGroups[i - 1].layer;
 				}
 				//canvas = this.staticCanvas[i - 1] || this.createCanvas();
-				context = canvas.getContext('2d');
 				this.staticCanvas[i] = canvas;
 				this.staticGroups.push(drawingGroup);
 			}
@@ -99,13 +105,12 @@ var SVJellyRenderer =//function ($world, $canvas)
 			{
 				canvas = this.dynamicCanvas[i - 1] || this.createCanvas();
 				layer = canvas;
-				context = canvas.getContext('2d');
 				this.dynamicCanvas[i] = canvas;
 				this.dynamicGroups.push(drawingGroup);
 			}
 			drawingGroup.canvas = canvas;
 			drawingGroup.layer = layer;
-			drawingGroup.context = context;
+			drawingGroup.context = canvas.getContext('2d');
 		}
 		this.dynamicGroupsLength = this.dynamicGroups.length;
 		this.staticGroupsLength = this.staticGroups.length;
@@ -141,30 +146,9 @@ var SVJellyRenderer =//function ($world, $canvas)
 			}
 		}
 		this.draw = this.multiCanvas ? this.drawMultiCanvas : this.drawSingleCanvas;
-		//
 
-		//drawing once
-		// for (i = 0; i < this.drawingGroupsLength; i += 1)
-		// {
-		// 	drawingGroup = this.drawingGroups[i];
-		// 	this.drawGroup(drawingGroup, drawingGroup.context);
-		// }
-
-		//this.updateStaticLayers();
-
-		//this.setViewport(this.width * 0.5, this.height * 0.5, this.width, this.height);
-		//this.setViewport([[0, 0], [this.width, this.height]]);
-		this.setViewCenter([this.width * 0.5, this.height * 0.5], 1);
-		// this.setViewport(0, 0, this.width * 0.5, this.height * 0.5);
-		// this.setViewport(0, this.height * 0.5, this.width * 0.5, this.height);
-		// this.setViewport(0, this.height * 0.5, this.width * 0.5, this.height);
-		// this.setViewport(0, this.height * 0.5, this.width * 0.5, this.height);
-		// this.setViewport(0, this.height * 0.5, this.width * 0.5, this.height);
-		// this.setViewport(0, 0, this.width, this.height);
-		// this.setViewport(0, this.height * 0.5, this.width * 0.5, this.height);
-		// this.setViewport(0, this.height * 0.5, this.width * 0.5, this.height);
-		// this.setViewport(0, this.height * 0.5, this.width * 0.5, this.height);
-		//this.setViewport(0, 0, this.width * 0.5, this.height * 0.5);
+		this.setViewCenter([this.world.physicsManager.worldWidth * 0.5, this.world.physicsManager.worldHeight * 0.5], this.ratio / this.scaleX);
+		//this.setViewCenter([this.width * 0.5, this.height * 0.5], 1);
 
 		if (this.debug)
 		{
@@ -172,20 +156,6 @@ var SVJellyRenderer =//function ($world, $canvas)
 			this.debugContext = this.debugCanvas.getContext('2d');
 			this.addLayer(this.multiCanvas ? this.container : this.mainCanvas.parentNode, this.debugCanvas, false);
 		}
-
-		// this.viewport = [[this.width * 0.5, this.height * 0.5], [this.width, this.height]];
-
-		//caching hard stuff - not interesting performance-wise yet
-		// for (i = 0; i < this.drawingGroupsLength; i += 1)
-		// {
-		// 	drawingGroup = this.drawingGroups[i];
-		// 	if (drawingGroup.bodyType === 'hard' && !drawingGroup.fixed)
-		// 	{
-		// 		canvas = this.createCanvas();
-		// 		this.drawGroup(drawingGroup, canvas.getContext('2d'));
-		// 		this.cachedHard[i] = canvas;
-		// 	}
-		// }
 	},
 
 	setViewCenter: function ($vc, $scale)
@@ -195,25 +165,19 @@ var SVJellyRenderer =//function ($world, $canvas)
 		this.viewportScale = $scale || this.viewportScale;
 	},
 
-	setViewport: function ($vp)
-	{
-		this.viewport[0][0] = Math.round($vp[0][0] * 10) / 10;
-		this.viewport[0][1] = Math.round($vp[0][1] * 10) / 10;
-		this.viewport[1][0] = Math.round($vp[1][0] * 10) / 10;
-		this.viewport[1][1] = Math.round($vp[1][1] * 10) / 10;
-	},
-
 	setScale: function ()
 	{
+		console.log('setscale');
 		var previousStatic;
 		for (var i = 0; i < this.staticGroupsLength; i += 1)
 		{
 			var staticGroup = this.staticGroups[i];
 			if (staticGroup.canvas !== previousStatic)
 			{
-				staticGroup.canvas.width = this.width * this.viewportScale;
-				staticGroup.canvas.height = this.height * this.viewportScale;
+				staticGroup.canvas.width = this.world.physicsManager.worldWidth * this.scaleX * this.viewportScale;
+				staticGroup.canvas.height = this.world.physicsManager.worldHeight * this.scaleY * this.viewportScale;
 				staticGroup.context.scale(this.viewportScale, this.viewportScale);//this.contextScale, this.contextScale);
+				// staticGroup.context.scale(1, 1);
 				//staticGroup.canvas.width = this.width;
 				//staticGroup.canvas.height = this.height;
 				previousStatic = staticGroup.canvas;
@@ -243,8 +207,8 @@ var SVJellyRenderer =//function ($world, $canvas)
 
 			context = layer.getContext('2d');
 			context.clearRect(0, 0, this.width, this.height);
-			var sx = this.viewCenter[0] * this.viewportScale - this.width * 0.5;
-			var sy = this.viewCenter[1] * this.viewportScale - this.height * 0.5;
+			var sx = this.viewCenter[0] * this.scaleX * this.viewportScale - this.width * 0.5;
+			var sy = this.viewCenter[1] * this.scaleX * this.viewportScale - this.height * 0.5;
 			context.drawImage(drawingGroup.canvas, sx, sy, this.width, this.height, 0, 0, this.width, this.height);
 			//context.drawImage(drawingGroup.canvas, 0, 0, this.width, this.height, 0, 0, this.width, this.height);
 			previous = layer;
@@ -258,8 +222,9 @@ var SVJellyRenderer =//function ($world, $canvas)
 		{
 			var dynamicGroup = this.dynamicGroups[i];
 			if (dynamicGroup.canvas === previousDynamic) { continue; }
+			//dynamicGroup.context.scale(this.viewportScale, this.viewportScale);
 			//dynamicGroup.context.setTransform(this.viewportScale, 0, 0, this.viewportScale, -this.viewCenter[0] * this.viewportScale, -this.viewY * this.viewportScale);
-			dynamicGroup.context.setTransform(this.viewportScale, 0, 0, this.viewportScale, -this.viewCenter[0] * this.viewportScale + this.width * 0.5, -this.viewCenter[1] * this.viewportScale + this.height * 0.5);
+			dynamicGroup.context.setTransform(this.viewportScale, 0, 0, this.viewportScale, -this.viewCenter[0] * this.scaleX * this.viewportScale + this.width * 0.5, -this.viewCenter[1] * this.scaleX * this.viewportScale + this.height * 0.5);
 			previousDynamic = dynamicGroup.canvas;
 		}
 	},
@@ -270,10 +235,8 @@ var SVJellyRenderer =//function ($world, $canvas)
 			this.viewCenter[1] !== this.previousViewCenter[1] ||
 			this.viewportScale !== this.previousViewportScale)
 		{
-			this.viewWidth = this.width / this.viewportScale;
-			this.viewHeight = this.height / this.viewportScale;
-			this.viewX = this.viewCenter[0] - this.width * 0.5;
-			this.viewY = this.viewCenter[1] - this.height * 0.5;
+			this.viewHeight = this.height / this.scaleX / this.viewportScale;
+			this.viewWidth = this.width / this.scaleX / this.viewportScale;
 
 			if (this.viewportScale !== this.previousViewportScale)
 			{
@@ -318,7 +281,13 @@ var SVJellyRenderer =//function ($world, $canvas)
 		for (var i = 0; i < this.dynamicGroupsLength; i += 1)
 		{
 			var drawingGroup = this.dynamicGroups[i];
-			if (previous !== drawingGroup.context) { drawingGroup.context.clearRect(0, 0, this.width, this.height); }
+			if (previous !== drawingGroup.context)
+			{
+				drawingGroup.context.save();
+				drawingGroup.context.setTransform(1, 0, 0, 1, 0, 0);
+				drawingGroup.context.clearRect(0, 0, this.width, this.height);
+				drawingGroup.context.restore();
+			}
 			//drawingGroup.context.scale(this.contextScaleX, this.contextScaleY);
 			previous = drawingGroup.context;
 			this.drawGroup(drawingGroup, drawingGroup.context);
@@ -389,19 +358,20 @@ var SVJellyRenderer =//function ($world, $canvas)
 		for (var k = 0; k < objectDrawing.commandsLength; k += 1)
 		{
 			var currCommand = objectDrawing.commands[k];
+			var point = [currCommand.getX(), currCommand.getY()];
 
 			if (currCommand.name === MOVE_TO)
 			{
-				context.moveTo(currCommand.getX() * this.scaleX, currCommand.getY() * this.scaleY);
+				context.moveTo(point[0], point[1]);
 
 				//special case for lines with nice dynamic gradients
-				if (drawingGroup.useDynamicGradient)
+				if (objectDrawing.useDynamicGradient)
 				{
-					var x1 = currCommand.getX() * this.scaleX;
-					var y1 = currCommand.getY() * this.scaleY;
+					var x1 = currCommand.getX();
+					var y1 = currCommand.getY();
 					//console.log(currCommand.endCommand, currCommand.endCommand.getX(), currCommand.endCommand.getY());
-					var x2 = currCommand.endCommand.getX() * this.scaleX;
-					var y2 = currCommand.endCommand.getY() * this.scaleY;
+					var x2 = currCommand.endCommand.getX();
+					var y2 = currCommand.endCommand.getY();
 					var gradient = context.createLinearGradient(x1, y1, x2, y2);
 					for (var stopN = 0, stopLength = objectDrawing.properties.strokeGradient.stops.length; stopN < stopLength; stopN += 1)
 					{
@@ -413,43 +383,36 @@ var SVJellyRenderer =//function ($world, $canvas)
 			}
 			else if (currCommand.name === LINE_TO)
 			{
-				context.lineTo(currCommand.getX() * this.scaleX, currCommand.getY() * this.scaleY);
+				context.lineTo(point[0], point[1]);
 				continue;
 			}
-			else if (currCommand.name === ARC)
+			else if (currCommand.name === CIRCLE)
 			{
-				context.moveTo(currCommand.getX() * this.scaleX + currCommand.options[0], currCommand.getY() * this.scaleY);
-				context.arc(currCommand.getX() * this.scaleX, currCommand.getY() * this.scaleY, currCommand.options[0], 0, Math.PI * 2);
+				context.moveTo(point[0] + currCommand.radius, point[1]);
+				context.arc(point[0], point[1], currCommand.radius, 0, twoPIS);
 			}
 			if (!drawingGroup.isSimpleDrawing)
 			{
-				var options = currCommand.options;
-				var baseX = currCommand.getX() * this.scaleX;
-				var baseY = currCommand.getY() * this.scaleY;
-				var cp1x;
-				var cp1y;
+				var cp1;
 
 				if (currCommand.name === BEZIER_TO || currCommand.name === QUADRA_TO)
 				{
-					cp1x = baseX + options[0][0];
-					cp1y = baseY + options[0][1];
+					cp1 = currCommand.getCP1();
 				}
 
 				if (currCommand.name === BEZIER_TO)
 				{
-					var cp2x = baseX + options[1][0];
-					var cp2y = baseY + options[1][1];
-					context.bezierCurveTo(cp1x, cp1y, cp2x, cp2y, baseX, baseY);
-					//context.lineTo(baseX, baseY);
+					var cp2 = currCommand.getCP2();
+					context.bezierCurveTo(cp1[0], cp1[1], cp2[0], cp2[1], point[0], point[1]);
 				}
 				else if (currCommand.name === QUADRA_TO)
 				{
-					context.quadraticCurveTo(cp1x, cp1y, baseX, baseY);
+					context.quadraticCurveTo(cp1[0], cp1[1], point[0], point[1]);
 				}
 				else if (currCommand.name === ELLIPSE)
 				{
-					context.moveTo(currCommand.getX() * this.scaleX, currCommand.getY() * this.scaleY);
-					context.ellipse(currCommand.getX() * this.scaleX, currCommand.getY() * this.scaleY, currCommand.options[0], currCommand.options[1], currCommand.options[2], 0, Math.PI * 2);
+					context.moveTo(point[0], point[1]);
+					context.ellipse(point[0], point[1], currCommand.radius, currCommand.radiusB, currCommand.getRotation(), 0, twoPIS);
 				}
 			}
 		}
@@ -468,29 +431,13 @@ var SVJellyRenderer =//function ($world, $canvas)
 			for (var k = 0; k < commandsLength; k += 1)
 			{
 				var command = currObjectDrawing.commands[k];
-				var options = command.options;
 				if ($drawingGroup.isSimpleDrawing && (command.name === BEZIER_TO || command.name === QUADRA_TO))
 				{
 					command.name = LINE_TO;
 				}
 				if ($drawingGroup.isSimpleDrawing && (command.name === ELLIPSE))
 				{
-					command.name = ARC;
-				}
-				//precalculationg control points and radix;
-				if (command.name === BEZIER_TO || command.name === QUADRA_TO)
-				{
-					for (var m = 0, length = options.length; m < length; m += 1)
-					{
-						var currOption = options[m];
-						currOption[0] = currOption[0] * this.scaleX;
-						currOption[1] = currOption[1] * this.scaleY;
-					}
-				}
-				else if (command.name === ELLIPSE || command.name === ARC)
-				{
-					options[0] = options[0] * this.scaleX;
-					options[1] = options[1] * this.scaleX;
+					command.name = CIRCLE;
 				}
 			}
 		}
@@ -501,8 +448,6 @@ var SVJellyRenderer =//function ($world, $canvas)
 		if ($parent.contains($canvas)) { return; }
 		$parent.appendChild($canvas);
 		$canvas.style.position = 'absolute';
-		// $canvas.style.top = this.mainCanvas.offsetTop + 'px';
-		// $canvas.style.left = this.mainCanvas.offsetLeft + 'px';
 		$canvas.style.pointerEvents = $pointerEvents ? 'auto' : 'none';
 	},
 	createCanvas: function ()
@@ -584,9 +529,10 @@ var SVJellyRenderer =//function ($world, $canvas)
 
 	debugDraw: function ($clear)
 	{
+		this.debugContext.setTransform(1, 0, 0, 1, 0, 0);
 		if ($clear !== undefined) { this.debugContext.clearRect(0, 0, this.width, this.height); }
 
-		this.debugContext.setTransform(this.viewportScale, 0, 0, this.viewportScale, -this.viewCenter[0] * this.viewportScale + this.width * 0.5, -this.viewCenter[1] * this.viewportScale + this.height * 0.5);
+		this.debugContext.setTransform(this.viewportScale, 0, 0, this.viewportScale, -this.viewCenter[0] * this.scaleX * this.viewportScale + this.width * 0.5, -this.viewCenter[1] * this.scaleX  * this.viewportScale + this.height * 0.5);
 
 		this.debugContext.strokeStyle = 'yellow';
 		this.debugContext.lineCap = 'butt';
@@ -615,11 +561,11 @@ var SVJellyRenderer =//function ($world, $canvas)
 				// console.log(radius);
 				// debugger;
 				this.debugContext.moveTo(xPos + radius, yPos);
-				this.debugContext.arc(xPos, yPos, radius, 0, Math.PI * 2);
+				this.debugContext.arc(xPos, yPos, radius, 0, twoPIS);
 				if (currNode.physicsManager.body)
 				{
 					this.debugContext.moveTo(xPos, yPos);
-					var angle = Math.PI * 2 - currNode.physicsManager.body.angle;
+					var angle = twoPIS - currNode.physicsManager.body.angle;
 					this.debugContext.lineTo(xPos + Math.cos(angle) * radius, yPos + Math.sin(angle) * radius);
 				}
 			}

@@ -12,8 +12,8 @@
 		var loadEventHandler = function ()
 		{
 			var container = document.getElementById('container');
-			var maker = window.svjellymaker.createFromConfig(container, '../examples/assets/calanques.json', window.innerWidth, window.innerHeight, 'max');
-			maker.promise.then(function ()
+			var maker = window.svjelly.Maker.createFromConfig(container, '../examples/assets/calanques.json', window.innerWidth, window.innerHeight, 'max');
+			maker.initiated.then(function ()
 			{
 				container.style.width = maker.renderer.width + 'px';
 				container.style.height = maker.renderer.height + 'px';
@@ -22,7 +22,7 @@
 				var p2World = world.physicsManager.p2World;
 
 				//WIND
-				var windForce = 10;//world.conf.wind;
+				var windForce = world.conf.wind;
 				if (windForce)
 				{
 					var bodiesLength = p2World.bodies.length;

@@ -1,9 +1,9 @@
 module.exports = {
 
 	definition: 1,
-	worldWidth: 150,
+	worldWidth: 20,
 	multiCanvas: true,
-	wind: 5,
+	wind: 3,
 	debug: false,
 	gravity: [0, -9.8],
 	groups:
@@ -14,7 +14,7 @@ module.exports = {
 		{
 			physics:
 			{
-				mass: 10,
+				mass: 100,
 				bodyType: 'hard'
 			}
 		},
@@ -22,7 +22,7 @@ module.exports = {
 		{
 			physics:
 			{
-				mass: 5,
+				mass: 10,
 				bodyType: 'hard'
 			}
 		},
@@ -38,7 +38,7 @@ module.exports = {
 		{
 			physics:
 			{
-				mass: 0.01,
+				mass: 1,
 				gravityScale: -15,
 				bodyType: 'hard'
 			}
@@ -46,7 +46,7 @@ module.exports = {
 		tree:
 		{
 			structure: 'triangulate',
-			nodeRadius: 0.1,
+			nodeRadius: 0.013,
 			physics:
 			{
 				joints:
@@ -61,7 +61,7 @@ module.exports = {
 						}
 					}
 				},
-				mass: 5,
+				mass: 1,
 				damping: 0.8,
 				structuralMassDecay: 3,
 				bodyType: 'soft'
@@ -70,7 +70,7 @@ module.exports = {
 		flora:
 		{
 			structure: 'line',
-			nodeRadius: 0.1,
+			nodeRadius: 0.013,
 			physics:
 			{
 				joints:
@@ -85,7 +85,7 @@ module.exports = {
 						}
 					}
 				},
-				mass: 0.1,
+				mass: 1,
 				structuralMassDecay: 3,
 				bodyType: 'soft'
 			}
@@ -93,7 +93,7 @@ module.exports = {
 		rubber:
 		{
 			structure: 'triangulate',
-			nodeRadius: 0.1,
+			nodeRadius: 0.013,
 			physics:
 			{
 				joints: {
@@ -105,7 +105,7 @@ module.exports = {
 						}
 					}
 				},
-				mass: 1,
+				mass: 0.1,
 				bodyType: 'soft'
 			}
 		},
@@ -113,7 +113,7 @@ module.exports = {
 		{
 			structure: 'hexaFill',
 			innerStructureDef: 0.01,
-			nodeRadius: 0.1,
+			nodeRadius: 0.013,
 			physics:
 			{
 				joints:
@@ -127,7 +127,30 @@ module.exports = {
 						}
 					}
 				},
-				mass: 1,
+				mass: 0.13,
+				bodyType: 'soft'
+			}
+		},
+		sponge:
+		{
+			structure: 'preciseHexaFill',
+			innerStructureDef: 0.02,
+			nodeRadius: 0.013,
+			physics:
+			{
+				joints:
+				{
+					default:
+					{
+						revoluteConstraint:
+						{
+							stiffness: 1000,
+							relaxation: 5
+						}
+					}
+				},
+				material: 'rubber',
+				mass: 0.13,
 				bodyType: 'soft'
 			}
 		},
@@ -135,14 +158,14 @@ module.exports = {
 		{
 			structure: 'hexaFill',
 			innerStructureDef: 0.02,
-			nodeRadius: 0.8,
+			nodeRadius: 0.08,
 			drawNodesSeparately: true,
 			physics:
 			{
 				joints:
 				{
 				},
-				mass: 0.1,
+				mass: 0.013,
 				material: 'liquid',
 				bodyType: 'soft'
 			}
@@ -150,7 +173,7 @@ module.exports = {
 		rope:
 		{
 			structure: 'line',
-			nodeRadius: 0.1,
+			nodeRadius: 0.013,
 			physics:
 			{
 				joints:
@@ -181,7 +204,7 @@ module.exports = {
 		{
 			physics:
 			{
-				mass: 1,
+				mass: 0.13,
 				bodyType: 'hard',
 				noCollide: true
 			}
@@ -190,7 +213,7 @@ module.exports = {
 		{
 			physics:
 			{
-				mass: 0.001,
+				mass: 0.00013,
 				gravityScale: 0,
 				bodyType: 'hard',
 				noCollide: true
@@ -206,7 +229,7 @@ module.exports = {
 		},
 		rubber:
 		{
-			bounciness: 0,
+			bounciness: 10,
 			friction: 100
 		},
 		liquid:
@@ -230,10 +253,24 @@ module.exports = {
 		{
 			revoluteConstraint:
 			{
-				stiffness: Infinity,
-				relaxation: 0,
+				stiffness: 10000,
+				relaxation: 0.1,
 				motor: false,
 				collideConnected: false
+			}
+		},
+		shockAbsorber:
+		{
+			prismaticConstraint:
+			{
+				stiffness: 10000,
+				relaxation: 0.1,
+				canRotate: false
+			},
+			linearSpring:
+			{
+				stiffness: 400,
+				damping: 0.4
 			}
 		},
 		wire:

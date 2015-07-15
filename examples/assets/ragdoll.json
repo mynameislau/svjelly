@@ -1,0 +1,28 @@
+{
+	"source": "assets/ragdoll.svg",
+	"debug": false,
+	"wind": 0.5,
+	"worldWidth": 200,
+	"groups":
+	{
+		
+	},
+	"constraints":
+	{
+		"ragdollConstraint":
+		{
+			"revoluteConstraint":
+			{
+				"stiffness": 1000,
+				"relaxation": 1,
+				"collideConnected": false
+			},
+			"lockConstraint":
+			{
+				"stiffness": 40,
+				"relaxation": 2,
+				"collideConnected": false
+			}
+		}
+	}
+}

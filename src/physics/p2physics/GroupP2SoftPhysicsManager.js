@@ -13,9 +13,9 @@ var GroupP2SoftPhysicsManager = function ($group, $world, $worldHeight, $materia
 	this.group = $group;
 	this._boundingBox = [[0, 0], [0, 0]];
 	this.materialsList = $materialsList;
-	var self = this;
 	this._position = [];
-	this.nodesAddedPromise = new window.Promise(function (resolve) { self.resolveNodesAdded = resolve; });
+	var self = this;
+	this.addedToWorld = new window.Promise(function (resolve) { self.resolveAddedToWorld = resolve; });
 	this.world = $world;
 	this.worldHeight = $worldHeight;
 	this.conf = $group.conf.physics;
@@ -23,10 +23,97 @@ var GroupP2SoftPhysicsManager = function ($group, $world, $worldHeight, $materia
 	//this.nodesDiameter = this.conf.nodesDiameter;
 };
 
+GroupP2SoftPhysicsManager.prototype.addNodesToWorld = function ()
+{
+	for (var i = 0, length = this.group.nodes.length; i < length; i += 1)
+	{
+		// this.baseBody = new p2.Body({
+		// 	mass: 1
+		// });
+		var node = this.group.nodes[i];
+		//var fractionMass = this.conf.mass / this.group.nodes.length;
+		var area = this.group.structure.area;
+		var nodeMass = area * this.conf.mass / this.group.nodes.length;
+		//var mass = 500;
+		//var mass = this.conf.mass;//Math.random() * 10 + 1;
+		var body = new p2.Body({
+			mass: node.fixed ? 0 : nodeMass,
+			position: [node.oX, this.worldHeight - node.oY]
+		});
+		body.interpolatedPosition[0] = body.position[0];
+		body.interpolatedPosition[1] = body.position[1];
+
+		//if (node.fixed) { body.type = p2.Body.STATIC; }
+		//console.log(node.oX, node.oY);
+		//this.body.fixedRotation = true;
+
+		// var radius = this.conf.nodeRadius;
+		// var circleShape = new p2.Circle(radius);
+		// body.addShape(circleShape);
+
+		var radius = this.group.structure.innerRadius || this.group.conf.nodeRadius || 0.1;
+		var shape = new p2.Circle(radius);
+		body.addShape(shape);
+		shape.material = this.conf.material ? this.materialsList[this.conf.material].material : this.materialsList.default.material;
+
+		//console.log(this.body.getArea());
+
+		//this.body.setDensity(node.type === 'line' ? 1 : 5000);
+
+		//body.damping = 1;
+		//body.mass = mass;
+		node.physicsManager.addToWorld(p2, body, this.worldHeight);
+		node.physicsManager.radius = radius;
+		//node.physicsManager.setFixed(node.fixed);
+		//body.setDensity(0.1);
+		this.world.addBody(body);
+
+		//body.mass = body.getArea() * this.conf.mass;
+		//body.gravityScale = 0.1;
+		//body.updateMassProperties();
+		// body.mass = 0;
+		// body.setDensity(0);
+		//node.physicsManager.applyForce([0, 0]);
+		// body.mass = 10;
+		var massVariance = this.conf.massVariance || 0;
+		var random = -massVariance + Math.random() * massVariance * 2;
+		body.mass = body.mass + body.mass * random;
+		//body.mass = body.mass;
+		body.invMass = 1 / body.mass;
+		body.inertia = body.mass * 0.5;
+		body.invInertia = 1 / body.inertia;
+		body.collisionResponse = !this.conf.noCollide;
+
+		body.angularDamping = this.conf.angularDamping || body.angularDamping;
+		body.damping = this.conf.damping || body.damping;
+
+		body.gravityScale = this.conf.gravityScale !== undefined ? this.conf.gravityScale : 1;
+	}
+
+	var Polygon = require('../../core/Polygon');
+	var points = [];
+	var envelope = this.group.structure.envelope;
+	var envelopeLength = this.group.structure.envelope.length;
+	for (i = 0; i < envelopeLength; i += 1)
+	{
+		points.push(envelope[i].physicsManager.body.interpolatedPosition);
+	}
+	this.polygon = Polygon.init(points);
+	//debugger;
+
+	if (this.conf.structuralMassDecay) { this.setNodesMassFromJoints(); }
+
+	this.resolveAddedToWorld();
+
+	if (this.group.ID === 'smiley')
+	{
+		console.log(this.group.structure.area * this.conf.mass, this.getMass());
+	}
+};
+
 GroupP2SoftPhysicsManager.prototype.getDecorationDrawing = function ()
 {
-	console.log(SoftDecorationDrawing);
-	return new SoftDecorationDrawing(this.group);
+	return SoftDecorationDrawing.create(this.group);
 };
 
 GroupP2SoftPhysicsManager.prototype.getNodePhysicsManager = function ()
@@ -167,6 +254,18 @@ GroupP2SoftPhysicsManager.prototype.applyForce = function ($vector)
 	}
 };
 
+GroupP2SoftPhysicsManager.prototype.getMass = function ()
+{
+	var mass = 0;
+	for (var i = 0, length = this.group.nodes.length; i < length; i += 1)
+	{
+		var node = this.group.nodes[i];
+		mass += node.physicsManager.body.mass;
+	}
+
+	return mass;
+};
+
 GroupP2SoftPhysicsManager.prototype.getX = function () { return this.group.nodes[0].physicsManager.body.interpolatedPosition[0]; };
 GroupP2SoftPhysicsManager.prototype.getY = function () { return this.worldHeight - this.group.nodes[0].physicsManager.body.interpolatedPosition[1]; };
 
@@ -175,91 +274,9 @@ GroupP2SoftPhysicsManager.prototype.getAngle = function ()
 	return this.group.nodes[0].physicsManager.body.interpolatedAngle;
 };
 
-GroupP2SoftPhysicsManager.prototype.addNodesToWorld = function ()
-{
-	for (var i = 0, length = this.group.nodes.length; i < length; i += 1)
-	{
-		// this.baseBody = new p2.Body({
-		// 	mass: 1
-		// });
-		var node = this.group.nodes[i];
-		//var fractionMass = this.conf.mass / this.group.nodes.length;
-		var area = this.group.structure.area;
-		var nodeMass = area * this.conf.mass / this.group.nodes.length;
-		//var mass = 500;
-		//var mass = this.conf.mass;//Math.random() * 10 + 1;
-		var body = new p2.Body({
-			mass: node.fixed ? 0 : nodeMass,
-			position: [node.oX, this.worldHeight - node.oY]
-		});
-		body.interpolatedPosition[0] = body.position[0];
-		body.interpolatedPosition[1] = body.position[1];
-
-		//if (node.fixed) { body.type = p2.Body.STATIC; }
-		//console.log(node.oX, node.oY);
-		//this.body.fixedRotation = true;
-
-		// var radius = this.conf.nodeRadius;
-		// var circleShape = new p2.Circle(radius);
-		// body.addShape(circleShape);
-
-		var radius = this.group.structure.innerRadius || this.group.conf.nodeRadius || 0.1;
-		var shape = new p2.Circle(radius);
-		body.addShape(shape);
-		shape.material = this.conf.material ? this.materialsList[this.conf.material].material : this.materialsList.default.material;
-
-		//console.log(this.body.getArea());
-
-		//this.body.setDensity(node.type === 'line' ? 1 : 5000);
-
-		//body.damping = 1;
-		//body.mass = mass;
-		node.physicsManager.addToWorld(p2, body, this.worldHeight);
-		node.physicsManager.radius = radius;
-		//node.physicsManager.setFixed(node.fixed);
-		//body.setDensity(0.1);
-		this.world.addBody(body);
-
-		//body.mass = body.getArea() * this.conf.mass;
-		//body.gravityScale = 0.1;
-		//body.updateMassProperties();
-		// body.mass = 0;
-		// body.setDensity(0);
-		//node.physicsManager.applyForce([0, 0]);
-		// body.mass = 10;
-		var massVariance = this.conf.massVariance || 0;
-		var random = -massVariance + Math.random() * massVariance * 2;
-		body.mass = body.mass + body.mass * random;
-		//body.mass = body.mass;
-		body.invMass = 1 / body.mass;
-		body.inertia = body.mass * 0.5;
-		body.invInertia = 1 / body.inertia;
-		body.collisionResponse = !this.conf.noCollide;
-
-		body.angularDamping = this.conf.angularDamping || body.angularDamping;
-		body.damping = this.conf.damping || body.damping;
-
-		body.gravityScale = this.conf.gravityScale !== undefined ? this.conf.gravityScale : 1;
-	}
-
-	var Polygon = require('../../core/Polygon');
-	var points = [];
-	var envelope = this.group.structure.envelope;
-	var envelopeLength = this.group.structure.envelope.length;
-	for (i = 0; i < envelopeLength; i += 1)
-	{
-		points.push(envelope[i].physicsManager.body.interpolatedPosition);
-	}
-	this.polygon = Polygon.init(points);
-	//debugger;
-
-	if (this.conf.structuralMassDecay) { this.setNodesMassFromJoints(); }
-
-	this.resolveNodesAdded();
-};
-
 GroupP2SoftPhysicsManager.prototype.hitTest = function ($point, $precision)
 {
+	$point[1] = this.worldHeight - $point[1];
 	var dx;
 	var dy;
 	var nodesLength = this.group.nodes.length;

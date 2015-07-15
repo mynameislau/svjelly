@@ -3,6 +3,6 @@ module.exports = {
 	LINE_TO: 2,
 	BEZIER_TO: 3,
 	QUADRA_TO: 4,
-	ARC: 5,
+	CIRCLE: 5,
 	ELLIPSE: 6
 };

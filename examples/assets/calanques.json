@@ -1,6 +1,8 @@
 {
 	"source": "assets/calanques.svg",
 	"debug": false,
+	"wind": 10,
+	"worldWidth": 100,
 	"groups":
 	{
 		"tree":
@@ -11,16 +13,50 @@
 				{
 					"default":
 					{
+						"lockConstraint": null,
 						"distanceConstraint": null,
-						"lockConstraint":
+						"revoluteConstraint":
 						{
-							"stiffness": 100000,
-							"relaxation": 0.9
+							"noRotation": true,
+							"stiffness": 1000000,
+							"relaxation": 0.1
 						}
 					}
 				},
-				"mass": 1,
-				"structuralMassDecay": 2
+				"mass": 0.05,
+				"gravityScale": 1,
+				"structuralMassDecay": 1.9
+			}
+		},
+		"shrub":
+		{
+			"structure": "triangulate",
+			"nodeRadius": 0.013,
+			"physics":
+			{
+				"joints": {
+					"default": {
+						"revoluteConstraint":
+						{
+							"noRotation": true,
+							"stiffness": 100,
+							"relaxation": 0.1
+						}
+					}
+				},
+				"mass": 0.1,
+				"bodyType": "soft"
+			}
+		}
+	},
+	"constraints":
+	{
+		"revolute":
+		{
+			"revoluteConstraint":
+			{
+				"stiffness": 100000,
+				"relaxation": 0
 			}
 		}
 	}

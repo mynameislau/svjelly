@@ -21,9 +21,9 @@ P2MouseControls.prototype.addBasicMouseControls = function ($stiffness, $relaxat
 	}, false);
 
 	var worldWidth = this.world.worldWidth;
+	var worldHeight = this.world.physicsManager.worldHeight;
 	//var bodies = this.p2World.bodies.concat();
 	var groups = this.world.groups;
-	var scale = this.renderer.scaleX;
 
 	var getPhysicsCoord = function ($contact)
 	{
@@ -34,8 +34,7 @@ P2MouseControls.prototype.addBasicMouseControls = function ($stiffness, $relaxat
 		var y = ($contact.clientY - pos.top) / (pos.bottom - pos.top);
 		x = renderer.viewCenter[0] + (x - 0.5) * renderer.viewWidth;
 		y = renderer.viewCenter[1] + (y - 0.5) * renderer.viewHeight;
-		x = x / scale;
-		y = (renderer.height - y) / scale;
+
 		return [x, y];
 	};
 
@@ -59,7 +58,7 @@ P2MouseControls.prototype.addBasicMouseControls = function ($stiffness, $relaxat
 			p2World.addBody(touchBody);
 
 			touchBody.position[0] = position[0];
-			touchBody.position[1] = position[1];
+			touchBody.position[1] = worldHeight - position[1];
 
 			var touchConstraint = new p2.LockConstraint(touchBody, body,
 			{
@@ -89,7 +88,7 @@ P2MouseControls.prototype.addBasicMouseControls = function ($stiffness, $relaxat
 			{
 				var position = getPhysicsCoord(touch);
 				touchConstraints[identifier].bodyA.position[0] = position[0];
-				touchConstraints[identifier].bodyA.position[1] = position[1];
+				touchConstraints[identifier].bodyA.position[1] = worldHeight - position[1];
 			}
 		}
 	};

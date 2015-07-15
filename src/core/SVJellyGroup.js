@@ -41,6 +41,7 @@ SVJellyGroup.prototype.createNode = function ($px, $py, $options, $overwrite)
 		this.nodes.push(node);
 	}
 
+	node.ID = window.performance.now();
 	node.physicsManager = this.physicsManager.getNodePhysicsManager(node);
 	//this.physicsManager.addNodeToWorld(node);
 

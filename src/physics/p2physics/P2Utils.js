@@ -22,8 +22,8 @@ P2Utils.createConstraints = function ($world, $bodyA, $bodyB, $config, $options)
 		var vecLocB = p2.vec2.create();
 		$bodyA.toWorldFrame(vecWorldA, [0, 0]);
 		$bodyB.toWorldFrame(vecWorldB, [0, 0]);
-		$bodyA.toLocalFrame(vecLocA, $bodyB.position);
-		$bodyB.toLocalFrame(vecLocB, $bodyA.position);
+		$bodyA.toLocalFrame(vecLocA, $bodyB.interpolatedPosition);
+		$bodyB.toLocalFrame(vecLocB, $bodyA.interpolatedPosition);
 
 		// console.log(revolute.autoPivot);
 		if (!$options || !$options[0] || !$options[1]) { revolute.autoPivot = true; }
@@ -47,8 +47,9 @@ P2Utils.createConstraints = function ($world, $bodyA, $bodyB, $config, $options)
 			constraint.setMotorSpeed(-1);
 			constraint.collideConnected = false;
 		}
-		if (revolute.stiffness) { constraint.setStiffness(revolute.stiffness); } //default 20
-		if (revolute.relaxation) { constraint.setRelaxation(revolute.relaxation); }
+		if (revolute.noRotation) { constraint.setLimits(0, 0); }
+		if (revolute.stiffness !== undefined) { constraint.setStiffness(revolute.stiffness); } //default 20
+		if (revolute.relaxation !== undefined) { constraint.setRelaxation(revolute.relaxation); }
 		$world.addConstraint(constraint);
 		constraints.push(constraint);
 	}
@@ -89,8 +90,8 @@ P2Utils.createConstraints = function ($world, $bodyA, $bodyB, $config, $options)
 	if (linearSpring)
 	{
 		constraint = new p2.LinearSpring($bodyA, $bodyB, {
-			localAnchorA: $options[0],
-			localAnchorB: $options[1]
+			localAnchorA: $options && $options[0] ? $options[0] : undefined,
+			localAnchorB: $options && $options[1] ? $options[1] : undefined
 		});
 		if (linearSpring.stiffness) { constraint.stiffness = linearSpring.stiffness; }
 		if (linearSpring.damping) { constraint.damping = linearSpring.damping; }
@@ -103,7 +104,7 @@ P2Utils.createConstraints = function ($world, $bodyA, $bodyB, $config, $options)
 		if (rotationalSpring.stiffness) { constraint.stiffness = rotationalSpring.stiffness; }
 		if (rotationalSpring.damping) { constraint.damping = rotationalSpring.damping; }
 		constraints.push(constraint);
-		//$world.addSpring(constraint);
+		$world.addSpring(constraint);
 	}
 	if (distance)
 	{

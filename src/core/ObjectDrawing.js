@@ -1,21 +1,25 @@
 var NodeDrawingCommand = require('./NodeDrawingCommand');
 var Commands = require('./Commands');
+var DecorationDrawing = require('./DecorationDrawing');
 
-var ObjectDrawing = function ($group)
+var ObjectDrawing = Object.create(DecorationDrawing);
+ObjectDrawing.create = function ($group)
 {
-	this.group = $group;
-	this.commands = [];
-	this.commandsLength = 0;
-	this.properties = undefined;
+	var inst = Object.create(ObjectDrawing);
+	inst.group = $group;
+	inst.commands = [];
+	inst.commandsLength = 0;
+	inst.properties = undefined;
+	return inst;
 };
 
-ObjectDrawing.prototype.setProperties = function ($properties)
+ObjectDrawing.setProperties = function ($properties)
 {
 	this.properties = $properties;
 	this.useDynamicGradient = this.group.conf.structure === 'line' && this.properties.strokeGradient;
 };
 
-ObjectDrawing.prototype.setCommands = function ()
+ObjectDrawing.setCommands = function ()
 {
 	for (var i = 0, length = this.group.structure.nodeProperties.length; i < length; i += 1)
 	{
@@ -24,7 +28,7 @@ ObjectDrawing.prototype.setCommands = function ()
 	}
 };
 
-ObjectDrawing.prototype.addCommand = function ($node, $commandProperties, $envelope)
+ObjectDrawing.addCommand = function ($node, $commandProperties, $envelope)
 {
 	var commandName;
 	var properties = $commandProperties;
@@ -37,7 +41,7 @@ ObjectDrawing.prototype.addCommand = function ($node, $commandProperties, $envel
 	{
 		if (this.group.conf.drawNodesSeparately)
 		{
-			commandName = Commands.ARC;
+			commandName = Commands.CIRCLE;
 			properties = {};
 			properties.options = [];
 			properties.options[0] = this.group.conf.nodeRadius;
@@ -47,7 +51,7 @@ ObjectDrawing.prototype.addCommand = function ($node, $commandProperties, $envel
 			commandName = this.commandsLength === 0 ? Commands.MOVE_TO : Commands.LINE_TO;
 		}
 	}
-	// commandName = Commands.ARC;
+	// commandName = Commands.CIRCLE;
 	// $properties.options[0] = 5;
 	// $properties.options[1] = 5;
 	var command = new NodeDrawingCommand(commandName, $node, properties);
@@ -56,17 +60,17 @@ ObjectDrawing.prototype.addCommand = function ($node, $commandProperties, $envel
 	this.commandsLength += 1;
 };
 
-ObjectDrawing.prototype.getBoundingBox = function ()
+ObjectDrawing.getBoundingBox = function ()
 {
 	return this.group.physicsManager.getBoundingBox();
 };
 
-ObjectDrawing.prototype.isStatic = function ()
+ObjectDrawing.isStatic = function ()
 {
 	return this.group.conf.fixed === true;
 };
 
-ObjectDrawing.prototype.willNotIntersect = function ()
+ObjectDrawing.willNotIntersect = function ()
 {
 	if (this.group.conf.physics.bodyType === 'hard')
 	{
@@ -75,7 +79,7 @@ ObjectDrawing.prototype.willNotIntersect = function ()
 	return false;
 };
 
-ObjectDrawing.prototype.isSimpleDrawing = function ()
+ObjectDrawing.isSimpleDrawing = function ()
 {
 	if (this.group.conf.physics.bodyType === 'hard' || this.group.conf.physics.bodyType === 'soft')
 	{

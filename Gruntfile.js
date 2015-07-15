@@ -73,7 +73,26 @@ module.exports = function(grunt)
 					browserifyOptions:
 					{
 						debug: true,
-						standalone: 'svjellymaker'
+						standalone: 'svjelly.Maker'
+					}
+				}
+			},
+			PixiRenderer:
+			{
+				src: 'src/renderer/pixi/PixiRenderer.js',
+				dest: 'build/pixirenderer.js',
+				options:
+				{
+					watch: true,
+					watchifyOptions:
+					{
+						debug: true,
+						verbose: true
+					},
+					browserifyOptions:
+					{
+						debug: true,
+						standalone: 'svjelly.PixiRenderer'
 					}
 				}
 			},
@@ -104,5 +123,5 @@ module.exports = function(grunt)
 	grunt.loadNpmTasks('grunt-express');
 	grunt.loadNpmTasks('grunt-browserify');
 
-	grunt.registerTask('server', ['express', 'browserify:svjellymaker', 'browserify:P2PhysicsManager', 'browserify:svjelly', 'watch:jshint']);
+	grunt.registerTask('server', ['express', 'browserify:svjellymaker', 'browserify:P2PhysicsManager', 'browserify:svjelly', 'browserify:PixiRenderer', 'watch:jshint']);
 };

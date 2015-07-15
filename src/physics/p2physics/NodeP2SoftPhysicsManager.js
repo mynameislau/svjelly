@@ -3,6 +3,8 @@
 
 var NodeP2SoftPhysicsManager = function ()
 {
+	var self = this;
+	this.addedToWorld = new window.Promise(function (resolve) { self.resolveAddedToWorld = resolve; });
 };
 
 NodeP2SoftPhysicsManager.prototype.addToWorld = function ($p2, $body, $worldHeight)
@@ -10,6 +12,7 @@ NodeP2SoftPhysicsManager.prototype.addToWorld = function ($p2, $body, $worldHeig
 	this.p2 = $p2;
 	this.body = $body;
 	this.worldHeight = $worldHeight;
+	this.resolveAddedToWorld();
 };
 
 NodeP2SoftPhysicsManager.prototype.applyForce = function ($vec)
@@ -26,6 +29,11 @@ NodeP2SoftPhysicsManager.prototype.setFixed = function ($fixed)
 	{
 		this.body.type = this.p2.Body.STATIC;
 	}
+};
+
+NodeP2SoftPhysicsManager.prototype.getAngle = function ()
+{
+	return this.body.interpolatedAngle;
 };
 
 NodeP2SoftPhysicsManager.prototype.getX = function ()

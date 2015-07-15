@@ -111,7 +111,7 @@ Structure.prototype.setNodeDrawingCommands = function ($nodes)
 
 Structure.prototype.createPreciseHexaFillStructure = function ($points)
 {
-	var envelope = this.createNodesFromPoints($points);
+	var envelope = this.createNodesFromPoints($points, true);
 	this.setNodeDrawingCommands(envelope);
 	this.fillNodes = this.createInnerStructure($points);
 

@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Document</title>
+</head>
+<body>
+	<script src="../libs/p2.js"></script>
+	<script>
+		var world = new p2.World({
+			gravity: [0, -10]
+		});
+		var body = new p2.Body({
+			mass: 1,
+			position: [0, 0]
+		});
+		var shape = new p2.Circle(1);
+		body.addShape(shape);
+		world.addBody(body);
+
+		world.step(10);
+
+		console.log(body.position);
+	</script>
+</body>
+</html>

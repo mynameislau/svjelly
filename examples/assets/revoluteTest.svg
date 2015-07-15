@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Generator: Adobe Illustrator 16.0.0, SVG Export Plug-In . SVG Version: 6.00 Build 0)  -->
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+	 width="2000px" height="1320px" viewBox="0 0 2000 1320" enable-background="new 0 0 2000 1320" xml:space="preserve">
+<rect id="static" y="1105.23" fill="#E98100" width="2000" height="214.77"/>
+<circle id="wood-A" fill="#E98100" cx="688.663" cy="525.658" r="34.712"/>
+<g>
+	<circle id="wood-B" fill="#E98100" cx="972.286" cy="513.805" r="40.638"/>
+	<line id="constraint-A-revolute" fill="#E98100" x1="688.663" y1="525.658" x2="972.287" y2="513.805"/>
+</g>
+</svg>

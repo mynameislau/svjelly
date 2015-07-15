@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Generator: Adobe Illustrator 16.0.0, SVG Export Plug-In . SVG Version: 6.00 Build 0)  -->
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+	 width="2000px" height="1320px" viewBox="0 0 2000 1320" enable-background="new 0 0 2000 1320" xml:space="preserve">
+<rect y="-21.002" fill="#594331" stroke="#000000" stroke-miterlimit="10" width="2000" height="1341.002"/>
+<g>
+	<g id="bonhomme">
+		<g id="wood-forearmRight">
+			<rect x="8.977" y="-3.16" transform="matrix(-0.9162 -0.4007 0.4007 -0.9162 22.4106 -0.42)" width="4.368" height="1.213"/>
+			
+				<rect id="constraint-armRight-ragdollConstraint" x="12.679" y="-2.104" transform="matrix(-0.7444 -0.6677 0.6677 -0.7444 24.0085 5.8844)" fill="#D40F00" width="0.903" height="0.903"/>
+		</g>
+		<g id="wood-forearmLeft">
+			<rect x="21.494" y="5.448" transform="matrix(-0.6855 -0.7281 0.7281 -0.6855 35.5006 27.4447)" width="4.367" height="1.214"/>
+			
+				<rect id="constraint-armLeft-ragdollConstraint" x="21.909" y="4.131" transform="matrix(-0.8254 -0.5646 0.5646 -0.8254 38.0378 20.6291)" fill="#D40F00" width="0.601" height="0.602"/>
+		</g>
+		<g id="wood-thighRight">
+			
+				<rect id="constraint-body-ragdollConstraint_1" x="13.897" y="4.981" transform="matrix(-0.8737 -0.4865 0.4865 -0.8737 24.2432 17.161)" fill="#D40F00" width="0.905" height="0.904"/>
+			<rect x="9.668" y="5.708" transform="matrix(0.9081 -0.4187 0.4187 0.9081 -1.5443 5.6146)" width="4.708" height="1.236"/>
+		</g>
+		<g id="wood-thighLeft">
+			<rect x="16.614" y="6.446" transform="matrix(-0.9793 0.2023 -0.2023 -0.9793 35.9634 14.2945)" width="1.274" height="5.078"/>
+			
+				<rect id="constraint-body-ragdollConstraint_2" x="16.428" y="5.881" transform="matrix(-0.8739 -0.4861 0.4861 -0.8739 28.5525 20.0737)" fill="#D40F00" width="0.904" height="0.904"/>
+		</g>
+		<g id="wood-legRight">
+			
+				<rect id="constraint-thighRight-ragdollConstraint" x="9.329" y="6.851" transform="matrix(-0.9577 -0.2879 0.2879 -0.9577 17.0458 17.1132)" fill="#D40F00" width="0.904" height="0.904"/>
+			
+				<rect id="constraint-skateBody" x="5.729" y="10.019" transform="matrix(0.8734 0.487 -0.487 0.8734 6.0517 -1.9963)" opacity="0.2" fill="#594331" enable-background="new    " width="2.273" height="1.247"/>
+			<rect x="6.33" y="8.163" transform="matrix(-0.7073 0.7069 -0.7069 -0.7073 20.7204 8.972)" width="4.346" height="1.225"/>
+		</g>
+		<g id="wood-legLeft">
+			
+				<rect id="constraint-thighLeft-ragdollConstraint" x="17.254" y="11.033" transform="matrix(-0.8732 -0.4873 0.4873 -0.8732 27.5702 30.1424)" fill="#D40F00" width="0.905" height="0.903"/>
+			
+				<rect id="constraint-skateBody_1_" x="15.221" y="14.985" transform="matrix(0.8736 0.4866 -0.4866 0.8736 9.6697 -6.0977)" opacity="0.2" fill="#594300" enable-background="new    " width="2.707" height="1.165"/>
+			<rect x="16.642" y="11.22" transform="matrix(-0.974 -0.2265 0.2265 -0.974 30.9936 30.4856)" width="1.209" height="4.489"/>
+		</g>
+		<g id="wood-head">
+			<circle fill="#FFFFFF" stroke="#000000" stroke-width="0.0212" stroke-miterlimit="10" cx="20.653" cy="-3.637" r="2.535"/>
+			
+				<rect id="constraint-body-ragdollConstraint_3" x="18.554" y="-1.127" transform="matrix(-0.8736 -0.4867 0.4867 -0.8736 35.9388 7.9857)" fill="#D40F00" width="0.905" height="0.904"/>
+			<g id="decoration">
+				<circle cx="19.247" cy="-4.444" r="0.31"/>
+				<circle cx="22.105" cy="-2.652" r="0.232"/>
+			</g>
+		</g>
+		<g id="wood-armRight">
+			<rect x="13.064" y="-1.942" transform="matrix(-0.9822 -0.1878 0.1878 -0.9822 30.4731 0.2165)" width="4.366" height="1.213"/>
+			
+				<rect id="constraint-body-ragdollConstraint_4" x="16.812" y="-1.565" transform="matrix(-0.873 -0.4878 0.4878 -0.873 32.8775 6.3366)" fill="#D40F00" width="0.904" height="0.904"/>
+		</g>
+		<g id="wood-armLeft">
+			<rect x="19.1" y="1.958" transform="matrix(-0.449 -0.8935 0.8935 -0.449 28.5472 22.7336)" width="4.366" height="1.213"/>
+			
+				<rect id="constraint-body-ragdollConstraint_5" x="20.049" y="0.24" transform="matrix(-0.8733 -0.4871 0.4871 -0.8733 38.0702 11.2789)" fill="#D40F00" width="0.905" height="0.901"/>
+		</g>
+		<g>
+			
+				<rect id="wood-body" x="15.34" y="-1.109" transform="matrix(0.8738 0.4864 -0.4864 0.8738 3.5448 -8.0143)" stroke="#FF3316" stroke-width="0.1295" stroke-miterlimit="10" width="3.741" height="7.861"/>
+			<g id="decoration_1_">
+				<polygon fill="#FFFFFF" stroke="#000000" stroke-width="0.0189" stroke-miterlimit="10" points="18.307,-1.318 20.201,-0.263 
+					17.179,2.499 17.981,-1.253 				"/>
+				<polygon points="18.704,-0.828 19.18,-1.094 19.467,-0.994 19.403,-0.461 19.078,-0.292 19.088,0.104 17.04,3.403 16.477,2.937 
+					18.339,-0.25 18.729,-0.444 				"/>
+				<polygon fill="#FFFFFF" stroke="#000000" stroke-width="0.0189" stroke-miterlimit="10" points="18.1,-1.335 18.781,-1.779 
+					19.356,-1.235 20.168,-1.007 20.058,-0.187 19.239,-0.53 19.244,-1.034 18.79,-0.76 				"/>
+				<polygon stroke="#FFFFFF" stroke-width="0.0189" stroke-miterlimit="10" points="18.346,-1.471 17.505,-1.52 17.604,-0.219 
+					17.259,-0.718 16.318,4.044 19.886,0.865 19.217,0.827 20.534,0.17 20.136,-0.442 17.443,2.023 				"/>
+				
+					<line fill="none" stroke="#FFFFFF" stroke-width="0.0189" stroke-miterlimit="10" x1="17.507" y1="1.907" x2="15.184" y2="6.191"/>
+			</g>
+		</g>
+		
+			<line fill="none" stroke="#000000" stroke-width="0.0189" stroke-miterlimit="10" x1="19.244" y1="-1.034" x2="19.356" y2="-1.235"/>
+	</g>
+	<g>
+		
+			<rect id="wood-skateBody" x="2.139" y="12.96" transform="matrix(0.8736 0.4867 -0.4867 0.8736 8.0204 -3.8101)" width="18.41" height="1.144"/>
+		<g id="metal-wheelRear">
+			<circle fill="#FF9316" cx="3.272" cy="12.302" r="1.035"/>
+		</g>
+		<g id="metal">
+			
+				<rect x="16.285" y="18.226" transform="matrix(0.8736 0.4866 -0.4866 0.8736 11.3045 -5.6639)" fill="#D13000" width="0.545" height="1.416"/>
+			
+				<rect id="constraint-wheelFront-axis" x="16.146" y="19.485" transform="matrix(0.8747 0.4847 -0.4847 0.8747 11.5062 -5.4074)" fill="#594331" width="0.129" height="0.127"/>
+			<line id="constraint-skateBody-shockAbsorber_1_" fill="none" x1="16.788" y1="18.498" x2="17.51" y2="17.159"/>
+		</g>
+		<g id="metal-wheelFront">
+			<circle fill="#FF9316" cx="16.211" cy="19.552" r="1.035"/>
+		</g>
+		<g id="metal_1_">
+			
+				<rect x="3.342" y="10.974" transform="matrix(0.8733 0.4872 -0.4872 0.8733 6.1499 -0.2809)" fill="#D13000" width="0.545" height="1.415"/>
+			
+				<rect id="constraint-wheelRear-axis" x="3.153" y="12.184" transform="matrix(0.8729 0.4879 -0.4879 0.8729 6.4177 -0.0328)" fill="#594331" width="0.237" height="0.235"/>
+			<line id="constraint-skateBody-shockAbsorber" fill="none" x1="3.81" y1="11.273" x2="4.49" y2="10.04"/>
+		</g>
+	</g>
+</g>
+<g id="static">
+	<polygon fill="#48F100" points="0,17.828 67.204,54.645 89.833,51.499 74.833,64.499 0,55.5 	"/>
+	<polygon fill="#48F100" points="378.085,306.292 183.188,188.641 196.357,158.019 263.833,211.834 297.833,235.167 
+		325.167,253.167 346.5,258.501 366.5,254.501 373.833,248.501 379.833,239.927 	"/>
+	<rect x="407.167" y="280.501" fill="#48F100" width="105.333" height="51.333"/>
+</g>
+<g>
+	<rect id="wood" x="89.833" y="135.271" fill="#48F100" width="109" height="2.152"/>
+	<line id="constraint-world-wire" fill="none" x1="89.833" y1="135.271" x2="144.333" y2="13.659"/>
+	<line id="constraint-world-wire_1_" fill="none" x1="198.833" y1="135.271" x2="144.333" y2="13.659"/>
+</g>
+</svg>

@@ -8,9 +8,9 @@ var GroupP2HardPhysicsManager = require('./GroupP2HardPhysicsManager');
 var GroupGhostPhysicsManager = require('./GroupGhostPhysicsManager');
 var AnchorP2GhostPhysicsManager = require('./AnchorP2GhostPhysicsManager');
 
-var P2PhysicsManager = function ($conf)
+var P2PhysicsManager = function ($conf, $p2World)
 {
-	this.p2World = new p2.World($conf);
+	this.p2World = $p2World || new p2.World($conf);
 	this.p2 = p2;
 	this.conf = $conf;
 	this.worldWidth = undefined;
@@ -28,7 +28,7 @@ P2PhysicsManager.prototype.step = function ($time)
 {
 	this.newTime = $time - this.lastTime || 0;
 	this.lastTime = $time;
-	this.p2World.step(1 / 60, this.newTime, 5);
+	this.p2World.step(1 / 60, this.newTime / 1000, 5);
 };
 
 P2PhysicsManager.prototype.constrainGroups = function ($anchorA, $anchorB, $type)
