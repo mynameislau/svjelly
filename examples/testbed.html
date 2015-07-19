@@ -13,7 +13,7 @@
 		{
 			var container = document.getElementById('container');
 			container.width = document.body.clientWidth;
-			var maker = window.svjellymaker.createFromURL(container, '../examples/assets/testbed.svg', window.innerWidth, window.innerHeight, 'min');
+			var maker = window.svjelly.Maker.createFromURL(container, '../examples/assets/constraintTest.svg', window.innerWidth, window.innerHeight, 'min');
 
 			maker.initiated.then(function ()
 			{
@@ -39,7 +39,7 @@
 						for (var i = 0, length = bodiesLength; i < length; i += 1)
 						{
 							var curr = p2World.bodies[i];
-							curr.applyForce([Math.sin(coeff) * windForce, 0], curr.position);
+							//curr.applyForce([Math.sin(coeff) * windForce, 0], curr.position);
 						}
 					});
 					maker.updateCallback = function ($time)

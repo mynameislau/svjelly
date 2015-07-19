@@ -12,45 +12,41 @@
 		var loadEventHandler = function ()
 		{
 			var container = document.getElementById('container');
-			var maker = window.svjelly.Maker.createFromConfig(container, '../examples/assets/calanques.json', window.innerWidth, window.innerHeight, 'max');
+			container.width = document.body.clientWidth;
+			var maker = window.svjelly.Maker.createFromConfig(container, '../examples/assets/shockAbsorberTest.json', window.innerWidth, window.innerHeight, 'min');
+
 			maker.initiated.then(function ()
 			{
 				container.style.width = maker.renderer.width + 'px';
 				container.style.height = maker.renderer.height + 'px';
 
+				var decal = [maker.physicsManager.worldWidth * 0.5, maker.physicsManager.worldHeight * 0.5];
 				var world = maker.svjellyWorld;
+				// var p2 = world.physicsManager.p2;
 				var p2World = world.physicsManager.p2World;
-				var movableGroups = [];
-				for (var i = 0, length = world.groups.length; i < length; i += 1)
-				{
-					var currGroup = world.groups[i];
-					if (currGroup.physicsManager.applyForce)
-					{
-						movableGroups.push(currGroup);
-					}
-				}
-				var movableLength = movableGroups.length;
-				console.log(movableLength);
 
 				//WIND
 				var windForce = world.conf.wind;
 				if (windForce)
 				{
+					var bodiesLength = p2World.bodies.length;
 					var coeff = 0;
 					var lastTime;
 					var twoPIs = Math.PI * 2;
 					var windInterval = 4000;
 					p2World.on('postStep', function ()
 					{
-						for (i = 0; i < movableLength; i += 1)
+						for (var i = 0, length = bodiesLength; i < length; i += 1)
 						{
-							var curr = movableGroups[i].physicsManager;
-							var windResistance = Number(curr.conf.windResistance !== undefined ? curr.conf.windResistance : 1);
-							curr.applyForce([Math.sin(coeff) * windForce * windResistance, 0]);
+							var curr = p2World.bodies[i];
+							curr.applyForce([Math.sin(coeff) * windForce, 0], curr.position);
 						}
 					});
 					maker.updateCallback = function ($time)
 					{
+						decal[0] += 0.01;
+						decal[1] += 0.01;
+						//maker.renderer.setViewCenter(decal, 1);
 						if (!lastTime || coeff > Math.PI * 2)
 						{
 							lastTime = $time;
@@ -58,6 +54,7 @@
 							coeff = 0;
 						}
 						coeff = ($time - lastTime) / windInterval * twoPIs;
+						//console.log(Math.sin(coeff));
 					};
 				}
 

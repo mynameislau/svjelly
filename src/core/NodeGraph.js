@@ -94,7 +94,7 @@ NodeGraph.prototype.traverse = function ($startingVertices)
 			var currEdge = vertexEdges[i];
 			var otherVertex = currEdge.vertexA === closedVertex ? currEdge.vertexB : currEdge.vertexA;
 			if (otherVertex.closed) { continue; }
-			
+
 			if (!otherVertex.opened)
 			{
 				otherVertex.opened = true;

@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Generator: Adobe Illustrator 16.0.0, SVG Export Plug-In . SVG Version: 6.00 Build 0)  -->
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+	 width="1000px" height="1000px" viewBox="0 0 1000 1000" enable-background="new 0 0 1000 1000" xml:space="preserve">
+<rect fill="#FFFFFF" stroke="#000000" stroke-miterlimit="10" width="1000" height="1000"/>
+<rect id="static-ground" x="53.315" y="395.541" fill="#FFFFFF" stroke="#000000" stroke-width="3" stroke-miterlimit="10" width="648.685" height="105.264"/>
+<rect id="wood_1_" x="53.315" y="51.973" fill="#FFFFFF" stroke="#000000" stroke-width="3" stroke-miterlimit="10" width="169.736" height="146.053"/>
+<g id="wood_2_">
+	<rect x="150.421" y="625" fill="#FFFFFF" stroke="#000000" stroke-width="3" stroke-miterlimit="10" width="73.685" height="125"/>
+	
+		<line id="constraint-ground-shockAbsorber_1_" fill="#FFFFFF" stroke="#000000" stroke-width="3" stroke-miterlimit="10" x1="187.263" y1="625.402" x2="187.263" y2="500"/>
+</g>
+<g id="wood_4_">
+	<rect x="307.894" y="750" fill="#FFFFFF" stroke="#000000" stroke-width="3" stroke-miterlimit="10" width="73.686" height="125"/>
+	
+		<line id="constraint-ground-shockAbsorber_3_" fill="#FFFFFF" stroke="#000000" stroke-width="3" stroke-miterlimit="10" x1="344.737" y1="750" x2="344.737" y2="500.805"/>
+</g>
+<g>
+	<rect x="560.869" fill="none" stroke="#A92100" stroke-width="3" stroke-miterlimit="10" width="172.131" height="500"/>
+	<rect x="560.869" y="500" fill="none" stroke="#A92100" stroke-width="3" stroke-miterlimit="10" width="172.131" height="500"/>
+	<line fill="none" stroke="#A92100" stroke-width="3" stroke-miterlimit="10" x1="560.869" y1="250" x2="654.664" y2="250"/>
+	<line fill="none" stroke="#A92100" stroke-width="3" stroke-miterlimit="10" x1="560.869" y1="750" x2="654.664" y2="750"/>
+	<g>
+		<line fill="none" stroke="#A92100" stroke-width="3" stroke-miterlimit="10" x1="560.869" y1="125" x2="616.959" y2="125"/>
+		<line fill="none" stroke="#A92100" stroke-width="3" stroke-miterlimit="10" x1="560.869" y1="625" x2="616.959" y2="625"/>
+	</g>
+	<g>
+		<line fill="none" stroke="#A92100" stroke-width="3" stroke-miterlimit="10" x1="560.869" y1="375" x2="616.959" y2="375"/>
+		<line fill="none" stroke="#A92100" stroke-width="3" stroke-miterlimit="10" x1="560.869" y1="875" x2="616.959" y2="875"/>
+	</g>
+</g>
+<line fill="none" stroke="#000000" stroke-width="3" stroke-miterlimit="10" x1="797.74" y1="500" x2="797.74" y2="1000"/>
+<line fill="none" stroke="#000000" stroke-width="3" stroke-miterlimit="10" x1="797.74" y1="719.079" x2="821.739" y2="719.079"/>
+<line fill="none" stroke="#000000" stroke-width="3" stroke-miterlimit="10" x1="797.74" y1="500" x2="763.242" y2="500"/>
+<line fill="none" stroke="#000000" stroke-width="3" stroke-miterlimit="10" x1="797.74" y1="992.065" x2="763.242" y2="992.065"/>
+<g id="metre">
+	<path d="M834.909,695.773h-0.198l-11.272,6.084l-1.699-6.686l14.168-7.581h7.482v64.846h-8.48V695.773z"/>
+	<path d="M926.784,722.905c-0.499-9.376-1.098-20.647-0.998-29.028h-0.301c-2.293,7.881-5.086,16.259-8.48,25.539l-11.87,32.621
+		h-6.583l-10.876-32.023c-3.192-9.479-5.886-18.156-7.779-26.137h-0.202c-0.197,8.381-0.697,19.652-1.295,29.729l-1.798,28.831
+		h-8.278l4.689-67.238h11.07l11.475,32.522c2.793,8.277,5.09,15.66,6.785,22.644h0.297c1.699-6.781,4.092-14.164,7.086-22.644
+		l11.969-32.522h11.074l4.191,67.238h-8.48L926.784,722.905z"/>
+</g>
+<line fill="none" stroke="#FF0000" stroke-width="3" stroke-miterlimit="10" x1="150.421" y1="625" x2="53.315" y2="625"/>
+<line fill="none" stroke="#FF0000" stroke-width="3" stroke-miterlimit="10" x1="307.894" y1="750" x2="224.105" y2="750"/>
+<g id="wood_3_">
+	<rect x="471.29" y="875" fill="#FFFFFF" stroke="#000000" stroke-width="3" stroke-miterlimit="10" width="73.686" height="125"/>
+	
+		<line id="constraint-ground-shockAbsorber_2_" fill="#FFFFFF" stroke="#000000" stroke-width="3" stroke-miterlimit="10" x1="508.133" y1="875" x2="508.133" y2="500.805"/>
+</g>
+<line fill="none" stroke="#FF0000" stroke-width="3" stroke-miterlimit="10" x1="471.29" y1="875" x2="387.501" y2="875"/>
+</svg>

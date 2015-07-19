@@ -10,19 +10,19 @@
 	"constraints":
 	{
 		"ragdollConstraint":
-		{
-			"revoluteConstraint":
+		[
 			{
+				"type": "revoluteConstraint",
 				"stiffness": 1000,
 				"relaxation": 1,
 				"collideConnected": false
 			},
-			"lockConstraint":
 			{
+				"type": "lockConstraint",
 				"stiffness": 40,
 				"relaxation": 2,
 				"collideConnected": false
 			}
-		}
+		]
 	}
 }

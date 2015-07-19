@@ -167,7 +167,6 @@ var SVJellyRenderer =//function ($world, $canvas)
 
 	setScale: function ()
 	{
-		console.log('setscale');
 		var previousStatic;
 		for (var i = 0; i < this.staticGroupsLength; i += 1)
 		{
@@ -336,7 +335,7 @@ var SVJellyRenderer =//function ($world, $canvas)
 			this.drawObject(currObjectDrawing, drawingGroup, context, force);
 		}
 
-		if (drawingGroup.properties.closePath) { context.closePath(); }
+		// if (drawingGroup.properties.closePath) { context.closePath(); }
 		if (drawingGroup.properties.fill !== 'none') { context.fill(); }
 		if (drawingGroup.properties.stroke !== 'none') { context.stroke(); }
 		if (drawingGroup.properties.opacity !== 1) { context.globalAlpha = 1; }
@@ -415,6 +414,10 @@ var SVJellyRenderer =//function ($world, $canvas)
 					context.ellipse(point[0], point[1], currCommand.radius, currCommand.radiusB, currCommand.getRotation(), 0, twoPIS);
 				}
 			}
+		}
+		if (objectDrawing.properties.closePath)
+		{
+			context.lineTo(objectDrawing.commands[0].getX(), objectDrawing.commands[0].getY());
 		}
 	},
 

@@ -85,7 +85,7 @@ GroupP2SoftPhysicsManager.prototype.addNodesToWorld = function ()
 		body.collisionResponse = !this.conf.noCollide;
 
 		body.angularDamping = this.conf.angularDamping || body.angularDamping;
-		body.damping = this.conf.damping || body.damping;
+		body.damping = this.conf.damping !== undefined && this.conf.damping !== null ? Number(this.conf.damping) : body.damping;
 
 		body.gravityScale = this.conf.gravityScale !== undefined ? this.conf.gravityScale : 1;
 	}
@@ -213,12 +213,11 @@ GroupP2SoftPhysicsManager.prototype.setNodesMassFromJoints = function ()
 	{
 		var vertex = nodeGraph.vertices[i];
 		var decay = Number(this.group.conf.physics.structuralMassDecay);
-		var value = Math.pow(decay, vertex.mapValue / 5);//Math.pow(2, vertex.mapValue / 7.33);
+		var value = Math.pow(decay, vertex.mapValue / 2);//Math.pow(2, vertex.mapValue / 7.33);
 		var body = vertex.node.physicsManager.body;
 		if (!vertex.node.fixed)
 		{
 			//body.mass = this.conf.mass / this.group.nodes.length / value * body.getArea();
-			//vertex.node.debugText = body.mass;
 			//body.updateMassProperties();
 			var massVariance = this.conf.massVariance || 0;
 			var random = -massVariance + Math.random() * massVariance * 2;
@@ -228,6 +227,8 @@ GroupP2SoftPhysicsManager.prototype.setNodesMassFromJoints = function ()
 			body.invMass = 1 / body.mass;
 			body.inertia = body.mass / 2;
 			body.invInertia = 1 / body.inertia;
+			vertex.node.debugText = Math.round(body.mass * 100) / 100;
+			//vertex.node.debugText = Math.round(vertex.mapValue * 100) / 100;
 		}
 	}
 };

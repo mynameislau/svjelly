@@ -1,0 +1,22 @@
+{
+	"source": "assets/shockAbsorberTest.svg",
+	"debug": false,
+	"wind": 0,
+	"worldWidth": 4,
+	"groups":
+	{
+		
+	},
+	"constraints":
+	{
+		"shockAbsorber":
+		[
+			{
+				"type": "prismaticConstraint",
+				"stiffness": 1000000000000,
+				"relaxation": 3,
+				"canRotate": false
+			}
+		]
+	}
+}

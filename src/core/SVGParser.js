@@ -6,7 +6,8 @@ var MOVE_TO = Commands.MOVE_TO;
 var BEZIER_TO = Commands.BEZIER_TO;
 var QUADRA_TO = Commands.QUADRA_TO;
 var ELLIPSE = Commands.ELLIPSE;
-var onlyDrawingElements = ':not(g):not(title):not([id*="joint"]):not([id*="constraint"]):not(title):not(linearGradient):not(radialGradient):not(stop)';
+var supportedElements = ['line', 'rect', 'polygon', 'polyline', 'path', 'circle', 'ellipse'];
+var onlyDrawingElements = ':not([id*="joint"]):not([id*="constraint"])';
 
 var SVGParser = function () {};
 //var isPolygon = /polygon|rect/ig;
@@ -24,12 +25,18 @@ SVGParser.prototype.parse = function ($world, $SVG)
 	this.world.setHeight(this.viewBoxHeight * this.ratio);
 
 	//temp
-	this.elementsQuery = 'g:not([id*="decoration"])>' + onlyDrawingElements + ',' + 'svg>' + onlyDrawingElements;
+	var i = 0;
+	var supportedLength = supportedElements.length;
+	this.elementsQuery = '';
+	for (i = 0; i < supportedLength; i += 1)
+	{
+		var supported = supportedElements[i];
+		this.elementsQuery += 'g:not([id*="decoration"])>' + supported + onlyDrawingElements + ',' + 'svg>' + supported + onlyDrawingElements;
+		if (i < supportedLength - 1) { this.elementsQuery += ','; }
+	}
 	// this.elementsQuery = '*:not(defs):not(g):not(title):not(linearGradient):not(radialGradient):not(stop):not([id*="joint"]):not([id*="constraint"])';
 	var elemRaws = this.SVG.querySelectorAll(this.elementsQuery);
 
-	var i = 0;
-	var rawGroupPairings = [];
 	var elemsLength = elemRaws.length;
 
 	for (i = 0; i < elemsLength; i += 1)
@@ -41,6 +48,7 @@ SVGParser.prototype.parse = function ($world, $SVG)
 		currGroup.rawSVGElement = rawElement;
 
 		var drawingCommands = this.parseElement(rawElement);
+		//console.log(drawingCommands);
 		currGroup.structure.create(drawingCommands);
 		var objectDrawing = ObjectDrawing.create(currGroup);
 		objectDrawing.setCommands();
@@ -49,7 +57,6 @@ SVGParser.prototype.parse = function ($world, $SVG)
 		this.setGraphicInstructions(objectDrawing, rawElement, drawingCommands);
 
 		this.parseDecoration(currGroup, rawElement);
-		rawGroupPairings.push({ group: currGroup, raw: rawElement.parentNode });
 	}
 
 	this.parseConstraints();
@@ -236,11 +243,12 @@ SVGParser.prototype.setGraphicInstructions = function ($drawing, $raw, $drawingC
 	// 	$group.nodes.splice(i, 0, currNode);
 	// }
 
-	var rawFill = $raw.getAttribute('fill');
-	var rawStroke = $raw.getAttribute('stroke');
-	var rawLinecap = $raw.getAttribute('stroke-linecap');
-	var rawLinejoin = $raw.getAttribute('stroke-linejoin');
-	var rawOpacity = $raw.getAttribute('opacity');
+	var rawFill = this.getStyle('fill', $raw);
+	//console.log(rawFill);
+	var rawStroke = this.getStyle('stroke', $raw);
+	var rawLinecap = this.getStyle('stroke-linecap', $raw);
+	var rawLinejoin = this.getStyle('stroke-linejoin', $raw);
+	var rawOpacity = this.getStyle('opacity', $raw);
 
 	props.fill = rawFill || '#000000';
 	props.lineWidth = this.getThickness($raw);//rawStrokeWidth * this.ratio || 0;
@@ -258,6 +266,17 @@ SVGParser.prototype.setGraphicInstructions = function ($drawing, $raw, $drawingC
 	props.fillGradient = this.getGradient(props.fill);
 
 	$drawing.setProperties(props);
+};
+
+SVGParser.prototype.getStyle = function ($name, $raw)
+{
+	if ($raw.getAttribute($name)) { return $raw.getAttribute($name); }
+	var regexResult = new RegExp($name + ':(.+?)(;|$)', 'g').exec($raw.getAttribute('style'));
+	if (regexResult)
+	{
+		return regexResult[1];
+	}
+	return null;
 };
 
 SVGParser.prototype.getGradient = function ($value)
@@ -375,17 +394,19 @@ SVGParser.prototype.parseRect = function ($rawRect)
 		[x2, y1]
 	];
 
-	var m = this.getMatrix($rawRect.getAttribute('transform'));
-	if (m)
-	{
-		points =
-		[
-			this.multiplyPointByMatrix(points[0], m),
-			this.multiplyPointByMatrix(points[1], m),
-			this.multiplyPointByMatrix(points[2], m),
-			this.multiplyPointByMatrix(points[3], m)
-		];
-	}
+	this.applyMatrices(points, $rawRect);
+
+	// var m = this.getMatrix($rawRect.getAttribute('transform'));
+	// if (m)
+	// {
+	// 	points =
+	// 	[
+	// 		this.applyMatrices(points[0], m),
+	// 		this.applyMatrices(points[1], m),
+	// 		this.applyMatrices(points[2], m),
+	// 		this.applyMatrices(points[3], m)
+	// 	];
+	// }
 
 	var pointCommands = [];
 	pointCommands.push({ name: MOVE_TO, point: points[0], options: [] });
@@ -401,25 +422,29 @@ SVGParser.prototype.parsePoly = function ($rawPoly)
 	var regex = /([\-.\d]+)[, ]([\-.\d]+)/ig;
 	var result = regex.exec($rawPoly.getAttribute('points'));
 	var pointCommands = [];
+	var points = [];
 
 	while (result)
 	{
 		var name = pointCommands.length === 0 ? MOVE_TO : LINE_TO;
 		var point = [this.getCoord(result[1]), this.getCoord(result[2])];
 		pointCommands.push({ name: name, point: point, options: [] });
+		points.push(point);
 		result = regex.exec($rawPoly.getAttribute('points'));
 	}
+	this.applyMatrices(points, $rawPoly);
 	return { type: $rawPoly.tagName, pointCommands: pointCommands, closePath: $rawPoly.tagName !== 'polyline', thickness: this.getThickness($rawPoly) };
 };
 
 SVGParser.prototype.parsePath = function ($rawPath)
 {
 	var d = $rawPath.getAttribute('d');
-	var pathReg = /([a-y])([.\-,\d]+)/igm;
+	var pathReg = /([a-y]) ?([.\- ,\d]+)/igm;
 	var result;
 	var closePath = /z/igm.test(d);
 	var coordsRegex = /-?[\d.]+/igm;
 	var pointCommands = [];
+	var points = [];
 	var lastX = this.getCoord(0);
 	var lastY = this.getCoord(0);
 
@@ -453,6 +478,7 @@ SVGParser.prototype.parsePath = function ($rawPath)
 	var createPoint = function ($commandName, $point, $options)
 	{
 		var info = { name: $commandName, point: $point, options: $options || [] };
+		points.push($point);
 		lastX = info.point[0];
 		lastY = info.point[1];
 		pointCommands.push(info);
@@ -469,7 +495,8 @@ SVGParser.prototype.parsePath = function ($rawPath)
 	{
 		var instruction = result[1].toLowerCase();
 		var coords = result[2].match(coordsRegex);
-		var isLowserCase = /[a-z]/.test(result[1]);
+		var isLowerCase = /[a-z]/.test(result[1]);
+		var currCoords;
 
 		switch (instruction)
 		{
@@ -477,65 +504,116 @@ SVGParser.prototype.parsePath = function ($rawPath)
 			case 'm':
 				quadra1 = null;
 				cubic2 = null;
-				point = getPoint(coords[0], coords[1], isLowserCase);
+				point = getPoint(coords[0], coords[1], isLowerCase);
 				createPoint(MOVE_TO, point);
+				coords.splice(0, 2);
+				currCoords = coords.splice(0, 2);
+				while (currCoords.length > 0)
+				{
+					point = getPoint(currCoords[0], currCoords[1], isLowerCase);
+					createPoint(LINE_TO, point);
+					currCoords = coords.splice(0, 2);
+				}
 				break;
 			case 'l':
 				quadra1 = null;
 				cubic2 = null;
-				point = getPoint(coords[0], coords[1], isLowserCase);
-				createPoint(LINE_TO, point);
+				currCoords = coords.splice(0, 2);
+				while (currCoords.length > 0)
+				{
+					point = getPoint(currCoords[0], currCoords[1], isLowerCase);
+					createPoint(LINE_TO, point);
+					currCoords = coords.splice(0, 2);
+				}
 				break;
 			case 'v':
 				quadra1 = null;
 				cubic2 = null;
-				point = getPoint(undefined, coords[0], isLowserCase);
-				createPoint(LINE_TO, point);
+				currCoords = coords.splice(0, 1);
+				while (currCoords.length > 0)
+				{
+					point = getPoint(undefined, currCoords[0], isLowerCase);
+					createPoint(LINE_TO, point);
+					currCoords = coords.splice(0, 1);
+				}
 				break;
 			case 'h':
 				quadra1 = null;
 				cubic2 = null;
-				point = getPoint(coords[0], undefined, isLowserCase);
-				createPoint(LINE_TO, point);
+				currCoords = coords.splice(0, 1);
+				while (currCoords.length > 0)
+				{
+					point = getPoint(currCoords[0], undefined, isLowerCase);
+					createPoint(LINE_TO, point);
+					currCoords = coords.splice(0, 1);
+				}
 				break;
 			case 'c':
 				quadra1 = null;
-				point = getPoint(coords[4], coords[5], isLowserCase);
-				cubic1 = getRelativePoint(point, coords[0], coords[1], isLowserCase);
-				cubic2 = getRelativePoint(point, coords[2], coords[3], isLowserCase);
-				createPoint(BEZIER_TO, point, [cubic1, cubic2]);
+				currCoords = coords.splice(0, 6);
+				while (currCoords.length > 0)
+				{
+					point = getPoint(currCoords[4], currCoords[5], isLowerCase);
+					cubic1 = getRelativePoint(point, currCoords[0], currCoords[1], isLowerCase);
+					cubic2 = getRelativePoint(point, currCoords[2], currCoords[3], isLowerCase);
+					createPoint(BEZIER_TO, point, [cubic1, cubic2]);
+					currCoords = coords.splice(0, 6);
+				}
 				break;
 			case 's':
 				quadra1 = null;
-				point = getPoint(coords[2], coords[3], isLowserCase);
-				cubic1 = cubic2 ? [lastX - cubic2[0] - point[0], lastY - cubic2[1] - point[1]] : undefined;
-				cubic2 = getRelativePoint(point, coords[0], coords[1], isLowserCase);
-				cubic1 = cubic1 || [cubic2[0], cubic2[1]];
-				createPoint(BEZIER_TO, point, [cubic1, cubic2]);
+				currCoords = coords.splice(0, 4);
+				while (currCoords.length > 0)
+				{
+					point = getPoint(coords[2], coords[3], isLowerCase);
+					cubic1 = cubic2 ? [lastX - cubic2[0] - point[0], lastY - cubic2[1] - point[1]] : undefined;
+					cubic2 = getRelativePoint(point, coords[0], coords[1], isLowerCase);
+					cubic1 = cubic1 || [cubic2[0], cubic2[1]];
+					createPoint(BEZIER_TO, point, [cubic1, cubic2]);
+					currCoords = coords.splice(0, 4);
+				}
 				break;
 			case 'q':
 				cubic2 = null;
-				point = getPoint(coords[2], coords[3], isLowserCase);
-				quadra1 = getRelativePoint(point, coords[0], coords[1], isLowserCase);
-				createPoint(QUADRA_TO, point, [quadra1]);
+				currCoords = coords.splice(0, 4);
+				while (currCoords.length > 0)
+				{
+					point = getPoint(coords[2], coords[3], isLowerCase);
+					quadra1 = getRelativePoint(point, coords[0], coords[1], isLowerCase);
+					createPoint(QUADRA_TO, point, [quadra1]);
+					currCoords = coords.splice(0, 4);
+				}
 				break;
 			case 't':
 				cubic2 = null;
-				quadra1 = quadra1 ? quadra1 : point;
-				point = getPoint(coords[0], coords[1], isLowserCase);
-				createPoint(QUADRA_TO, point, [quadra1]);
+				currCoords = coords.splice(0, 2);
+				while (currCoords.length > 0)
+				{
+					quadra1 = quadra1 ? quadra1 : point;
+					point = getPoint(coords[0], coords[1], isLowerCase);
+					createPoint(QUADRA_TO, point, [quadra1]);
+					currCoords = coords.splice(0, 2);
+				}
 				break;
 			case 'a':
 				cubic2 = null;
 				quadra1 = null;
-				point = getPoint(coords[5], coords[6], isLowserCase);
-				createPoint('arcTo', point);
-				console.warn('not supported');
+
+				currCoords = coords.splice(0, 7);
+				while (currCoords.length > 0)
+				{
+					point = getPoint(coords[5], coords[6], isLowerCase);
+					createPoint('arcTo', point);
+					console.warn('not supported');
+					currCoords = coords.splice(0, 7);
+				}
 				break;
 		}
 
 		result = pathReg.exec(d);
 	}
+
+	this.applyMatrices(points, $rawPath);
 
 	return { type: 'path', pointCommands: pointCommands, closePath: closePath, thickness: this.getThickness($rawPath) };
 };
@@ -550,8 +628,29 @@ SVGParser.prototype.round = function ($number)
 
 SVGParser.prototype.getThickness = function ($raw)
 {
-	var rawThickness = $raw.getAttribute('stroke-width') || 1;
-	return this.getCoord(rawThickness);
+	var strokeWidth = this.getStyle('stroke-width', $raw);
+	if (strokeWidth && strokeWidth.indexOf('px') !== -1) { strokeWidth = strokeWidth.slice(0, -2); }
+	var thickness = strokeWidth || 1;
+	return this.getCoord(thickness);
+};
+
+SVGParser.prototype.applyMatrices = function ($points, $raw)
+{
+	var currentGroup = $raw;
+	while (currentGroup)
+	{
+		var matrix = currentGroup.getAttribute ? this.getMatrix(currentGroup.getAttribute('transform')) : null;
+		if (matrix)
+		{
+			for (var i = 0, length = $points.length; i < length; i += 1)
+			{
+				var point = this.multiplyPointByMatrix($points[i], matrix);
+				$points[i][0] = point[0];
+				$points[i][1] = point[1];
+			}
+		}
+		currentGroup = currentGroup.parentNode;
+	}
 };
 
 SVGParser.prototype.getMatrix = function ($attribute)

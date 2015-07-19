@@ -3,8 +3,8 @@ module.exports = {
 	definition: 1,
 	worldWidth: 20,
 	multiCanvas: true,
-	wind: 3,
-	debug: false,
+	wind: 0,
+	debug: true,
 	gravity: [0, -9.8],
 	groups:
 	{
@@ -14,7 +14,7 @@ module.exports = {
 		{
 			physics:
 			{
-				mass: 100,
+				mass: 1,
 				bodyType: 'hard'
 			}
 		},
@@ -22,7 +22,7 @@ module.exports = {
 		{
 			physics:
 			{
-				mass: 10,
+				mass: 5,
 				bodyType: 'hard'
 			}
 		},
@@ -38,8 +38,8 @@ module.exports = {
 		{
 			physics:
 			{
-				mass: 1,
-				gravityScale: -15,
+				mass: 0.5,
+				gravityScale: 1,
 				bodyType: 'hard'
 			}
 		},
@@ -52,14 +52,13 @@ module.exports = {
 				joints:
 				{
 					default:
-					{
-						distanceConstraint: null,
-						lockConstraint:
+					[
 						{
+							type: 'lockConstraint',
 							stiffness: 10000,
 							relaxation: 0.9
 						}
-					}
+					]
 				},
 				mass: 1,
 				damping: 0.8,
@@ -76,14 +75,13 @@ module.exports = {
 				joints:
 				{
 					default:
-					{
-						distanceConstraint: null,
-						lockConstraint:
+					[
 						{
+							type: 'lockConstraint',
 							stiffness: 1000,
 							relaxation: 1
 						}
-					}
+					]
 				},
 				mass: 1,
 				structuralMassDecay: 3,
@@ -97,13 +95,13 @@ module.exports = {
 			physics:
 			{
 				joints: {
-					default: {
-						distanceConstraint:
+					default: [
 						{
+							type: 'distanceConstraint',
 							stiffness: 100000,
 							relaxation: 1
 						}
-					}
+					]
 				},
 				mass: 0.1,
 				bodyType: 'soft'
@@ -119,13 +117,13 @@ module.exports = {
 				joints:
 				{
 					default:
-					{
-						distanceConstraint:
+					[
 						{
+							type: 'distanceConstraint',
 							stiffness: 10000,
 							relaxation: 30
 						}
-					}
+					]
 				},
 				mass: 0.13,
 				bodyType: 'soft'
@@ -141,13 +139,13 @@ module.exports = {
 				joints:
 				{
 					default:
-					{
-						revoluteConstraint:
+					[
 						{
+							type: 'revoluteConstraint',
 							stiffness: 1000,
 							relaxation: 5
 						}
-					}
+					]
 				},
 				material: 'rubber',
 				mass: 0.13,
@@ -179,15 +177,15 @@ module.exports = {
 				joints:
 				{
 					default:
-					{
-						distanceConstraint:
+					[
 						{
+							type: 'distanceConstraint',
 							stiffness: 1000,
 							relaxation: 1
 						}
-					}
+					]
 				},
-				mass: 1,
+				mass: 0.1,
 				bodyType: 'soft'
 			}
 		},
@@ -213,7 +211,8 @@ module.exports = {
 		{
 			physics:
 			{
-				mass: 0.00013,
+				mass: 1,
+				windResistance: 0,
 				gravityScale: 0,
 				bodyType: 'hard',
 				noCollide: true
@@ -241,63 +240,65 @@ module.exports = {
 	constraints:
 	{
 		default:
-		{
-			lockConstraint:
+		[
 			{
+				type: 'lockConstraint',
 				stiffness: 10000000000000,
-				relaxation: 0,
+				relaxation: 0.1,
 				collideConnected: false
 			}
-		},
+		],
 		axis:
-		{
-			revoluteConstraint:
+		[
 			{
-				stiffness: 10000,
+				type: 'revoluteConstraint',
+				stiffness: 1000000000000,
 				relaxation: 0.1,
 				motor: false,
 				collideConnected: false
 			}
-		},
+		],
 		shockAbsorber:
-		{
-			prismaticConstraint:
+		[
 			{
-				stiffness: 10000,
-				relaxation: 0.1,
-				canRotate: false
+				type: 'prismaticConstraint',
+				stiffness: 100000000000000,
+				relaxation: 1,
+				canRotate: false,
+				upperLimit: 1,
+				lowerLimit: 0
 			},
-			linearSpring:
 			{
-				stiffness: 400,
-				damping: 0.4
+				type: 'linearSpring',
+				stiffness: 1,
+				damping: 0.1
 			}
-		},
+		],
 		wire:
-		{
-			distanceConstraint:
+		[
 			{
-				stiffness: 1000,
-				relaxation: 1
+				type: 'distanceConstraint',
+				stiffness: 10000000000000000000000,
+				relaxation: 0.1
 			}
-		},
+		],
 		spring:
-		{
-			distanceConstraint:
+		[
 			{
+				type: 'distanceConstraint',
 				stiffness: 100000,
-				relaxation: 0
+				relaxation: 0.1
 			}
-		},
+		],
 		continuousMotor:
-		{
-			revoluteConstraint:
+		[
 			{
+				type: 'revoluteConstraint',
 				motor: true,
 				continuousMotor: true,
 				motorPower: 4
 			}
-		}
+		]
 	}
 };
 

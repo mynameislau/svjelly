@@ -32,6 +32,7 @@ P2MouseControls.prototype.addBasicMouseControls = function ($stiffness, $relaxat
 
 		var x = ($contact.clientX - pos.left) / (pos.right - pos.left);
 		var y = ($contact.clientY - pos.top) / (pos.bottom - pos.top);
+		console.log(x, y, renderer.viewWidth, renderer.viewHeight);
 		x = renderer.viewCenter[0] + (x - 0.5) * renderer.viewWidth;
 		y = renderer.viewCenter[1] + (y - 0.5) * renderer.viewHeight;
 
@@ -51,7 +52,7 @@ P2MouseControls.prototype.addBasicMouseControls = function ($stiffness, $relaxat
 				if (body) { break; }
 			}
 		}
-
+		console.log(body);
 		if (body)
 		{
 			var touchBody = new p2.Body();

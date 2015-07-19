@@ -147,7 +147,6 @@ var SVJellyMaker =
 		// this.container.width = canvasWidth;
 		// this.container.height = canvasHeight;
 
-		console.log(this.Renderer === true);
 		this.renderer = this.Renderer ? this.Renderer.create(svjellyWorld, this.container) : SVJellyRenderer.create(svjellyWorld, this.container);
 		this.renderer.setSize(canvasWidth, canvasHeight);
 

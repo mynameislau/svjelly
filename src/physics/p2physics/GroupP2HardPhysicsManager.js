@@ -86,6 +86,11 @@ GroupP2HardPhysicsManager.prototype.createAnchors = function ($points)
 	return toReturn;
 };
 
+GroupP2HardPhysicsManager.prototype.applyForce = function ($vector)
+{
+	this.body.applyForce($vector, this.body.interpolatedPosition);
+};
+
 GroupP2HardPhysicsManager.prototype.addJointsToWorld = function () { return; };
 
 GroupP2HardPhysicsManager.prototype.addNodesToWorld = function ()
@@ -140,8 +145,11 @@ GroupP2HardPhysicsManager.prototype.addNodesToWorld = function ()
 		currShape.material = this.conf.material ? this.materialsList[this.conf.material].material : this.materialsList.default.material;
 	}
 	this.P2World.addBody(this.body);
-	this.body.mass = this.body.getArea() * this.conf.mass;
-	this.body.updateMassProperties();
+	if (this.conf.mass > 0)
+	{
+		this.body.setDensity(this.conf.mass);
+	}
+
 	this.body.collisionResponse = !this.conf.noCollide;
 
 	// if (this.group.ID === 'rearWheel')
