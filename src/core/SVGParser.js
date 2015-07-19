@@ -18,8 +18,10 @@ SVGParser.prototype.parse = function ($world, $SVG)
 {
 	this.SVG = $SVG;
 	var viewBoxAttr = this.SVG.getAttribute('viewBox');
-	this.viewBoxWidth = viewBoxAttr ? Number(viewBoxAttr.split(' ')[2]) : Number(this.SVG.getAttribute('width'));
-	this.viewBoxHeight = viewBoxAttr ? Number(viewBoxAttr.split(' ')[3]) : Number(this.SVG.getAttribute('height'));
+	this.viewBoxWidth = viewBoxAttr ? Number(viewBoxAttr.split(' ')[2]) : Number(/([\d\.-]+)/.exec(this.SVG.getAttribute('width'))[1]);
+	this.viewBoxHeight = viewBoxAttr ? Number(viewBoxAttr.split(' ')[3]) : Number(/([\d\.-]+)/.exec(this.SVG.getAttribute('height'))[1]);
+	if (this.SVG.getAttribute('width').indexOf('mm') > -1) { this.viewBoxWidth *= 3.7795151515; }
+	if (this.SVG.getAttribute('height').indexOf('mm') > -1) { this.viewBoxHeight *= 3.7795151515; }
 	this.ratio = $world.getWidth() / this.viewBoxWidth;
 	this.world = $world;
 	this.world.setHeight(this.viewBoxHeight * this.ratio);

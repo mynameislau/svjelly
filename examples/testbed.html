@@ -13,7 +13,7 @@
 		{
 			var container = document.getElementById('container');
 			container.width = document.body.clientWidth;
-			var maker = window.svjelly.Maker.createFromURL(container, '../examples/assets/constraintTest.svg', window.innerWidth, window.innerHeight, 'min');
+			var maker = window.svjelly.Maker.createFromURL(container, '../examples/assets/max.svg', window.innerWidth, window.innerHeight, 'min');
 
 			maker.initiated.then(function ()
 			{
@@ -27,6 +27,7 @@
 
 				//WIND
 				var windForce = world.conf.wind;
+				windForce = 1;
 				if (windForce)
 				{
 					var bodiesLength = p2World.bodies.length;
@@ -34,6 +35,9 @@
 					var lastTime;
 					var twoPIs = Math.PI * 2;
 					var windInterval = 4000;
+					var carre = world.getGroupByID('carre');
+					console.log(carre.physicsManager.getY());
+					console.log(world.physicsManager.worldHeight);
 					p2World.on('postStep', function ()
 					{
 						for (var i = 0, length = bodiesLength; i < length; i += 1)

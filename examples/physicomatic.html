@@ -32,9 +32,10 @@
 					maker.remove();
 					maker.removeBasicMouseControls();
 				}
-				maker = window.svjellymaker.createFromString(container, textarea.value);
-				maker.promise.then(function ()
+				maker = window.svjelly.Maker.createFromString(container, textarea.value);
+				maker.initiated.then(function ()
 				{
+					console.log('rrrrrrrrrr');
 					maker.addBasicMouseControls();
 				});
 			});

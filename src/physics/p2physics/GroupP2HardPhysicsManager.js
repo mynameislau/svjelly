@@ -151,6 +151,7 @@ GroupP2HardPhysicsManager.prototype.addNodesToWorld = function ()
 	}
 
 	this.body.collisionResponse = !this.conf.noCollide;
+	console.log('trytfuyfpygvyofvut');
 
 	// if (this.group.ID === 'rearWheel')
 	// {
